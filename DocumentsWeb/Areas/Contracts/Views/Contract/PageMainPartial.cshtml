@@ -1,0 +1,272 @@
+﻿@model DocumentsWeb.Areas.Contracts.Models.DocumentContractModel
+@using DocumentsWeb.Models
+@using DocumentsWeb.Areas.Analitics.Models
+@using BusinessObjects
+
+
+<input type="hidden" id="Name" name="Name" value="@Model.Name" />
+<input type="hidden" id="StateId" name="StateId" value="@Model.StateId" />
+<input type="hidden" id="IsReadOnly" name="IsReadOnly" value="@Model.IsReadOnly" />
+<input type="hidden" id="ModelId" name="ModelId" value="@Model.ModelId" />
+<table class="edit_form_table2">
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>
+            {
+                //s.ControlStyle.CssClass = "label";
+                s.Text = "Дата:";
+                s.AssociatedControlName = "date";
+            }).GetHtml()
+        </td>
+        <td colspan="2">
+            @Html.DevExpress().DateEdit(s =>
+            {
+                s.Name = "date";
+                s.Properties.NullText = "Введите дату...";
+                //s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ClientEnabled = !Model.IsReadOnly;
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.Date).GetHtml()
+        </td>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>
+            {
+                //s.ControlStyle.CssClass = "label";
+                s.Text = "Номер:";
+                s.AssociatedControlName = GlobalPropertyNames.DocNumber;
+                s.Properties.Style.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            }).GetHtml()
+        </td>
+        <td colspan="2">
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = GlobalPropertyNames.DocNumber;
+                s.Properties.NullText = "Введите номер документа...";
+                //s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ClientEnabled = !Model.IsReadOnly;
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.DocNumber).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>
+            {
+                //s.ControlStyle.CssClass = "label";
+                s.Text = "Предприятие:";
+                s.AssociatedControlName = GlobalPropertyNames.MainCompanyDepatmentId;
+            }).GetHtml()
+        </td>
+        <td colspan="5">
+            @Html.DevExpress().ComboBox(s =>
+            {
+                s.Name = GlobalPropertyNames.MainCompanyDepatmentId;
+                s.Properties.ValueField = GlobalPropertyNames.Id;
+                s.Properties.TextField = GlobalPropertyNames.Name;
+                s.Properties.ValueType = typeof(int);
+                s.Properties.NullDisplayText = "Выберите наше предприяте...";
+                //s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ClientEnabled = !Model.IsReadOnly;
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                s.Properties.ClientSideEvents.SelectedIndexChanged = "AgentToId_Changed";
+                s.ReadOnly = Model.IsReadOnly;
+            }).BindList(DocumentModel.GetMyDepatmentsForDocumet(Model.MainCompanyDepatmentId)).Bind(Model.MainCompanyDepatmentId).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>
+            {
+                //s.ControlStyle.CssClass = "label";
+                s.Text = "Контрагент:";
+                s.AssociatedControlName = GlobalPropertyNames.MainClientDepatmentId;
+            }).GetHtml()
+        </td>
+        <td colspan="5">
+            @Html.Partial("AgentFromPartial", Model, new ViewDataDictionary { { GlobalPropertyNames.MainCompanyDepatmentId, Model.MainCompanyDepatmentId } })
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>
+            {
+                //s.ControlStyle.CssClass = "label";
+                s.Text = "Состояние:";
+                s.AssociatedControlName = "StateCurrentId";
+            }).GetHtml()
+        </td>
+        <td colspan="5">
+            @Html.Partial("StateCurrentPartial", Model)
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>
+            {
+                //s.ControlStyle.CssClass = "label";
+                s.Text = "Важность:";
+                s.AssociatedControlName = "ImportanceId";
+            }).GetHtml()
+        </td>
+        <td colspan="5">
+            @Html.DevExpress().ComboBox(s =>
+            {
+                s.Name = "ImportanceId";
+                s.Properties.ValueField = GlobalPropertyNames.Id;
+                s.Properties.TextField = GlobalPropertyNames.Name;
+                s.Properties.ValueType = typeof(int);
+                s.Properties.NullDisplayText = "Выберите важность...";
+                //s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ClientEnabled = !Model.IsReadOnly;
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).BindList(AnaliticModel.GetCollection("CONTRACT_PRIORITY")).Bind(Model.ImportanceId).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>
+            {
+                //s.ControlStyle.CssClass = "label";
+                s.Text = "Тип договора:";
+                s.AssociatedControlName = "ContractKindId";
+            }).GetHtml()
+        </td>
+        <td colspan="5">
+            @Html.DevExpress().ComboBox(s =>
+            {
+                s.Name = "ContractKindId";
+                s.Properties.ValueField = GlobalPropertyNames.Id;
+                s.Properties.TextField = GlobalPropertyNames.Name;
+                s.Properties.ValueType = typeof(int);
+                s.Properties.NullDisplayText = "Выберите тип договора...";
+                //s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ClientEnabled = !Model.IsReadOnly;
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).BindList(AnaliticModel.GetCollection("CONTRACT_KIND")).Bind(Model.ContractKindId).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>
+            {
+                //s.ControlStyle.CssClass = "label";
+                s.Text = "Действует с:";
+                s.AssociatedControlName = "DateStart";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().DateEdit(s =>
+            {
+                s.Name = "DateStart";
+                s.Properties.NullText = "Введите дату...";
+                //s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ClientEnabled = !Model.IsReadOnly;
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.DateStart).GetHtml()
+        </td>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>
+            {
+                //s.ControlStyle.CssClass = "label";
+                s.Text = "по:";
+                s.Properties.Style.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.AssociatedControlName = "DateEnd";
+            }).GetHtml()
+        </td>
+        <td>       
+            @Html.DevExpress().DateEdit(s =>
+            {
+                s.Name = "DateEnd";
+                s.Properties.NullText = "Введите дату...";
+                //s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ClientEnabled = !Model.IsReadOnly;
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.DateEnd).GetHtml()
+        </td>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>
+            {
+                //s.ControlStyle.CssClass = "label";
+                s.Text = "Сумма:";
+                s.Properties.Style.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.AssociatedControlName  = GlobalPropertyNames.DocSumma;
+            }).GetHtml()
+        </td>
+        <td>     
+            @Html.DevExpress().SpinEdit(s =>
+            {
+                s.Name = GlobalPropertyNames.DocSumma;
+                //s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ClientEnabled = !Model.IsReadOnly;
+                s.ShowModelErrors = true;
+                s.Properties.MinValue = 0;
+                s.Properties.DisplayFormatString = "0.00";
+                s.Properties.NumberFormat = SpinEditNumberFormat.Currency;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.DocSumma).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>
+            {
+                //s.ControlStyle.CssClass = "label";
+                s.Text = "Регистратор:";
+                s.AssociatedControlName = "RegistratorId";
+            }).GetHtml()
+        </td>
+        <td colspan="5">
+            @Html.Partial("RegistratorIdPartial", Model, new ViewDataDictionary { { GlobalPropertyNames.MainCompanyDepatmentId, Model.MainCompanyDepatmentId } })
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().Label(s =>
+            {
+                //s.ControlStyle.CssClass = "label";
+                s.Text = "Описание:";
+                s.AssociatedControlName = GlobalPropertyNames.Memo;
+            }).GetHtml()
+        </td>
+        <td colspan="5">
+            @Html.DevExpress().Memo(s =>
+            {
+                s.Name = GlobalPropertyNames.Memo;
+                s.Properties.NullText = "Введите примечание или писание документа...";
+                //s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ClientEnabled = !Model.IsReadOnly;
+                //s.Height = 80;
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.Memo).GetHtml()
+        </td>
+    </tr>
+</table>

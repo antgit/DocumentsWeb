@@ -1,0 +1,150 @@
+﻿@using BusinessObjects
+@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentWeb.Extentions
+@using DocumentsWeb.Models
+@{   
+    //bool haveCreate = WADataProvider.LibrariesElementRightView.IsAllow(Right.UICREATE, WebModuleNames.WEB_SUPPLYER);
+    //bool haveEdit = WADataProvider.LibrariesElementRightView.IsAllow(Right.UIEDIT, WebModuleNames.WEB_SUPPLYER);
+    //bool haveDelete = WADataProvider.LibrariesElementRightView.IsAllow(Right.UITRASH, WebModuleNames.WEB_SUPPLYER);
+    //bool haveView = WADataProvider.LibrariesElementRightView.IsAllow(Right.UIVIEW, WebModuleNames.WEB_SUPPLYER);
+    
+}
+
+@Html.DevExpress().NavBar(
+nbrSettings =>
+{
+    nbrSettings.Name = "nbReports";
+    nbrSettings.AllowExpanding = true;
+    nbrSettings.AllowSelectItem = true;
+    nbrSettings.AutoCollapse = false;
+    nbrSettings.EnableHotTrack = true;
+    nbrSettings.EnableAnimation = true;
+    nbrSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);//System.Web.UI.WebControls.Unit.Pixel(250);
+    nbrSettings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+    nbrSettings.EncodeHtml = false;
+    
+    nbrSettings.Groups.Add(group => {
+        group.Text = "Основные отчеты";
+        group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+        group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+        // TODO: убрать после обновления
+        group.ContentStyle.Font.Underline = true;
+        group.Expanded = true;
+        group.HeaderStyle.Font.Bold = true;
+        MVCxNavBarItem item = null;
+
+        //item = group.Items.Add("Приход и реализация", "mnuReportsInOut", "~/Images/STIREPORT_X16.png");
+        //item.ToolTip = "Отчет \"Приходы и раходы товара в разрезе документов\"";
+
+        //item = group.Items.Add("Реализаци и оплаты", "mnuReportsOutMoneyIn", "~/Images/STIREPORT_X16.png");
+        //item.ToolTip = "Отчет \"Реализация товара и оплаты\"";
+
+        //item = group.Items.Add("Приход и оплаты", "mnuReportsOutMoneyIn", "~/Images/STIREPORT_X16.png");
+        //item.ToolTip = "Отчет \"Приход товара и оплаты поставщику\"";
+
+        //item = group.Items.Add("Остатки", "mnuReportsOutMoneyIn", "~/Images/STIREPORT_X16.png");
+        //item.ToolTip = "Отчет \"Остатки товара\"";
+
+        item = group.Items.Add("Перейти в отчеты...", "mnuReportNavToReportsMain", "~/Images/arrowgreen.png");
+        item.ToolTip = "Перейти в раздел отчетов...";
+        //item.ClientEnabled = haveEdit;
+        item.NavigateUrl = Url.Action("Index", new { area = "Reports", Controller = "Report" });
+        
+        //item = group.Items.Add("Создать", "mnuAdd", "~/Images/new_x16.png");
+        //item.ClientEnabled = haveCreate;
+        //item.NavigateUrl = "javascript:ShowPopupEdit(0);";
+        //item.ToolTip = "Создать нового поставщика";
+
+        //item = group.Items.Add("Создать копию", "mnuAddCopy", "~/Images/copy_x16.png");
+        //item.ClientEnabled = haveCreate;
+        //item.NavigateUrl = "javascript:createCopy('Supplyer');";
+        //item.ToolTip = "Создание копии текущего выделенного в списке поставщика";
+                    
+        //item = group.Items.Add("Изменить", "mnuEdit", "~/Images/editdoc_x16.png");
+        //item.ClientEnabled = haveEdit;
+        //item.NavigateUrl = "javascript:editAgent();";
+        //item.ToolTip = "Изменить данные о текущем поставщике";
+
+        //item = group.Items.Add("Удалить", "mnuDelete", "~/Images/delete_x16.png");
+        //item.ClientEnabled = haveDelete;
+        //item.NavigateUrl = "javascript:deleteAgent('Supplyer');";
+        //item.ToolTip = "Удалить данные о текущем поставщике";
+
+        //item = group.Items.Add("Обновить", "mnuRefresh", "~/Images/refresh_x16.png");
+        //item.ToolTip = "Обновить данные в списке поставщиков. Рекомендуемое действие вместо обновления страницы.";
+        //item.NavigateUrl = "javascript:dxGridViewAgents.PerformCallback('refresh=true');";
+    });
+    nbrSettings.Groups.Add(group =>
+    {
+        group.Text = "Реестры документов";
+        group.Expanded = true;
+        group.HeaderStyle.Font.Bold = true;
+        group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+        group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+        // TODO: убрать после обновления
+        group.ContentStyle.Font.Underline = true;
+        MVCxNavBarItem item = null;
+
+
+        //item = group.Items.Add("Приходные накладные", "mnuReportsIn", "~/Images/STIREPORT_X16.png");
+        //item.ToolTip = "Отчет \"Реестр приходных накладных\"";
+        //item.ClientEnabled = haveEdit;
+        //item.NavigateUrl = "javascript:changeState(1, 'Supplyer');";
+
+        //item = group.Items.Add("Расходные накладные", "mnuReportsOut", "~/Images/STIREPORT_X16.png");
+        //item.ToolTip = "Отчет \"Реестр приходных накладных\"";
+        //item.ClientEnabled = haveEdit;
+        //item.NavigateUrl = "javascript:changeState(2, 'Supplyer');";
+
+        //item = group.Items.Add("Исходящие счета", "mnuReportsAccountOut", "~/Images/STIREPORT_X16.png");
+        //item.ToolTip = "Отчет \"Реестр исходящих счетов\"";
+        //item.ClientEnabled = haveEdit;
+        //item.NavigateUrl = "javascript:changeState(2, 'Supplyer');";
+
+        //item = group.Items.Add("Входящие счета", "mnuReportsAccountIn", "~/Images/STIREPORT_X16.png");
+        //item.ToolTip = "Отчет \"Реестр входящих счетов\"";
+        //item.ClientEnabled = haveEdit;
+        //item.NavigateUrl = "javascript:changeState(2, 'Supplyer');";
+
+        //item = group.Items.Add("Внутреннии перемещения", "mnuReportsMove", "~/Images/STIREPORT_X16.png");
+        //item.ToolTip = "Отчет \"Реестр внутренних перемещений\"";
+        //item.ClientEnabled = haveEdit;
+        //item.NavigateUrl = "javascript:changeState(2, 'Supplyer');";
+
+        item = group.Items.Add("Перейти в отчеты...", "mnuReportNavToReports", "~/Images/arrowgreen.png");
+        item.ToolTip = "Перейти в раздел отчетов...";
+        //item.ClientEnabled = haveEdit;
+        item.NavigateUrl = Url.Action("Index", new {area = "Reports", Controller = "Report"});
+
+    });
+
+    nbrSettings.Groups.Add(group =>
+    {
+        group.Text = "Избранное";
+        group.Expanded = false;
+        group.HeaderStyle.Font.Bold = true;
+        group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+        // TODO: убрать после обновления
+        group.ContentStyle.Font.Underline = true;
+        MVCxNavBarItem item = null;
+
+        //item = group.Items.Add("Установить состояние \"Активен\"", "mnuStateActive", "~/Images/state_active_x16.png");
+        //item.ToolTip = "Установка данного состояния возможная только при текущем состоянии не соответствующего \"Активному\" - например данное действие имеет смысл для требующих корректировки, запрещенных или удаленных поставщиков";
+        //item.ClientEnabled = haveEdit;
+        //item.NavigateUrl = "javascript:changeState(1, 'Supplyer');";
+
+        //item = group.Items.Add("Требовать корректировки", "mnuStateNeedCorrect", "~/Images/state_needcorrect_x16.png");
+        //item.ToolTip = "Установка данного состояния возможная только при текущем состоянии не соответствующего \"Требовующего корректировки\" - например данное действие имеет смысл для ативных складов, чтобы в дальшейшем откорректировать поставщика";
+        //item.ClientEnabled = haveEdit;
+        //item.NavigateUrl = "javascript:changeState(2, 'Supplyer');";
+
+        //item = group.Items.Add("Установить состояние \"Запрещен\"", "mnuStateBan", "~/Images/state_ban_x16.png");
+        //item.ToolTip = "Установка данного состояния возможная только при текущем состоянии не соответствующего \"Запрещеному\" - например данное действие имеет смысл для для блокировки поставщика по каким-либо причинам";
+        //item.ClientEnabled = haveEdit;
+        //item.NavigateUrl = "javascript:changeState(4, 'Supplyer');";
+    });
+
+}).GetHtml()

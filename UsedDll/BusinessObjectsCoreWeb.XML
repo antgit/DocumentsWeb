@@ -1,0 +1,799 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>BusinessObjectsCoreWeb</name>
+    </assembly>
+    <members>
+        <member name="T:BusinessObjects.Web.Core.WebModuleNames">
+            <summary>
+            Константы наименований Web модулей
+            </summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_NAVIGATOR">
+            <summary>Навигатор</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_DOCFINANCE">
+            <summary>Управление финансами</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_DOCFINANCENDS">
+            <summary>Управление финансами с НДС</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_DOCSERVICE">
+            <summary>Услуги</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_DOCSERVICENDS">
+            <summary>Услуги с НДС</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_DOCSALE">
+            <summary>Управление продажами</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_DOCSALENDS">
+            <summary>Управление продажами c НДС</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_DOCTAX">
+            <summary>Налоговые документы</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_DOCPRICE">
+            <summary>Ценовая политика</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_DOCDOGOVOR">
+            <summary>Договора</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_DOCALL">
+            <summary>Все документы</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_MYBIZ">
+            <summary>Мой бизнес</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_DOCMKTG">
+            <summary>Маркетинг</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_AGENTS">
+            <summary>Раздел "Корреспонденты"</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_MYCOMPANY">
+            <summary>Наши фирмы</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_SUPPLYER">
+            <summary>Поставщики</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_CLIENTS">
+            <summary>Покупатели</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_BANKS">
+            <summary>Банки</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_EMPLOERS">
+            <summary>Сотрудники</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_DEPATMENTS">
+            <summary>Отделы</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_STORES">
+            <summary>Склады</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_MODULE_DICTIONARY_COMPETITORS">
+            <summary>Конкуренты</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_PRODUCTS">
+            <summary>Товары</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_SERVICES">
+            <summary>Услуги</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_ASSETS">
+            <summary>Основные средства</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_RAWMATERIALS">
+            <summary>Сырье</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_PRODUCTFINISHED">
+            <summary>Готовая продукция</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_PRODUCTPACK">
+            <summary>Тара</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_MONEY">
+            <summary>Денежные средства</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_PACK">
+            <summary>Вид упаковки</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_PRODUCTTYPE">
+            <summary>Вид продукции</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_PRODUCTGROUP">
+            <summary>Товарная група</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_BREND">
+            <summary>Бренды</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_RETURN">
+            <summary>Причина возврата</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_COMPUTER">
+            <summary>Компьютеры</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_ORGTEX">
+            <summary>Оргтехника</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_DICTIONARIES">
+            <summary>Раздел "Справочники"</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_AGENTCATEGORY">
+            <summary>Категория торговой точки</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_MODULE_DICTIONARY_ANALITICCFO">
+            <summary>Центры финансовой ответственности</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_MODULE_DICTIONARY_ANALITICFINPLANKIND">
+            <summary>Тип финансового планирования</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_MODULE_DICTIONARY_ANALITICFINPLANRESULT">
+            <summary>Результат планирования</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_MODULE_DICTIONARY_ANALITICCONTRACTKIND">
+            <summary>Типы договоров</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_MODULE_DICTIONARY_ANALITICCONTRACTSTATE">
+            <summary>Состояния договоров</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_MODULE_DICTIONARY_ANALITICCONTRACTPRIORITY">
+            <summary>Важность</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_MODULE_DICTIONARY_ANALITICPAYMENTTYPE">
+            <summary>Денежные средства</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_MODULE_DICTIONARY_ANALITICDELIVERY">
+            <summary>Условия поставки</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_METRICAREA">
+            <summary>Метраж торговой точки</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_OUTLETTYPE">
+            <summary>Тип торговой точки</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_OWNERSHIP">
+            <summary>Форма хозяйствования</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_PAYMENTTYPE">
+            <summary>Денежые средства</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_CURRENCY">
+            <summary>Валюты</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_UNIT">
+            <summary>Единицы измерения</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_REASONTRADEPOINT">
+            <summary>Состояние отношений</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_OUTLETLOCATION">
+            <summary>Расположение торговой точки</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_EQUIPMENTPLACEMENT">
+            <summary>Размещение оборудования</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_TIMEPERIODS">
+            <summary>График работ</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_WORKPOST">
+            <summary>Должности</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_USERS">
+            <summary>Пользователи</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_REPORTS">
+            <summary>Отчеты</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_USERHOME">
+            <summary>Личная страница</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_USERMESSAGE">
+            <summary>Сообщения</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_USERSETUP">
+            <summary>Настройка аккаунта</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_ADMINUSERS">
+            <summary>Пользователи</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_EXIT">
+            <summary>Выход</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_ADMINSETUP">
+            <summary>Настройки системы</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_TASKS">
+            <summary>Задачи</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_KNOWLEDGES">
+            <summary>База знаний</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_DEVICES">
+            <summary>Устройства GPS</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_ROUTEMEMBERS">
+            <summary>Участники маршрута</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_ROUTES">
+            <summary>Маршруты</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_MODULE_DICTIONARY_EQUIPMENTS">
+            <summary>Оборудование</summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.WebModuleNames.WEB_MODULE_NEWS">
+            <summary>Новости</summary>
+        </member>
+        <member name="T:BusinessObjects.Web.Core.PeopleWebView">
+            <summary>
+            Представление корреспондентов для Web интерфейса
+            </summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.PeopleWebView.Id">
+            <summary>Идентификатор</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.PeopleWebView.Name">
+            <summary>Наименование</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.PeopleWebView.NameFull">
+            <summary>Печатное наименование</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.PeopleWebView.Code">
+            <summary>Код</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.PeopleWebView.TaxNumber">
+            <summary>Налоговый номер</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.PeopleWebView.Memo">
+            <summary>Примечание</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.PeopleWebView.DisplayMemo">
+            <summary>Примечание до 100 символов</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.PeopleWebView.StateName">
+            <summary>Состояние</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.PeopleWebView.UserName">
+            <summary>Имя пользователя</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.PeopleWebView.Phone">
+            <summary>Телефонный номер</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.PeopleWebView.MyCompanyId">
+            <summary>Идентификатор компании владельца</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.PeopleWebView.MyCompanyName">
+            <summary>Наименование компании владельца</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.PeopleWebView.FirstName">
+            <summary>Фамилия</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.PeopleWebView.LastName">
+            <summary>Имя</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.PeopleWebView.MidleName">
+            <summary>Отчество</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.PeopleWebView.FirstHierarchy">
+            <summary>Первая иерархия</summary>
+        </member>
+        <member name="T:BusinessObjects.Web.Core.AgentWebView">
+            <summary>
+            Представление корреспондентов для Web интерфейса
+            </summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.AgentWebView.RegNumber">
+            <summary>Номер свидетельства о регистрации</summary>
+        </member>
+        <member name="M:BusinessObjects.Web.Core.AgentWebView.Load(System.Data.SqlClient.SqlDataReader)">
+            <summary>Загрузка данных из объекта чтения данных</summary>
+            <param name="reader">Объект чтения данных</param>
+        </member>
+        <member name="M:BusinessObjects.Web.Core.AgentWebView.GetView(BusinessObjects.Hierarchy,System.Boolean,System.Boolean)">
+            <summary>
+            Получить представление
+            </summary>
+            <param name="h">Иерархия</param>
+            <param name="nested">С учетом вложенных</param>
+            <param name="refresh">Выполнять обновление данных с сервера базы данных </param>
+            <returns></returns>
+        </member>
+        <member name="M:BusinessObjects.Web.Core.AgentWebView.GetView(BusinessObjects.Agent)">
+            <summary>
+            Представление для одного объекта
+            </summary>
+            <param name="value">Корреспондент</param>
+            <returns></returns>
+        </member>
+        <member name="M:BusinessObjects.Web.Core.AgentWebView.op_Implicit(BusinessObjects.Web.Core.AgentWebView)~BusinessObjects.Agent">
+            <summary>
+            Преобразование представления в объект
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BusinessObjects.Web.Core.AgentWebView.op_Implicit(BusinessObjects.Agent)~BusinessObjects.Web.Core.AgentWebView">
+            <summary>
+            Преобразование объекта в представление
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentWebView.Id">
+            <summary>Идентификатор</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentWebView.KindId">
+            <summary>Тип</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentWebView.StateId">
+            <summary>Ид состояния</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentWebView.FlagsValue">
+            <summary>Флаг</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentWebView.Name">
+            <summary>Наименование</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentWebView.NameFull">
+            <summary>Печатное наименование</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentWebView.Code">
+            <summary>Код</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentWebView.TaxNumber">
+            <summary>Налоговый номер</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentWebView.Okpo">
+            <summary>Окпо</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentWebView.Memo">
+            <summary>Примечание</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentWebView.DisplayMemo">
+            <summary>Примечание до 100 символов</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentWebView.StateName">
+            <summary>Состояние</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentWebView.OwnerShip">
+            <summary>Форма собственности (сокращение)</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentWebView.OwnerShipId">
+            <summary>Идентификатор формы собственности</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentWebView.UserName">
+            <summary>Имя пользователя</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentWebView.Phone">
+            <summary>Телефонный номер</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentWebView.NdsPayer">
+            <summary>Плательщик НДС</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentWebView.MyCompanyId">
+            <summary>Наименование компании владельца</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentWebView.MyCompanyName">
+            <summary>Идентификатор компании владельца</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentWebView.CategoryId">
+            <summary>Идентификатор аналитики категория торговой точки</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentWebView.CategoryName">
+            <summary>Наименование аналитики категория торговой точки</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentWebView.MetricAreaId">
+            <summary>Идентификатор метража</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentWebView.MetricAreaName">
+            <summary>Наименование метража</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentWebView.OwnershipCode">
+            <summary>Код формы собственности</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentWebView.TypeOutletId">
+            <summary>Идентификатор аналитики тип торговой точки</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentWebView.TypeOutletCode">
+            <summary>Код аналитики тип торговой точки</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentWebView.TypeOutletName">
+            <summary>Наименование аналитики тип торговой точки</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentWebView.FirstName">
+            <summary>Фамилия</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentWebView.LastName">
+            <summary>Имя</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentWebView.MidleName">
+            <summary>Отчество</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentWebView.FirstHierarchy">
+            <summary>Первая иерархия</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentWebView.FirstHierarchyId">
+            <summary>Id первой иерархии</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentWebView.Workarea">
+            <summary>Рабочая область</summary>
+        </member>
+        <member name="T:BusinessObjects.Web.Core.AgentBankWebView">
+            <summary>
+            Представление банков для Web интерфейса
+            </summary>
+        </member>
+        <member name="F:BusinessObjects.Web.Core.AgentBankWebView.RegNumber">
+            <summary>Номер свидетельства о регистрации</summary>
+        </member>
+        <member name="M:BusinessObjects.Web.Core.AgentBankWebView.Load(System.Data.SqlClient.SqlDataReader)">
+            <summary>Загрузка данных из объекта чтения данных</summary>
+            <param name="reader">Объект чтения данных</param>
+        </member>
+        <member name="M:BusinessObjects.Web.Core.AgentBankWebView.GetView(BusinessObjects.Hierarchy,System.Boolean)">
+            <summary>
+            Получить представление
+            </summary>
+            <param name="h">Иерархия</param>
+            <param name="nested">С учетом вложенных</param>
+            <returns></returns>
+        </member>
+        <member name="M:BusinessObjects.Web.Core.AgentBankWebView.GetView(BusinessObjects.Agent)">
+            <summary>
+            Представление для одного объекта
+            </summary>
+            <param name="value">Корреспондент</param>
+            <returns></returns>
+        </member>
+        <member name="M:BusinessObjects.Web.Core.AgentBankWebView.op_Implicit(BusinessObjects.Web.Core.AgentBankWebView)~BusinessObjects.Agent">
+            <summary>
+            Преобразование представления в объект
+            </summary>
+            <param name="value">Представление</param>
+            <returns></returns>
+        </member>
+        <member name="M:BusinessObjects.Web.Core.AgentBankWebView.op_Implicit(BusinessObjects.Agent)~BusinessObjects.Web.Core.AgentBankWebView">
+            <summary>
+            Преобразование объекта в представление
+            </summary>
+            <param name="value">Корреспондент</param>
+            <returns></returns>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentBankWebView.Id">
+            <summary>Идентификатор</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentBankWebView.KindId">
+            <summary>Тип</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentBankWebView.StateId">
+            <summary>Ид состояния</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentBankWebView.FlagsValue">
+            <summary>Флаг</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentBankWebView.Name">
+            <summary>Наименование</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentBankWebView.NameFull">
+            <summary>Печатное наименование</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentBankWebView.Code">
+            <summary>Код</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentBankWebView.TaxNumber">
+            <summary>Налоговый номер</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentBankWebView.Okpo">
+            <summary>Окпо</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentBankWebView.Memo">
+            <summary>Примечание</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentBankWebView.DisplayMemo">
+            <summary>Примечание до 100 символов</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentBankWebView.StateName">
+            <summary>Состояние</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentBankWebView.OwnerShip">
+            <summary>Форма собственности (сокращение)</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentBankWebView.OwnerShipId">
+            <summary>Идентификатор формы собственности</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentBankWebView.UserName">
+            <summary>Имя пользователя</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentBankWebView.Phone">
+            <summary>Телефонный номер</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentBankWebView.NdsPayer">
+            <summary>Плательщик НДС</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentBankWebView.MyCompanyId">
+            <summary>Наименование компании владельца</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentBankWebView.MyCompanyName">
+            <summary>Идентификатор компании владельца</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentBankWebView.CategoryId">
+            <summary>Идентификатор аналитики категория торговой точки</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentBankWebView.CategoryName">
+            <summary>Наименование аналитики категория торговой точки</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentBankWebView.MetricAreaId">
+            <summary>Идентификатор метража</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentBankWebView.MetricAreaName">
+            <summary>Наименование метража</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentBankWebView.OwnershipCode">
+            <summary>Код формы собственности</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentBankWebView.TypeOutletId">
+            <summary>Идентификатор аналитики тип торговой точки</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentBankWebView.TypeOutletCode">
+            <summary>Код аналитики тип торговой точки</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentBankWebView.TypeOutletName">
+            <summary>Наименование аналитики тип торговой точки</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentBankWebView.FirstName">
+            <summary>Фамилия</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentBankWebView.LastName">
+            <summary>Имя</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentBankWebView.MidleName">
+            <summary>Отчество</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentBankWebView.FirstHierarchy">
+            <summary>Первая иерархия</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentBankWebView.FirstHierarchyId">
+            <summary>Id первой иерархии</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.AgentBankWebView.Workarea">
+            <summary>Рабочая область</summary>
+        </member>
+        <member name="T:BusinessObjects.Web.Core.MailClient">
+            <summary>
+            Почтовый клиент
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Web.Core.MailClient.SendWelcomeForNewCompany(BusinessObjects.Workarea,System.String,System.String,System.String,System.String)">
+            <summary>
+            Сообщение приветствия
+            </summary>
+            <remarks>Используются макро подстаеновки {USER_NAME}, {USER_PASSWORD}, {USER_LOGIN}</remarks>
+            <param name="wa">Рабочая область</param>
+            <param name="email">Адрес получателя</param>
+            <param name="userName">Имя пользователя</param>
+            <param name="userPassword">Пароль пользователя</param>
+            <param name="userLogin">Логин пользователя</param>
+            <returns></returns>
+        </member>
+        <member name="M:BusinessObjects.Web.Core.MailClient.SendTemplateMessage(BusinessObjects.Workarea,System.String,System.String,System.String)">
+            <summary>
+            Сообщение на основе текстового шаблона
+            </summary>
+            <param name="wa">Рабочая область</param>
+            <param name="email">Адрес получателя</param>
+            <param name="userName">Имя пользователя</param>
+            <param name="template">Шаблон</param>
+            <returns></returns>
+        </member>
+        <member name="M:BusinessObjects.Web.Core.MailClient.SendPassword(BusinessObjects.Workarea,BusinessObjects.Security.Uid)">
+            <summary>
+             Сообщение о восстановлении пароля
+            </summary>
+            <param name="wa">Рабочая область</param>
+            <param name="uid">Пользователь, которому восстанавливается пароль</param>
+            <returns></returns>
+        </member>
+        <member name="T:BusinessObjects.Web.Core.ReportInfoData">
+            <summary>
+            Данные для стринцы управления предприятием 
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Web.Core.ReportInfoData.Load(System.Data.SqlClient.SqlDataReader)">
+            <summary>
+            Загузка из базы даных
+            </summary>
+            <param name="reader"></param>
+        </member>
+        <member name="M:BusinessObjects.Web.Core.ReportInfoData.#cctor">
+            <summary>
+            Конструктор
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Web.Core.ReportInfoData.GetView(BusinessObjects.Workarea,System.Int32)">
+            <summary>
+            Данные о предприятии
+            </summary>
+            <param name="id">Ид корреспондента</param>
+            <param name="wa">Рабочая область</param>
+            <returns></returns>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.ReportInfoData.Code">
+            <summary>
+            Код
+            </summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.ReportInfoData.Name">
+            <summary>
+            Наименование
+            </summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.ReportInfoData.Value">
+            <summary>
+            Значение
+            </summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.ReportInfoData.NavigateUrl">
+            <summary>
+            Строка навигации для детализации
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Web.Core.BusinessObjectMembershipProvider.GetUser">
+            <summary>
+            Текущий пользователь
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BusinessObjects.Web.Core.BusinessObjectMembershipProvider.GetUser(System.Object,System.Boolean)">
+            <summary>
+            Пользователь по ключу
+            </summary>
+            <param name="providerUserKey">Идентификатор пользователя</param>
+            <param name="userIsOnline">Обновить данные о последней активности</param>
+            <returns></returns>
+        </member>
+        <member name="T:BusinessObjects.Web.Core.PeopleWebSearchView">
+            <summary>
+            Представление корреспондентов для поиска в Web интерфейса
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Web.Core.PeopleWebSearchView.GetView(BusinessObjects.Hierarchy,System.Boolean,System.Int32,System.Boolean)">
+            <summary>
+            список сотрудников в группе 
+            </summary>
+            <param name="h">Иерархия в которой необходимо производить поиск, обязательный параметр, не должен быть равен null</param>
+            <param name="nested">Искать во всех вложенных иерархиях</param>
+            <param name="myCompanyId">Идентификатор компании которой принадлежит сотрудник</param>
+            <param name="onlyUsers">Искать только сотрудников ассоциированных с пользователями системы</param>
+            <returns></returns>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.PeopleWebSearchView.Id">
+            <summary>Идентификатор корреспондента</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.PeopleWebSearchView.FlagsValue">
+            <summary>Текущий набор флагов</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.PeopleWebSearchView.Name">
+            <summary>Наименование</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.PeopleWebSearchView.TaxNumber">
+            <summary>Налоговый номер</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.PeopleWebSearchView.DisplayMemo">
+            <summary>Примечание до 100 символов</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.PeopleWebSearchView.Phone">
+            <summary>Телефонный номер</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.PeopleWebSearchView.MyCompanyId">
+            <summary>Идентификатор компании владельца</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.PeopleWebSearchView.MyCompanyName">
+            <summary>Наименование компании владельца</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.PeopleWebSearchView.FirstName">
+            <summary>Фамилия</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.PeopleWebSearchView.LastName">
+            <summary>Имя</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.PeopleWebSearchView.MidleName">
+            <summary>Отчество</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.PeopleWebSearchView.FirstHierarchy">
+            <summary>Первая иерархия</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.PeopleWebSearchView.FirstHierarchyId">
+            <summary>Идентификатор иерархии</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.PeopleWebSearchView.DepatmentId">
+            <summary>Идентификатор отдела</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.PeopleWebSearchView.DepatmentName">
+            <summary>Отдел</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.PeopleWebSearchView.UidId">
+            <summary>Идентификатор пользователя</summary>
+        </member>
+        <member name="P:BusinessObjects.Web.Core.PeopleWebSearchView.UidName">
+            <summary>Имя пользователя</summary>
+        </member>
+        <member name="M:BusinessObjects.Web.Core.UserRepository.RefreshUser(System.String)">
+            <summary>
+            Обновить данные о пользователе
+            </summary>
+            <param name="username"></param>
+            <returns></returns>
+        </member>
+        <member name="T:BusinessObjects.Web.Core.MktgDocumentsWebView">
+            <summary>
+            Представление списка документов маркетинга для Web интерфейса
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Web.Core.MktgDocumentsWebView.GetView(BusinessObjects.Workarea,System.Int32,System.String,System.String,System.DateTime,System.DateTime,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="wa"></param>
+            <param name="kindId"></param>
+            <param name="folderCodeFind"></param>
+            <param name="userName"></param>
+            <param name="ds">Начало пероида</param>
+            <param name="de">Конец периода</param>
+            <param name="count">Число возвращаемых записей</param>
+            <param name="stateId">Ид состояния</param>
+            <param name="refresh">Обновить данные из БД</param>
+            <returns></returns>
+        </member>
+        <member name="T:BusinessObjects.Web.Core.ContractDocumentsWebView">
+            <summary>
+            Представление списка документов договоров для Web интерфейса
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Web.Core.ContractDocumentsWebView.GetView(BusinessObjects.Workarea,System.Int32,System.String,System.String,System.DateTime,System.DateTime,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="wa"></param>
+            <param name="kindId"></param>
+            <param name="folderCodeFind"></param>
+            <param name="userName"></param>
+            <param name="ds">Начало пероида</param>
+            <param name="de">Конец периода</param>
+            <param name="count">Число возвращаемых записей</param>
+            <param name="stateId">Ид состояния</param>
+            <param name="refresh">Обновить данные из БД</param>
+            <returns></returns>
+        </member>
+        <member name="T:BusinessObjects.Web.Core.ServiceDocumentsWebView">
+            <summary>
+            Представление списка документов услуг для Web интерфейса
+            </summary>
+        </member>
+        <member name="T:BusinessObjects.Web.Core.SalesDocumentsWebView">
+            <summary>
+            Представление списка документов продаж для Web интерфейса
+            </summary>
+        </member>
+        <member name="T:BusinessObjects.Web.Core.PricesDocumentsWebView">
+            <summary>
+            Представление списка документов цен для Web интерфейса
+            </summary>
+        </member>
+        <member name="T:BusinessObjects.Web.Core.FinancesDocumentsWebView">
+            <summary>
+            Представление списка документов финансов для Web интерфейса
+            </summary>
+        </member>
+        <member name="T:BusinessObjects.Web.Core.TaxesDocumentsWebView">
+            <summary>
+            Представление списка налоговых документов для Web интерфейса
+            </summary>
+        </member>
+        <member name="T:BusinessObjects.Web.Core.DocumentsWebView">
+            <summary>
+            Представление списка документов для Web интерфейса
+            </summary>
+        </member>
+    </members>
+</doc>

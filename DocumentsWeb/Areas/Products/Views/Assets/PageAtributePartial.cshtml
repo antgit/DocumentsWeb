@@ -1,0 +1,186 @@
+﻿@using BusinessObjects
+@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentsWeb.Models
+@using DocumentsWeb.Areas.Products.Models
+@using DocumentsWeb.Areas.Analitics.Models
+@using DocumentsWeb.Controllers
+@using DocumentsWeb.Areas.General.Models
+@model ProductModel
+@{
+    bool haveEdit = !Model.IsReadOnly && WADataProvider.LibrariesElementRightView.IsAllow(Right.UIEDIT, WebModuleNames.WEB_ASSETS) && !WADataProvider.CommonRightView.ReadOnly;
+}
+        <table style="width:600px;">
+        
+                <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Код:";
+            s.AssociatedControlName = GlobalPropertyNames.Code;
+            s.ToolTip = ProductData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Code);
+        }).GetHtml()
+        </td><td>
+        @Html.DevExpress().TextBox(s =>
+        {
+            s.Name = GlobalPropertyNames.Code;
+            s.ReadOnly = !haveEdit;
+            if (!s.ReadOnly)
+            {
+                s.Properties.NullText = "Введите код товара...";
+                s.ToolTip = ProductData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Code);
+            }
+            s.ControlStyle.CssClass = "editor";
+            s.ShowModelErrors = true;
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.Code).GetHtml()
+        </td></tr>
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Вид продукции:";
+            s.AssociatedControlName = GlobalPropertyNames.ProductTypeId;
+        }).GetHtml()
+        </td><td>
+        @Html.Partial("ProductTypePartial", Model)
+        </td></tr>
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Упаковка:";
+            s.AssociatedControlName = "PakcTypeNameId";
+        }).GetHtml()
+        </td><td>
+        @Html.Partial("PakcTypeNamePartial", Model)
+        </td></tr>
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Бренд:";
+            s.AssociatedControlName = GlobalPropertyNames.BrandId;
+        }).GetHtml()
+        </td><td>
+        @Html.Partial("BrandPartial", Model)
+        </td></tr>
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Товарная группа:";
+            s.AssociatedControlName = GlobalPropertyNames.TradeMarkId;
+        }).GetHtml()
+        </td><td>
+        @Html.Partial("TradeMarkPartial", Model)
+        </td></tr>
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Вес:";
+            s.AssociatedControlName = GlobalPropertyNames.Weight;
+        }).GetHtml()
+        </td><td>
+        @Html.DevExpress().SpinEdit(s =>
+        {
+            s.Name = GlobalPropertyNames.Weight;
+            s.ReadOnly = !haveEdit;
+            s.ControlStyle.CssClass = "editor";
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.Style.Add("float", "left");
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            s.Properties.DisplayFormatString = "0.00";
+            s.Properties.MaxValue = 10000;
+            s.Properties.MinValue = 0;
+        }).Bind(Model.Weight).GetHtml()
+        </td></tr>
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Размер:";
+            s.AssociatedControlName  = GlobalPropertyNames.Width;
+        }).GetHtml()
+        </td><td>
+
+        <table cellspacing="0" cellpadding="0" style="width: 100%;">
+        <tr><td>
+        @Html.DevExpress().SpinEdit(s =>
+        {
+            s.Name  = GlobalPropertyNames.Width;
+            s.ReadOnly = !haveEdit;
+            s.ControlStyle.CssClass = "editor";
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.Style.Add("float", "left");
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            s.Properties.DisplayFormatString = "0.00";
+            s.Properties.MaxValue = 10000;
+            s.Properties.MinValue = 0;
+        }).Bind(Model.Width).GetHtml()
+        </td><td style="padding-left: 3px;">
+        @Html.DevExpress().SpinEdit(s =>
+        {
+            s.Name  = GlobalPropertyNames.Height;
+            s.ReadOnly = !haveEdit;
+            s.ControlStyle.CssClass = "editor";
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.Style.Add("float", "left");
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            s.Properties.DisplayFormatString = "0.00";
+            s.Properties.MaxValue = 10000;
+            s.Properties.MinValue = 0;
+        }).Bind(Model.Height).GetHtml()
+        </td><td style="padding-left: 3px;">
+        @Html.DevExpress().SpinEdit(s =>
+        {
+            s.Name  = GlobalPropertyNames.Depth;
+            s.ReadOnly = !haveEdit;
+            s.ControlStyle.CssClass = "editor";
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.Style.Add("float", "left");
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            s.Properties.DisplayFormatString = "0.00";
+            s.Properties.MaxValue = 10000;
+            s.Properties.MinValue = 0;
+        }).Bind(Model.Depth).GetHtml()
+        </td></tr></table>
+
+        </td></tr>
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Типоразмер:";
+            s.AssociatedControlName = GlobalPropertyNames.Size;
+        }).GetHtml()
+        </td><td>
+        @Html.DevExpress().TextBox(s =>
+        {
+            s.Name  = GlobalPropertyNames.Size;
+            s.ReadOnly = !haveEdit;
+            if (!s.ReadOnly)
+            {
+                s.Properties.NullText = "Введите типоразмер...";
+            }
+            s.ControlStyle.CssClass = "editor";
+            s.ShowModelErrors = true;
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.Size).GetHtml()
+        </table>

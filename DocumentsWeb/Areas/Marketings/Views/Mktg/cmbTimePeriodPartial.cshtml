@@ -1,0 +1,43 @@
+﻿@using BusinessObjects
+@using DocumentsWeb.Areas.General.Models;
+
+@{
+    int? TimePeriodId = null;
+    bool IsReadOnly = false;
+    try
+    {
+        TimePeriodId = int.Parse(ViewData["TimePeriodId"].ToString());
+        IsReadOnly = bool.Parse(ViewData["ModelReadOnly"].ToString());
+    }
+    catch{}
+}
+           
+@Html.DevExpress().ComboBox(s =>
+{
+    s.ControlStyle.CssClass = "editor";
+    s.CallbackRouteValues = new { Area = "Marketings", Controller = "Mktg", Action = "cmbTimePeriodPartial" };
+    s.Properties.EnableCallbackMode = true;
+    s.Properties.CallbackPageSize = 20;
+    
+    s.Name = "TimePeriodId";
+    s.Properties.ValueField = GlobalPropertyNames.Id;
+    s.Properties.TextField = GlobalPropertyNames.Name;
+    s.Properties.ValueType = typeof(int);
+    if (!IsReadOnly)
+    {
+        EditButton btnAdd = s.Properties.Buttons.Add();
+        btnAdd.Image.Url = "~/Images/add10x10.png";
+        EditButton btnView = s.Properties.Buttons.Add();
+        btnView.Image.Url = "~/Images/edit10x10.png";
+    }
+    //s.Properties.NullDisplayText = "Выберите график работы...";
+    s.Width = 247;
+    s.ShowModelErrors = true;
+    s.ReadOnly = IsReadOnly;
+    s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    s.Properties.ClientSideEvents.ButtonClick = "TimePeriodId_ButtonClick";
+    s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+    s.Properties.ClientSideEvents.GotFocus = "OnEditorGotFocus";
+    s.Properties.ClientSideEvents.LostFocus = "OnEditorLostFocus";
+}).BindList(TimePeriodModel.GetTimePeriodRange, TimePeriodModel.GetTimePeriodByID).Bind(TimePeriodId).GetHtml()

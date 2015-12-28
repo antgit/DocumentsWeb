@@ -1,0 +1,10 @@
+﻿<table style="width: 100%;">
+    <tr>
+        <td>
+            @Html.DevExpress().RoundPanel(settings=>{
+                settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                settings.HeaderText = "Действия";
+            }).GetHtml()
+        </td>
+    </tr>
+</table>

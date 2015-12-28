@@ -1,0 +1,344 @@
+﻿@model DocumentsWeb.Areas.Contracts.Models.DocumentContractModel
+
+@Html.ValidationSummary(false)          
+@using (Html.BeginForm("Edit", "AccountingComputers", FormMethod.Post, new { @class = "edit_form", @id = "documentEditForm" }))
+{
+    @Html.DevExpress().NavBar(nbSettings =>
+    {
+        nbSettings.Name = "nbDocContracts";
+        nbSettings.AllowExpanding = true;
+        nbSettings.AllowSelectItem = true;
+        nbSettings.AutoCollapse = false;
+        nbSettings.EnableHotTrack = true;
+        nbSettings.EnableAnimation = true;
+        nbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        nbSettings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+        nbSettings.EncodeHtml = false;
+
+        if (!ViewContext.ViewData.ModelState.IsValid)
+        {
+            nbSettings.Groups.Add(group =>
+            {
+                group.Text = "Ошибки!";
+                group.HeaderStyle.Font.Bold = true;
+                group.HeaderImage.Url = Url.Content("~/Images/ERROR_X16.png");
+
+                group.SetContentTemplateContent(c => ViewContext.Writer.Write(@Html.ValidationSummary(false).ToHtmlString()));
+            });
+        }
+    
+        nbSettings.Groups.Add(group => {
+            group.Text = Model.Name;
+            group.HeaderStyle.Font.Bold = true;
+        
+            group.Expanded = true;
+            group.HeaderStyle.HoverStyle.Font.Underline = true;
+            group.HeaderImage.Url = Url.Content("~/Images/DOCUMENTDONE_X16.png");
+        
+            group.SetContentTemplateContent(c =>
+            {
+                @Html.DevExpress().PageControl(settings =>
+                {
+                    settings.Name = "tsEditDocument";
+                    settings.ClientSideEvents.Init = "OnEditDocumentInit";
+                    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    //settings.Height = 400;
+                    settings.TabPages.Add("Главная").SetContent(() =>
+                    {
+                        Html.RenderPartial("PageMainPartial", Model);
+                    });
+
+                    settings.TabPages.Add("Ответственные").SetContent(() =>
+                    {
+                        Html.RenderPartial("SignaturesPartial", Model);
+                    });
+
+                    settings.TabPages.Add("Файлы").SetContent(() =>
+                    {
+                        ViewContext.Writer.Write("<table border=\"0\"><tr><td>");
+                        Html.DevExpress().UploadControl(ss =>
+                        {
+                            /* Ряполов Ю.А. Добавил 29.12.2011 9:59 */
+                            ss.Name = "ucMultiSelection";
+                            ss.CallbackRouteValues = new { Controller = "Contract", Action = "MultiSelectionImageUpload", ownewrModelId = Model.ModelId };
+                            //settings.ControlStyle.CssClass = "editorArea";
+
+                            ss.Width = System.Web.UI.WebControls.Unit.Pixel(380);
+                            ss.AdvancedModeSettings.EnableMultiSelect = true;
+
+                            ss.ValidationSettings.Assign(DocumentsWeb.Areas.Contracts.Controllers.ContractController.ValidationSettings);
+
+                            ss.ClientSideEvents.FileUploadStart = "function(s,e) { /*ClearFileContainer();*/ Uploader_OnFileUploadStart(); }";
+                            //settings.ClientSideEvents.FileUploadComplete = "function(s,e) { if(e.callbackData != '') AddFileToContainer(e.callbackData); }";
+                            ss.ClientSideEvents.FilesUploadComplete = "function(s,e) { Uploader_OnFilesUploadComplete(e);  gvFiles.PerformCallback(); }";
+                            ss.ClientSideEvents.UploadingProgressChanged = "function(s, e) { Uploader_ProgressChanged(e); }";
+                            ss.ClientSideEvents.TextChanged = "function(s, e) { UpdateUploadButton(); }";
+                            /* ------------------------------------ */
+                        }).Render();
+                        ViewContext.Writer.Write("</td><td>");
+                        Html.DevExpress().Button(ss =>
+                        {
+                            ss.Name = "btnUpload";
+                            ss.Text = "Загрузить";
+                            ss.Style.Add("padding", "5px");
+                            ss.Height = 15;
+                            ss.ClientEnabled = false;
+                            ss.ClientSideEvents.Click = "function(s,e) { ucMultiSelection.Upload(); }";
+                        }).Render();
+                        ViewContext.Writer.Write("</td></tr></table>");
+                        Html.RenderPartial("FileGridPartial");
+                    });
+
+                    settings.TabPages.Add("Примечания").SetContent(() =>
+                    {
+                        Html.RenderAction("NotesGrid", new { Area = "General", Controller = "Note", modelId = Model.ModelId });
+                    });
+
+                    settings.TabPages.Add("Свойства").SetContent(() =>
+                    {
+                        Html.RenderPartial("PagePropertiesPartial", Model);
+                    });
+                }).Render();
+            });
+        });
+
+        nbSettings.Groups.Add(group => {
+            group.Text = "Детализация - компьютеры...";
+            group.Expanded = true;
+            group.HeaderStyle.Font.Bold = true;
+            group.HeaderStyle.HoverStyle.Font.Underline = true;
+            group.HeaderImage.Url = Url.Content("~/Images/PRODUCT_X16.png");
+            group.SetContentTemplateContent(c =>
+            {
+                ViewContext.Writer.Write("<table id=\"tableDetalsProduct\" style=\"width:98%\"><tr><td>");
+                @Html.RenderPartial("DetailsGridPartial");
+                ViewContext.Writer.Write("</td></tr></table>");
+                ViewContext.Writer.Write("<div style=\"width: 100%; height: 50px;\"></div>");
+            });
+        });
+    }).GetHtml()
+}
+
+@*
+@using (Html.BeginForm("MultiFileSelection", "Contract", FormMethod.Post, new { @class = "edit_form" }))
+{
+    <table border="0">
+    <tr>
+    <td>
+    @Html.DevExpress().UploadControl(
+        settings =>
+        {
+            /* Ряполов Ю.А. Добавил 29.12.2011 9:59 */
+            settings.Name = "ucMultiSelection";
+            settings.CallbackRouteValues = new { Controller = "Contract", Action = "MultiSelectionImageUpload", ownewrModelId = Model.ModelId };
+            //settings.ControlStyle.CssClass = "editorArea";
+
+            settings.Width = System.Web.UI.WebControls.Unit.Pixel(380);
+            settings.AdvancedModeSettings.EnableMultiSelect = true;
+
+            settings.ValidationSettings.Assign(DocumentsWeb.Areas.Contracts.Controllers.ContractController.ValidationSettings);
+
+            settings.ClientSideEvents.FileUploadStart = "function(s,e) { /*ClearFileContainer();*/ Uploader_OnFileUploadStart(); }";
+            //settings.ClientSideEvents.FileUploadComplete = "function(s,e) { if(e.callbackData != '') AddFileToContainer(e.callbackData); }";
+            settings.ClientSideEvents.FilesUploadComplete = "function(s,e) { Uploader_OnFilesUploadComplete(e);  gvFiles.PerformCallback(); }";
+            settings.ClientSideEvents.UploadingProgressChanged = "function(s, e) { Uploader_ProgressChanged(e); }";
+            settings.ClientSideEvents.TextChanged = "function(s, e) { UpdateUploadButton(); }";
+            /* ------------------------------------ */
+
+        }).GetHtml()
+        </td>
+        <td>
+    @Html.DevExpress().Button(
+        settings =>
+        {
+            settings.Name = "btnUpload";
+            settings.Text = "Загрузить";
+            settings.Style.Add("padding", "5px");
+            settings.Height = 15;
+            settings.ClientEnabled = false;
+            settings.ClientSideEvents.Click = "function(s,e) { ucMultiSelection.Upload(); }";
+        }).GetHtml()
+        </td>
+        </tr>
+        </table>
+}
+@Html.Partial("FileGridPartial")*@
+
+<!-- Ряполов Ю.А. Добавил 29.12.2011 9:45 -->
+<script type="text/javascript">
+    // <![CDATA[
+    var fileNumber = 0;
+    var fileName = "";
+    var startDate = null;
+
+    function Uploader_OnFileUploadStart() {
+        startDate = new Date();
+        ClearProgressInfo();
+        pcProgress.Show();
+    }
+    function Uploader_OnFilesUploadComplete(e) {
+        pcProgress.Hide();
+        UpdateUploadButton();
+    }
+    function UpdateUploadButton() {
+        btnUpload.SetEnabled(ucMultiSelection.GetText(0) != "");
+    }
+    function SetCurrentFileUploadingProgress(fileName, uploadedLength, fileLength) {
+        $("#lblFileName").text("Текущий файл: " + fileName).attr("title", fileName);
+        $("#lblCurrentUploadedFileLength").text(GetContentLengthString(uploadedLength) + " / " + GetContentLengthString(fileLength));
+    }
+    function SetTotalUploadingProgress(number, count, uploadedLength, totalLength) {
+        $("#lblUploadedFiles").text("Всего: " + number + ' из ' + count + " файл(ы)");
+        $("#lblUploadedFileLength").text(GetContentLengthString(uploadedLength) + " / " + GetContentLengthString(totalLength));
+    }
+    function Uploader_ProgressChanged(args) {
+        if (!pcProgress.IsVisible())
+            return;
+
+        if (args.currentFileName != fileName) {
+            fileName = args.currentFileName;
+            fileNumber++;
+        }
+
+        SetCurrentFileUploadingProgress(args.currentFileName, args.currentFileUploadedContentLength, args.currentFileContentLength);
+        progress1.SetPosition(args.currentFileProgress);
+
+        SetTotalUploadingProgress(fileNumber, args.fileCount, args.uploadedContentLength, args.totalContentLength);
+        progress2.SetPosition(args.progress);
+
+        UpdateProgressStatus(args.uploadedContentLength, args.totalContentLength);
+    }
+    function ClearProgressInfo() {
+        SetCurrentFileUploadingProgress("", 0, 0);
+        progress1.SetPosition(0);
+
+        SetTotalUploadingProgress(0, 0, 0, 0);
+        progress2.SetPosition(0);
+
+        $("#lblProgressStatus").html("Затрачено: 00:00:00 &ensp; Необходимо: 00:00:00 &ensp; Скорость: " + GetContentLengthString(0) + "/s");
+
+        fileNumber = 0;
+        fileName = "";
+    }
+    function UpdateProgressStatus(uploadedLength, totalLength) {
+        var currentDate = new Date();
+        var timeDiff = new Date(currentDate - startDate);
+        var speed = uploadedLength / (timeDiff.valueOf() / 1000);
+
+        var elapsedDate = timeDiff;
+        elapsedDate.setHours(elapsedDate.getHours() + elapsedDate.getTimezoneOffset() / 60);
+        var elapsedTime = GetTimeString(elapsedDate);
+
+        var estimatedMilliseconds = Math.floor((totalLength - uploadedLength) / speed) * 1000;
+        var estimatedDate = new Date(estimatedMilliseconds);
+        estimatedDate.setHours(estimatedDate.getHours() + estimatedDate.getTimezoneOffset() / 60);
+        var estimatedTime = GetTimeString(estimatedDate);
+
+        $("#lblProgressStatus").html("Затрачено: " + elapsedTime + " &ensp; Необходимо: " + estimatedTime + " &ensp; Скорость: " + GetContentLengthString(speed) + "/сек");
+    }
+    function GetContentLengthString(contentLength) {
+        var sizeDimensions = ['байт', 'КБ', 'МБ', 'ГБ', 'ТБ'];
+        var index = 0;
+
+        var length = contentLength;
+        var postfix = sizeDimensions[index];
+
+        while (length > 1024) {
+            length = length / 1024;
+            postfix = sizeDimensions[++index];
+        }
+
+        var numberRegExpPattern = /[-+]?[0-9]*(?:\.|\,)[0-9]{0,2}|[0-9]{0,2}/;
+        var results = numberRegExpPattern.exec(length);
+        length = results ? results[0] : Math.floor(length);
+
+        return length.toString() + ' ' + postfix;
+    }
+    function GetTimeString(date) {
+        var timeRegExpPattern = /\d{1,2}:\d{1,2}:\d{1,2}/;
+        var results = timeRegExpPattern.exec(date.toTimeString());
+        return results ? results[0] : "00:00:00";
+    }
+// ]]>
+</script>
+
+@Html.DevExpress().PopupControl(
+    pcSettings =>
+    {
+        pcSettings.Name = "pcProgress";
+        pcSettings.Width = System.Web.UI.WebControls.Unit.Pixel(460);
+        pcSettings.Modal = true;
+        pcSettings.HeaderText = "Загрузка";
+        pcSettings.EnableAnimation = false;
+        pcSettings.CloseAction = CloseAction.None;
+        pcSettings.PopupHorizontalAlign = PopupHorizontalAlign.WindowCenter;
+        pcSettings.PopupVerticalAlign = PopupVerticalAlign.WindowCenter;
+        pcSettings.AllowDragging = true;
+        pcSettings.ShowPageScrollbarWhenModal = true;
+        pcSettings.ShowCloseButton = false;
+        pcSettings.ShowFooter = true;
+
+        pcSettings.SetContent(() =>
+        {
+            ViewContext.Writer.Write(
+                "<table style=\"width: 100%;\">" +
+                    "<tr><td style=\"width: 100%;\">" +
+                        "<div style=\"overflow: hidden; width: 280px;\">" +
+                            "<label id=\"lblFileName\"></label>" +
+                        "</div>" +
+                    "</td><td class=\"NoWrap\" align=\"right\">" +
+                        "<label id=\"lblCurrentUploadedFileLength\"></label>" +
+                    "</td></tr><tr><td colspan=\"2\" class=\"TopPadding\" >");
+            @Html.DevExpress().ProgressBar(
+                    settings =>
+                    {
+                        settings.Name = "progress1";
+                        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                        settings.Height = System.Web.UI.WebControls.Unit.Pixel(21);
+                    }).Render();
+            ViewContext.Writer.Write(
+                "</td></tr><tr><td colspan=\"2\">" +
+                    "<div class=\"Spacer\" style=\"height: 12px;\"></div>" +
+                "</td></tr><tr><td style=\"width: 100%;\">" +
+                    "<label id=\"lblUploadedFiles\"></label>" +
+                "</td><td class=\"NoWrap\" align=\"right\">" +
+                    "<label id=\"lblUploadedFileLength\"></label>" +
+                "</td></tr><tr><td colspan=\"2\" class=\"TopPadding\" >");
+            @Html.DevExpress().ProgressBar(
+                    settings =>
+                    {
+                        settings.Name = "progress2";
+                        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                        settings.Height = System.Web.UI.WebControls.Unit.Pixel(21);
+                        settings.ControlStyle.CssClass = "BottomMargin";
+                    }).Render();
+            ViewContext.Writer.Write(
+                "</td></tr><tr><td colspan=\"2\">" +
+                    "<div class=\"Spacer\" style=\"height: 12px;\"></div>" +
+                "</td></tr>" +
+                "<tr><td colspan=\"2\">" +
+                    "<label id=\"lblProgressStatus\"></label>" +
+                "</td></tr>" +
+            "</table>");
+
+        });
+
+        pcSettings.SetFooterTemplateContent(c =>
+        {
+            ViewContext.Writer.Write(
+                "<table style=\"width: 100%;\"><tr><td align=\"right\">");
+            @Html.DevExpress().Button(
+                    settings =>
+                    {
+                        settings.Name = "btnCancel";
+                        settings.Text = "Отмена";
+                        settings.UseSubmitBehavior = false;
+                        settings.Width = System.Web.UI.WebControls.Unit.Pixel(100);
+                        settings.ClientSideEvents.Click = "function(s, e) { ucMultiSelection.Cancel(); }";
+                    }).Render();
+            ViewContext.Writer.Write(
+                "</td></tr></table>");
+        });
+    }).GetHtml()
+
+    <!-- ---------------------------------------- -->

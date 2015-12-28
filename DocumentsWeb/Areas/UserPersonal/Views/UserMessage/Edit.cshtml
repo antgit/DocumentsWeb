@@ -1,0 +1,54 @@
+﻿@model DocumentsWeb.Areas.UserPersonal.Models.WebMessageModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = Model.Name;
+}
+@Html.Partial("HeadPartial")
+
+
+@using (Html.BeginForm("Edit", "UserMessage", FormMethod.Post, new { @class = "edit_form", @id = "documentEditForm" }))
+{
+    @Html.DevExpress().Splitter(settings =>
+        {
+            settings.Name = "splFullScreenMode";
+            settings.Orientation = System.Web.UI.WebControls.Orientation.Vertical;
+            settings.Styles.Pane.Paddings.Padding = 0;
+            settings.FullscreenMode = true;
+
+            settings.Panes.Add(contentMain =>
+                {
+                    contentMain.Panes.Add(actionsPane =>
+                        {
+                            actionsPane.Name = "ActionPane";
+                            actionsPane.Size = 270;
+                            actionsPane.MinSize = 270;
+                            actionsPane.MaxSize = 400;
+                            actionsPane.AllowResize = DefaultBoolean.True;
+                            actionsPane.ShowCollapseBackwardButton = DefaultBoolean.False;
+                            actionsPane.SetContent(() => Html.RenderPartial("ActionsPartial", Model));
+                        });
+
+                    contentMain.Panes.Add(contentPane =>
+                        {
+                            contentPane.Name = "ContentPane";
+                            contentPane.ScrollBars = System.Web.UI.WebControls.ScrollBars.Auto;
+                            contentPane.SetContent(() => @Html.RenderPartial("EditPartial", Model));
+                        });
+                    settings.Panes.Add(footerPane =>
+                        {
+                            footerPane.Size = 80;
+                            footerPane.AllowResize = DefaultBoolean.False;
+                            footerPane.ShowSeparatorImage = DefaultBoolean.False;
+                            footerPane.SetContent(() => @Html.RenderPartial("FooterPartial"));
+                        });
+                });
+        }).GetHtml()
+
+    @Html.Partial("PeoplesFinderPartial", new ViewDataDictionary
+        {
+            {"Name", "PeopleFinderCreator"},
+            {"ComboboxName", "UserRecipientId"},
+            {"ComboboxButtonIndex", 0},
+            {"onlyUsers", true}
+        })
+}

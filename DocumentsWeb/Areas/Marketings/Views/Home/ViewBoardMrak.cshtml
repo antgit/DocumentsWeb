@@ -1,0 +1,131 @@
+﻿@using System.Globalization
+@using BusinessObjects
+@using DocumentsWeb.Models
+@Html.DevExpress().GridView(settings=>{
+                                                settings.Settings.ShowTitlePanel = true;
+                                                
+                                                settings.SetTitlePanelTemplateContent(c =>
+                                                {
+                                                    //@Html.DevExpress().HyperLink(s =>
+                                                    //{
+                                                    //    s.Properties.Text = "Входящие счета";
+                                                    //    s.NavigateUrl = Url.Action("Index", "ViewListAccountIn", new { area = "Sales", controller = "HoViewListAccountInme" });
+                                                    //}).GetHtml();
+                                                    ViewContext.Writer.Write("<div style=\"width: 100%; text-align: center; font-size: 10pt;\">");
+                                                    Html.DevExpress().HyperLink(hl =>
+                                                    {
+                                                        hl.Properties.ImageUrl = Url.Content("~/Images/REFRESHGREEN_X16.png");
+                                                        hl.ToolTip = "Обновить";
+                                                        hl.Style.Add("float", "left");
+                                                        hl.NavigateUrl = "javascript:gvDocuments.PerformCallback('refresh=true');";
+                                                    }).Render();
+                                                    Html.DevExpress().HyperLink(s =>
+                                                    {
+                                                        s.Properties.Text = "Анкеты клиентов";
+                                                        s.NavigateUrl = Url.Action("Index", "ViewListMrak");
+
+                                                    }).Render();
+
+                                                    ViewContext.Writer.Write("</div>");
+                                                });
+                                                settings.Name="gvDocuments";
+                                                settings.CallbackRouteValues = new { Controller = "Home", Action = "ViewBoardMrak" };
+                                                settings.Settings.ShowFilterBar = GridViewStatusBarMode.Hidden;
+                                                settings.SettingsBehavior.AllowFocusedRow = true;
+                                                settings.KeyFieldName = GlobalPropertyNames.Id;
+                                                settings.Settings.ShowGroupPanel = false;
+                                                settings.Settings.ShowFilterRow = false;
+                                                settings.Settings.ShowFilterRowMenu = false;
+                                                settings.SettingsPager.Visible = false;
+                                                settings.Settings.ShowVerticalScrollBar = true;
+                                                settings.Settings.ShowHorizontalScrollBar = true;
+                                                settings.Settings.VerticalScrollableHeight = 300;
+                                                settings.Styles.Cell.Font.Size = System.Web.UI.WebControls.FontUnit.Point(11);
+                                                settings.Styles.Cell.Paddings.Padding = System.Web.UI.WebControls.Unit.Pixel(2);
+                                                settings.Styles.Cell.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+                                                settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+    
+                                                settings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+                                                settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+                                                
+                
+                                                settings.Columns.Add(column =>
+                                                                         {
+                                                                             column.Caption = "";
+                                                                             column.Width = 20;
+                                                                             column.SetDataItemTemplateContent(c =>
+                                                                                                                   {
+                                                                                                                       Html.DevExpress().HyperLink(hl =>
+                                                                                                                       {
+                                                                                                                           hl.Name = "MktgDocumentEdit_" + c.ItemIndex.ToString(CultureInfo.InvariantCulture);
+                                                                                                                           hl.Properties.ImageUrl = Url.Content("~/Images/DOCUMENTDONE_X16.png");
+                                                                                                                           hl.ToolTip = "Просмотреть/Изменить";
+                                                                                                                           hl.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "Mktg", Action = "Edit", Id = c.KeyValue });
+                                                                                                                           hl.Properties.Target = "_blank";
+                                                                                                                           //hl.ClientEnabled = haveEdit || haveView;
+                                                                                                                       }).Render();
+                                                                                                                   });
+                                                                         });
+                                                settings.Columns.Add(column =>
+                                                                         {
+                                                                             column.FieldName = GlobalPropertyNames.Date;
+                                                                             column.Caption = "Дата";
+                                                                             column.Width = 70;
+                                                                             column.PropertiesEdit.DisplayFormatString = "d";
+                                                                             column.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+                                                                             column.ColumnType = MVCxGridViewColumnType.DateEdit;
+                                                                         });
+                                                MVCxGridViewColumn col_number = settings.Columns.Add("DocNumber", "Номер");
+                                                col_number.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+                                                col_number.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+                                                col_number.Width = 70;
+
+
+
+                                                MVCxGridViewColumn col_who = settings.Columns.Add("CompanyName", "Компания");
+                                                col_who.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+                                                col_who.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+                                                col_who.Width = 450;
+                                                col_who.Visible = false;
+
+                                                MVCxGridViewColumn col_whoCode = settings.Columns.Add("CompanyCode", "Предприятие");
+                                                col_whoCode.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+                                                col_whoCode.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+                                                col_whoCode.Width = 200;
+
+                                                MVCxGridViewColumn col_whom = settings.Columns.Add("AgentDepartmentToName", "Клиент");
+                                                col_whom.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+                                                col_whom.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+                                                col_whom.Width = 450;
+    
+                                                MVCxGridViewColumn col_manager = settings.Columns.Add("ManagerName", "Менеджер");
+                                                col_manager.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+                                                col_manager.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+                                                col_manager.Width = 250;
+
+                                                MVCxGridViewColumn col_TownName = settings.Columns.Add("TownName", "Город");
+                                                col_TownName.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+                                                col_TownName.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+                                                col_TownName.Width = 150;
+
+                                                MVCxGridViewColumn col_StreetName = settings.Columns.Add("StreetName", "Улица");
+                                                col_StreetName.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+                                                col_StreetName.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+                                                col_StreetName.Width = 150;
+    
+                                                
+                                                settings.CustomCallback = (sender, e) =>
+                                                {
+                                                    MVCxGridView grid = (MVCxGridView)sender;
+                                                    string refreshArg = e.Parameters.Split('&').FirstOrDefault(s => s.StartsWith("refresh"));
+                                                    bool refresh = (refreshArg != null) && (refreshArg.EndsWith("true"));
+                                                    if(refresh)
+                                                    {
+                                                        System.Data.DataTable tbl = MktgHelper.GetDocumentsMrak(true, 1, 10, new DateTime(2001, 1, 1), new DateTime(2020, 1, 1));
+                                                        //tbl.DefaultView.RowFilter = "StateId=1";
+                                                        grid.DataSource = tbl;
+                                                    }
+                                                    grid.DataBind();
+                                                };
+}).Bind(Model).GetHtml()

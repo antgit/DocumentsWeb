@@ -1,0 +1,64 @@
+﻿@using DevExpress.Web.Mvc.UI
+@using System.Web.UI.WebControls
+@using DevExpress.Utils;
+@using DevExpress.Web.Mvc;
+
+@{
+    ViewBag.Title = "Ремонт оборудования";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script type="text/javascript">
+    function ShowPopupEdit(id) {
+        pcEdit.Load('@DevExpressHelper.GetUrl(new { Controller = "Worker", Action = "Edit" })/' + id, 700, 520);
+    }
+
+</script>
+
+@Html.Partial("NavpanelPartial")
+@Html.DevExpress().Splitter(settings =>
+{
+    settings.Name = "splFullScreenMode";
+    settings.Orientation = Orientation.Vertical;
+    settings.Styles.Pane.Paddings.Padding = 0;
+    settings.FullscreenMode = true;
+
+	settings.Panes.Add(contentPane =>
+	{
+		contentPane.ScrollBars = ScrollBars.None;
+		contentPane.Panes.Add(actionsPane =>
+		{
+			actionsPane.Name = "actionPane";
+			actionsPane.AllowResize = DefaultBoolean.True;
+			actionsPane.Size = 270;
+			actionsPane.MinSize = 270;
+			actionsPane.ShowCollapseBackwardButton = DefaultBoolean.True;
+			actionsPane.ScrollBars = ScrollBars.None;
+			actionsPane.SetContent(() =>
+			{
+				Html.RenderPartial("ActionsPartial");
+			});
+		});
+		contentPane.Panes.Add(gridPane =>
+		{
+			gridPane.Name = "gridPane";
+			gridPane.SetContent(() =>
+			{
+				Html.RenderPartial("IndexPartial");
+			});
+		});
+	});
+
+    settings.Panes.Add(footerPane =>
+    {
+        footerPane.Size = 80;
+        footerPane.AllowResize = DefaultBoolean.False;
+        footerPane.ShowSeparatorImage = DefaultBoolean.False;
+        footerPane.SetContent(() =>
+        {
+            @Html.RenderPartial("FooterPartial");
+        });
+    });
+
+	//settings.ClientSideEvents.PaneResized = "ChangePaneSize";
+}).GetHtml()

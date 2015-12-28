@@ -1,0 +1,232 @@
+﻿@using BusinessObjects
+@using DocumentsWeb.Areas.Admins.Models
+@model DocumentConfigPricesModel
+
+@Html.DevExpress().CheckBox(s =>
+   {
+       s.Name = "Config.PriceListSupplier.AllowNumberEdit";
+       s.ShowModelErrors = true;
+       s.Text = "Разрешить редактирование номера";
+       s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), s.Name);
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+   }).Bind(Model.Config.PriceListSupplier.AllowNumberEdit).GetHtml()
+
+@Html.DevExpress().CheckBox(s =>
+   {
+       s.Name = "Config.PriceListSupplier.AllowAgenToEdit";
+       s.ShowModelErrors = true;
+       s.Text = "Разрешить редактирование контрагента";
+       s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), s.Name);
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+   }).Bind(Model.Config.PriceListSupplier.AllowAgenToEdit).GetHtml()
+
+@Html.DevExpress().CheckBox(s =>
+   {
+       s.Name = "Config.PriceListSupplier.AllowProductEdit";
+       s.ShowModelErrors = true;
+       s.Text = "Разрешить редактирование товара";
+       s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), s.Name);
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+   }).Bind(Model.Config.PriceListSupplier.AllowProductEdit).GetHtml()
+
+<hr />
+
+@Html.DevExpress().CheckBox(s =>
+   {
+       s.Name = "Config.PriceListSupplier.AllowAgenToSearch";
+       s.ShowModelErrors = true;
+       s.Text = "Разрешить поиск корреспондента";
+       s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), s.Name);
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+   }).Bind(Model.Config.PriceListSupplier.AllowAgenToSearch).GetHtml()
+   
+
+@Html.DevExpress().CheckBox(s =>
+   {
+       s.Name = "Config.PriceListSupplier.AllowProductSearch";
+       s.ShowModelErrors = true;
+       s.Text = "Разрешить поиск товара";
+       s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), s.Name);
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+   }).Bind(Model.Config.PriceListSupplier.AllowProductSearch).GetHtml()
+<hr />
+
+@Html.DevExpress().CheckBox(s =>
+   {
+       s.Name = "Config.PriceListSupplier.AllowAgenToCreate";
+       s.ShowModelErrors = true;
+       s.Text = "Разрешить создание корреспондента";
+       s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), s.Name);
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+   }).Bind(Model.Config.PriceListSupplier.AllowAgenToCreate).GetHtml()
+
+@Html.DevExpress().CheckBox(s =>
+   {
+       s.Name = "Config.PriceListSupplier.AllowProductCreate";
+       s.ShowModelErrors = true;
+       s.Text = "Разрешить создание товара";
+       s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), s.Name);
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+   }).Bind(Model.Config.PriceListSupplier.AllowProductCreate).GetHtml()
+<hr />
+
+<table style="width:200px;" >
+    <thead>
+@Html.DevExpress().Label(s =>
+            {
+                
+                s.Text = "Количество десятичных знаков при редактировании";
+                s.AssociatedControlName = "date";
+                }).GetHtml()        
+    </thead>
+    <tr>
+        <td style="width:100px;" >
+            @Html.DevExpress().Label(s =>
+                {
+                    s.Text = "Количество";
+                }).GetHtml()        
+        </td>
+        <td >
+            @Html.DevExpress().Label(s =>
+                {
+                    s.Text = "Цена";
+                }).GetHtml()    
+        </td>
+        <td>
+            @Html.DevExpress().Label(s =>
+                {
+                    s.Text = "Сумма";
+                    
+                }).GetHtml()  
+        </td>
+    </tr>
+    
+    <tr>
+        <td style="width:100px;">
+            @Html.DevExpress().SpinEdit(s =>
+                {
+                    s.Name = "Config.PriceListSupplier.DecimalPlacesQty";
+                    s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), s.Name);
+                    s.ShowModelErrors = true;
+                    s.Properties.MinValue = 0;
+                    s.Properties.MaxValue = 4;
+                    s.Properties.NumberType = SpinEditNumberType.Integer;
+                    s.Properties.DecimalPlaces = 0;
+                    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                    s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                    s.ControlStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+                }).Bind(Model.Config.PriceListSupplier.DecimalPlacesQty).GetHtml()    
+
+            
+        </td>
+        <td>
+            @Html.DevExpress().SpinEdit(s =>
+                {
+                    s.Name = "Config.PriceListSupplier.DecimalPlacesPrice";
+                    s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), s.Name);
+                    s.ShowModelErrors = true;
+                    s.Properties.MinValue = 0;
+                    s.Properties.MaxValue = 4;
+                    s.Properties.NumberType = SpinEditNumberType.Integer;
+                    s.Properties.DecimalPlaces = 0;
+                    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                    s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                    s.ControlStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+                }).Bind(Model.Config.PriceListSupplier.DecimalPlacesPrice).GetHtml()        
+        </td>
+        <td>
+            @Html.DevExpress().SpinEdit(s =>
+                {
+                    s.Name = "Config.PriceListSupplier.DecimalPlacesSumma";
+                    s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), s.Name);
+                    s.ShowModelErrors = true;
+                    s.Properties.MinValue = 0;
+                    s.Properties.MaxValue = 4;
+                    s.Properties.NumberType = SpinEditNumberType.Integer;
+                    s.Properties.DecimalPlaces = 0;
+                    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                    s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                    s.ControlStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+                }).Bind(Model.Config.PriceListSupplier.DecimalPlacesSumma).GetHtml()      
+        </td>
+    </tr>
+    
+</table>
+
+
+<table style="width:200px;">
+    <thead>
+@Html.DevExpress().Label(s =>
+            {
+                s.Text = "Формат данных при отображении";
+                s.AssociatedControlName = "date";
+            }).GetHtml()        
+    </thead>
+    <tr>
+        <td style="width:100px;">
+            @Html.DevExpress().Label(s =>
+                {
+                    s.Text = "Количество";
+                    s.AssociatedControlName = "Config.PriceListSupplier.DistpalyFormatQty";
+                }).GetHtml()        
+        </td>
+        <td >
+            @Html.DevExpress().Label(s =>
+                {
+                    s.Text = "Цена";
+                    s.AssociatedControlName = "Config.PriceListSupplier.DisplayFormatPrice";
+                }).GetHtml()    
+        </td>
+        <td>
+            @Html.DevExpress().Label(s =>
+                {
+                    s.Text = "Сумма";
+                    s.AssociatedControlName = "Config.PriceListSupplier.DisplayFormatSumma";
+                }).GetHtml()  
+        </td>
+    </tr>
+    
+    <tr>
+        <td style="width:100px;">
+            @Html.DevExpress().TextBox(s =>
+                {
+                    s.Name = "Config.PriceListSupplier.DistpalyFormatQty";
+                    s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), s.Name);
+                    s.ShowModelErrors = true;
+                    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                    s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                    s.ControlStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+                }).Bind(Model.Config.PriceListSupplier.DistpalyFormatQty).GetHtml()    
+        </td>
+        <td>
+            @Html.DevExpress().TextBox(s =>
+                {
+                    s.Name = "Config.PriceListSupplier.DisplayFormatPrice";
+                    s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), s.Name);
+                    s.ShowModelErrors = true;
+                    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                    s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                    s.ControlStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+                }).Bind(Model.Config.PriceListSupplier.DisplayFormatPrice).GetHtml()        
+        </td>
+        <td>
+            
+            @Html.DevExpress().TextBox(s =>
+                {
+                    s.Name = "Config.PriceListSupplier.DisplayFormatSumma";
+                    s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), s.Name);
+                    s.ShowModelErrors = true;
+                    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                    s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                    s.ControlStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+                }).Bind(Model.Config.PriceListSupplier.DisplayFormatSumma).GetHtml() 
+        </td>
+    </tr>
+</table>     
+

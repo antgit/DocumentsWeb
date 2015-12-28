@@ -1,0 +1,78 @@
+﻿@using DocumentsWeb.Models;
+@{
+    var url = WADataProvider.SysConfig.ReportsLocation + "WebViewer" + (WADataProvider.SysConfig.UseFlashForReports ? "Fx" : "") + ".aspx?repId=";
+}
+<script type="text/javascript">
+    function RefreshReports() {
+        var fldId = gvReportsTree.GetRowKey(gvReportsTree.GetFocusedRowIndex());
+        var url = "Report/IndexPartial?refresh=true&folderId=" + fldId;
+        $.post(url, function (data) {
+            if (data) {
+                // callback to show image/flag 
+            } else {
+                // callback to show error/permission 
+            }
+        });
+        gvReports.PerformCallback();
+    }
+    function OnMenuItemClick(s, e) {
+        switch (e.item.name) {
+        case "mnuBuild":
+            var id = gvReports.GetRowKey(gvReports.GetFocusedRowIndex());
+            if (id == null)
+                break;
+            var path = '@url' + id;
+            window.open(path, '');
+            break;
+        case "mnuRefresh":
+            var fldId = gvReportsTree.GetRowKey(gvReportsTree.GetFocusedRowIndex());
+            var url = "Report/IndexPartial?refresh=true&folderId=" + fldId;
+            $.post(url, function (data) {
+                if (data) {
+                    // callback to show image/flag 
+                } else {
+                    // callback to show error/permission 
+                }
+            });
+            gvReports.PerformCallback();
+            break;
+        case "mnuShowCustomizationWindow":
+            if (gvReports.IsCustomizationWindowVisible())
+                gvReports.HideCustomizationWindow();
+            else
+                gvReports.ShowCustomizationWindow();
+            break;
+        default:
+            alert(e.item.name);
+            break;
+        }        
+    }
+
+    function OngvFoldersTreeGetRowValues(values){
+        //window.open('@DevExpressHelper.GetUrl(new { Controller = "Document", Action = "Create"})?formCode='+values[0]+'&folderId='+values[1], '_blank', 'width=800,height=600,resizable=1');
+    }
+</script>
+
+@Html.DevExpress().Menu(settings =>
+{
+    settings.EnableHotTrack = true;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Name = "mFeatures";
+    settings.ClientSideEvents.ItemClick = "OnMenuItemClick";
+
+    settings.Items.Add(item =>
+    {
+        item.Name = "mnuRefresh";
+        item.Text = "Обновить";
+        item.ToolTip = "Обновить данные в таблице";
+        item.Image.Url = @Url.Content("~/Images/REFRESHGREEN_X16.png");
+    });
+    
+    settings.Items.Add(item =>
+    {
+        item.Name = "mnuShowCustomizationWindow";
+        item.Text = "Выбор колонок";
+        item.Image.Url = @Url.Content("~/Images/gear.png");
+    });
+}).GetHtml()
+

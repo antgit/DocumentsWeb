@@ -1,0 +1,33 @@
+﻿@using DevExpress.Web.Mvc.UI
+@using System.Web.UI.WebControls
+@inherits WebViewPage
+@{
+    ViewBag.Title = "Настройка аккаунта";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src="@Url.Content("~/Scripts/Demo.js")" type="text/javascript"></script>
+<script type="text/javascript">
+    DXDemo.CurrentThemeCookieKey = "@Utils.CurrentThemeCookieKey";
+</script>
+@Html.Partial("NavpanelPartial")
+@Html.DevExpress().Splitter(settings =>
+{
+    settings.Name = "splFullScreenMode";
+    settings.Orientation = Orientation.Vertical;
+    settings.Styles.Pane.Paddings.Padding = 0;
+    settings.FullscreenMode = true;
+    
+    settings.Panes.Add(contentPane => contentPane.Panes.Add(gridPane =>
+        {
+            contentPane.ScrollBars = ScrollBars.Auto;
+            gridPane.Name = "GridPane";
+            gridPane.SetContent(() => Html.RenderPartial("IndexPartial"));
+        }));
+
+    settings.Panes.Add(footerPane =>{
+        footerPane.Size = 80;
+        footerPane.AllowResize = DefaultBoolean.False;
+        footerPane.ShowSeparatorImage = DefaultBoolean.False;
+        footerPane.SetContent(() => @Html.RenderPartial("FooterPartial"));
+    });
+}).GetHtml()

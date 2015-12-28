@@ -1,0 +1,192 @@
+﻿@using BusinessObjects
+@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentsWeb.Models
+@using DocumentsWeb.Areas.Agents.Models
+@using DocumentsWeb.Areas.Analitics.Models
+@using DocumentsWeb.Controllers
+@using DocumentsWeb.Areas.General.Models
+@using DocumentsWeb.Areas.Products.Models
+@model ProductModel
+
+@{
+    bool haveEdit = !Model.IsReadOnly && WADataProvider.LibrariesElementRightView.IsAllow(Right.UIEDIT, WebModuleNames.WEB_SERVICES) && !WADataProvider.CommonRightView.ReadOnly;
+}
+
+<input type="hidden" id="StateId" name="StateId" value="@Model.StateId"/>
+<input type="hidden" id="KindId" name="KindId" value="@Model.KindId"/>
+<input type="hidden" id="IsReadOnly" name="IsReadOnly" value="@Model.IsReadOnly"/>
+<input type="hidden" id="ModelId" name="ModelId" value="@Model.ModelId"/>
+<input type="hidden" id="MyCompanyId" name="MyCompanyId" value="@Model.MyCompanyId"/>
+
+<table style="width:600px;">
+    <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Наименование:";
+            s.AssociatedControlName = GlobalPropertyNames.Name;
+            s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Name);
+        }).GetHtml()
+</td><td>
+        @Html.DevExpress().TextBox(s =>
+        {
+            s.Name = GlobalPropertyNames.Name;
+            s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Name);
+            s.ReadOnly = !haveEdit;
+            s.Properties.ConvertEmptyStringToNull = true;
+            if (!s.ReadOnly)
+            {
+                s.Properties.NullText = "Введите наименование...";
+                s.Properties.NullTextStyle.ForeColor = System.Drawing.Color.Red;
+            }
+            s.ControlStyle.CssClass = "editor";
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.ShowModelErrors = true;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.Name).GetHtml()
+</td></tr>
+
+    <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Печать:";
+            s.ToolTip = ProductData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.NameFull);
+            s.AssociatedControlName = GlobalPropertyNames.NameFull;
+        }).GetHtml()
+        </td><td>
+        @Html.DevExpress().Memo(s =>
+        {
+            s.Name = GlobalPropertyNames.NameFull;
+            s.Properties.ConvertEmptyStringToNull = true;
+            s.ReadOnly = !haveEdit;
+            if (!s.ReadOnly)
+            {
+                s.Properties.NullText = "Введите полное наименование(используется при печати)...";
+                s.ToolTip = ProductData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.NameFull);
+            }
+            s.ControlStyle.CssClass = "editor";
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.ShowModelErrors = true;
+            s.Height = 35;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.NameFull).GetHtml()
+        </td></tr>
+        
+        <tr><td class="table_label\">
+          @Html.DevExpress().Label(s =>
+     {
+         s.ControlStyle.CssClass = "label";
+         s.Text = "Номенклатура:";
+         s.AssociatedControlName = GlobalPropertyNames.Nomenclature;
+         s.ToolTip = ProductData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Nomenclature);
+     }).GetHtml()
+        </td><td>
+        @Html.DevExpress().TextBox(s =>
+       {
+           s.Name = GlobalPropertyNames.Nomenclature;
+           s.ReadOnly = !haveEdit;
+           if (!s.ReadOnly)
+           {
+               s.Properties.NullText = "Введите номенклатурный номер...";
+               s.ToolTip = ProductData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Nomenclature);
+           }
+           s.ControlStyle.CssClass = "editor";
+           s.ShowModelErrors = true;
+           s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+           s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+           s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+       }).Bind(Model.Nomenclature).GetHtml()
+       </td></tr>
+       
+      <tr><td class="table_label\">
+          @Html.DevExpress().Label(s =>
+     {
+         s.ControlStyle.CssClass = "label";
+         s.Text = "Штрих-код:";
+         s.AssociatedControlName = GlobalPropertyNames.Barcode;
+         s.ToolTip = ProductData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Barcode);
+     }).GetHtml()
+        </td><td>
+        @Html.DevExpress().TextBox(s =>
+   {
+       s.Name = GlobalPropertyNames.Barcode;
+       s.ReadOnly = !haveEdit;
+       if (!s.ReadOnly)
+       {
+           s.Properties.NullText = "Введите штрих-код...";
+           s.ToolTip = ProductData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Barcode);
+       }
+       s.ControlStyle.CssClass = "editor";
+       s.ShowModelErrors = true;
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+       s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+       s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+   }).Bind(Model.Barcode).GetHtml()
+             </td></tr> 
+             
+      <tr><td class="table_label\">
+          @Html.DevExpress().Label(s =>
+     {
+         s.ControlStyle.CssClass = "label";
+         s.Text = "Ед. измерения:";
+         s.AssociatedControlName = GlobalPropertyNames.UnitId;
+         s.ToolTip = ProductData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.UnitId);
+     }).GetHtml()
+        </td><td>
+                @Html.DevExpress().ComboBox(s =>
+        {
+            //s.Name = "UnitName";
+            s.Name = GlobalPropertyNames.UnitId;
+            s.ReadOnly = !haveEdit;
+            //s.Properties.NullText = "Выберите единицу измерения...";
+            s.ControlStyle.CssClass = "editor";
+            s.ShowModelErrors = true;
+            //s.ReadOnly = true;
+            s.Properties.ValueField = GlobalPropertyNames.Id;
+            s.Properties.TextField = GlobalPropertyNames.Name;
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.Properties.ValueType = typeof(int);
+            //s.Properties.Buttons.Add("...");
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            //s.Properties.ClientSideEvents.ButtonClick = "UnitName_ButtonClick";
+            s.Properties.Columns.Add("Name", "Наименование").Width = 200;
+            s.Properties.Columns.Add("Code", "Код").Width = 25;
+            s.Properties.TextFormatString = "{0}";
+            s.Properties.FilterMinLength = 2;
+            s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+        }).BindList(WebUnitModel.GetCollection()).Bind(Model.UnitId).GetHtml()
+             </td></tr> 
+   
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Примечание:";
+            s.AssociatedControlName = GlobalPropertyNames.Memo;
+            s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Memo);
+        }).GetHtml()
+        </td><td>
+        @Html.DevExpress().Memo(s =>
+   {
+       s.Name = GlobalPropertyNames.Memo;
+       s.ReadOnly = !haveEdit;
+       if (!s.ReadOnly)
+       {
+           s.Properties.NullText = "Примечание или описание товара...";
+           s.ToolTip = ProductData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Memo);
+       }
+       s.ControlStyle.CssClass = "editor";
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+       s.Height = 100;
+       s.ShowModelErrors = true;
+       s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+       s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+   }).Bind(Model.Memo).GetHtml()
+             </td><tr>
+             </table>

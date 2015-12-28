@@ -1,0 +1,98 @@
+﻿@if(Utils.IsIE6()) {
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/ie6.css")" />
+}
+
+@Html.DevExpress().GetStyleSheets( 
+    new StyleSheet { ExtensionSuite = ExtensionSuite.NavigationAndLayout, Theme = Utils.CurrentTheme }, 
+    new StyleSheet { ExtensionSuite = ExtensionSuite.Editors, Theme = Utils.CurrentTheme}, 
+    new StyleSheet { ExtensionSuite = ExtensionSuite.HtmlEditor, Theme = Utils.CurrentTheme }, 
+    new StyleSheet { ExtensionSuite = ExtensionSuite.GridView, Theme = Utils.CurrentTheme },
+    new StyleSheet { ExtensionSuite = ExtensionSuite.PivotGrid },
+    new StyleSheet { ExtensionSuite = ExtensionSuite.Chart },
+    new StyleSheet { ExtensionSuite = ExtensionSuite.Report },
+    new StyleSheet { ExtensionSuite = ExtensionSuite.Scheduler },
+    
+    new StyleSheet { ExtensionSuite = ExtensionSuite.NavigationAndLayout, Theme = "RedWine" },
+    new StyleSheet { ExtensionSuite = ExtensionSuite.Editors, Theme = "RedWine"}, 
+    new StyleSheet { ExtensionSuite = ExtensionSuite.HtmlEditor, Theme = "RedWine" }  
+    
+    
+) 
+<link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/Site.css")" />
+@*<script src="@Url.Content("~/Scripts/Demo.js")" type="text/javascript"></script>*@
+@if(Utils.IsDebugMode)
+{
+    <script src="@Url.Content("~/Scripts/jquery-1.8.2.js")" type="text/javascript"></script>
+}
+else
+{
+    if(Utils.IsRealWebAccessMode)
+    {
+        <script type="text/javascript" src="http://ajax.microsoft.com/ajax/jquery/jquery-1.7.1.min.js"></script>   
+    }
+    else
+    {
+        <script src="@Url.Content("~/Scripts/jquery-1.8.2.min.js")" type="text/javascript"></script>    
+    }
+}          
+<script src="@Url.Content("~/Scripts/MicrosoftAjax.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/MicrosoftMvcAjax.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/MicrosoftMvcValidation.js")" type="text/javascript"></script>
+
+@*<script type="text/javascript">
+    if (typeof jQuery == 'undefined') {
+        document.write(unescape("%3Cscript src='/Scripts/jquery-1.7.1.min.js' type='text/javascript'%3E%3C/script%3E"));
+    }
+</script>*@
+@if (!ViewData.ContainsKey("IsDinamicScriptRegister"))
+{
+    @Html.DevExpress().GetScripts(
+            new Script { ExtensionSuite = ExtensionSuite.NavigationAndLayout },
+            new Script { ExtensionSuite = ExtensionSuite.HtmlEditor },
+            new Script { ExtensionSuite = ExtensionSuite.GridView },
+            new Script { ExtensionSuite = ExtensionSuite.PivotGrid },
+            new Script { ExtensionSuite = ExtensionSuite.Editors },
+            new Script { ExtensionSuite = ExtensionSuite.Chart },
+            new Script { ExtensionSuite = ExtensionSuite.Report },
+            new Script { ExtensionSuite = ExtensionSuite.Scheduler }
+         )
+}
+else
+{
+    if (ViewData.ContainsKey("GETSCRIPTS.SALESDOCUMENT"))
+    {
+        @Html.DevExpress().GetScripts(
+        new Script { ExtensionSuite = ExtensionSuite.NavigationAndLayout },
+        new Script { ExtensionSuite = ExtensionSuite.GridView },
+        new Script { ExtensionSuite = ExtensionSuite.Editors }
+         )
+    }
+    else
+    {
+        if (ViewData.ContainsKey("ExtensionSuite.GridView"))
+        {
+            Html.DevExpress().GetScripts(new Script {ExtensionSuite = ExtensionSuite.GridView});
+        }
+        if (ViewData.ContainsKey("ExtensionSuite.Editors"))
+        {
+            Html.DevExpress().GetScripts(new Script {ExtensionSuite = ExtensionSuite.Editors});
+        }
+
+        if (ViewData.ContainsKey("ExtensionSuite.NavigationAndLayout"))
+        {
+            Html.DevExpress().GetScripts(new Script {ExtensionSuite = ExtensionSuite.NavigationAndLayout});
+        }
+        if (ViewData.ContainsKey("ExtensionSuite.HtmlEditor"))
+        {
+            Html.DevExpress().GetScripts(new Script {ExtensionSuite = ExtensionSuite.HtmlEditor});
+        }
+        if (ViewData.ContainsKey("ExtensionSuite.GridView"))
+        {
+            Html.DevExpress().GetScripts(new Script {ExtensionSuite = ExtensionSuite.GridView});
+        }
+        if (ViewData.ContainsKey("ExtensionSuite.Editors"))
+        {
+            Html.DevExpress().GetScripts(new Script {ExtensionSuite = ExtensionSuite.Editors});
+        }
+    }
+}

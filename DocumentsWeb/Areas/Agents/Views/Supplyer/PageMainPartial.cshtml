@@ -1,0 +1,282 @@
+﻿@using BusinessObjects
+@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentsWeb.Models
+@using DocumentsWeb.Areas.Agents.Models
+@using DocumentsWeb.Areas.Analitics.Models
+@using DocumentsWeb.Controllers
+@using DocumentsWeb.Areas.General.Models
+@model ClientModel
+
+@{
+    bool haveEdit = !Model.IsReadOnly && WADataProvider.LibrariesElementRightView.IsAllow(Right.UIEDIT, WebModuleNames.WEB_SUPPLYER) && !WADataProvider.CommonRightView.ReadOnly;
+}
+
+<input type="hidden" id="StateId" name="StateId" value="@Model.StateId"/>
+<input type="hidden" id="KindId" name="KindId" value="@Model.KindId"/>
+<input type="hidden" id="IsReadOnly" name="IsReadOnly" value="@Model.IsReadOnly"/>
+<input type="hidden" id="ModelId" name="ModelId" value="@Model.ModelId"/>
+<input type="hidden" id="MyCompanyId" name="MyCompanyId" value="@Model.MyCompanyId"/>
+
+<table style="width:600px;">
+    <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Наименование:";
+            s.AssociatedControlName = GlobalPropertyNames.Name;
+            s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Name);
+        }).GetHtml()
+</td><td colspan="3">
+        @Html.DevExpress().TextBox(s =>
+        {
+            s.Name = GlobalPropertyNames.Name;
+            s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Name);
+            s.ReadOnly = !haveEdit;
+            s.Properties.ConvertEmptyStringToNull = true;
+            if (!s.ReadOnly)
+            {
+                s.Properties.NullText = "Введите наименование...";
+                s.Properties.NullTextStyle.ForeColor = System.Drawing.Color.Red;
+            }
+            s.ControlStyle.CssClass = "editor";
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.ShowModelErrors = true;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.Name).GetHtml()
+</td></tr>
+
+    <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Печать:";
+            s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.NameFull);
+            s.AssociatedControlName = GlobalPropertyNames.NameFull;
+        }).GetHtml()
+        </td><td colspan="3">
+        @Html.DevExpress().Memo(s =>
+        {
+            s.Name = GlobalPropertyNames.NameFull;
+            s.Properties.ConvertEmptyStringToNull = true;
+            s.ReadOnly = !haveEdit;
+            if (!s.ReadOnly)
+            {
+                s.Properties.NullText = "Введите полное наименование(используется при печати)...";
+                s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.NameFull);
+            }
+            s.ControlStyle.CssClass = "editor";
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.ShowModelErrors = true;
+            s.Height = 35;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.NameFull).GetHtml()
+        </td></tr>
+        
+        <tr><td class="table_label\">
+         @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Налоговый номер:";
+            s.AssociatedControlName = "TaxNumber";
+        }).GetHtml()
+        </td><td>
+         @Html.DevExpress().TextBox(s =>
+        {
+            s.Name = "TaxNumber";
+            s.ReadOnly = !haveEdit;
+            if (!s.ReadOnly)
+            {
+                s.Properties.NullText = "Введите ИНН предприятия...";
+            }
+            s.ControlStyle.CssClass = "editor";
+            s.ShowModelErrors = true;
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.TaxNumber).GetHtml()
+        </td><td class="table_label">
+        @Html.DevExpress().Label(s =>
+       {
+           s.ControlStyle.CssClass = "label";
+           s.Text = "ОКПО:";
+           s.AssociatedControlName = GlobalPropertyNames.Okpo;
+           s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Okpo);
+       }).GetHtml()
+        </td><td>
+        @Html.DevExpress().TextBox(s =>
+       {
+           s.Name = GlobalPropertyNames.Okpo;
+           s.ReadOnly = !haveEdit;
+           if (!s.ReadOnly)
+           {
+               s.Properties.NullText = "Введите ОКПО предприятия...";
+               s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Okpo);
+           }
+           s.ControlStyle.CssClass = "editor";
+           s.ShowModelErrors = true;
+           s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+           s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+           s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+       }).Bind(Model.Okpo).GetHtml()
+        </td></tr>
+        
+        <tr><td class="table_label">
+         @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Плательщик НДС:";
+            s.AssociatedControlName = GlobalPropertyNames.NdsPayer;
+            s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.NdsPayer);
+        }).GetHtml()
+        </td><td>
+        @Html.DevExpress().CheckBox(s =>
+       {
+           s.Name = GlobalPropertyNames.NdsPayer;
+           s.ReadOnly = !haveEdit;
+           if (!s.ReadOnly)
+           {
+               s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.NdsPayer);
+           }
+           s.ControlStyle.CssClass = "editor";
+           s.ShowModelErrors = true;
+           s.Width = 100;
+           s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+           s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+       }).Bind(Model.NdsPayer).GetHtml()
+        </td><td class="table_label">
+        @Html.DevExpress().Label(s =>
+       {
+           s.ControlStyle.CssClass = "label";
+           s.Text = "№ свидетельства:";
+           s.AssociatedControlName = GlobalPropertyNames.RegNumber;
+           s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.RegNumber);
+       }).GetHtml()
+        </td><td>
+        @Html.DevExpress().TextBox(s =>
+       {
+           s.Name = GlobalPropertyNames.RegNumber;
+           s.ReadOnly = !haveEdit;
+           if (!s.ReadOnly)
+           {
+               s.Properties.NullText = "Введите номер свидетельства предприятия...";
+               s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.RegNumber);
+           }
+           s.ControlStyle.CssClass = "editor";
+           s.ShowModelErrors = true;
+           s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+           s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+           s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+       }).Bind(Model.RegNumber).GetHtml()
+        </td></tr>      
+        
+            <tr><td class="table_label\">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Телефон:";
+            s.AssociatedControlName = GlobalPropertyNames.Phone;
+            s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Phone);
+        }).GetHtml()
+        </td><td colspan=3>
+        @Html.DevExpress().TextBox(s =>
+        {
+            s.Name = GlobalPropertyNames.Phone;
+            s.ReadOnly = !haveEdit;
+            if (!s.ReadOnly)
+            {
+                s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Phone);
+                s.Properties.NullText = "Введите телефон предприятия...";
+            }
+            s.ControlStyle.CssClass = "editor";
+            s.ShowModelErrors = true;
+            s.Properties.MaskSettings.Mask = "000-000-00-00";
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.Properties.MaskSettings.IncludeLiterals = MaskIncludeLiteralsMode.None;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.Phone).GetHtml()
+        </td></tr>
+    <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Фактический адрес:";
+            s.AssociatedControlName = GlobalPropertyNames.AddressPhysical;
+            s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.AddressPhysical);
+        }).GetHtml()
+        </td><td colspan="3">
+        @Html.DevExpress().Memo(s =>
+        {
+            s.Name = GlobalPropertyNames.AddressPhysical;
+            s.ReadOnly = !haveEdit;
+            if (!s.ReadOnly)
+            {
+                s.Properties.NullText = "Введите фактический адрес...";
+                s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.AddressPhysical);
+            }
+            s.ControlStyle.CssClass = "editor";
+            s.Height = 35;
+            s.ShowModelErrors = true;
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.AddressPhysical).GetHtml()
+        </td></tr>
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.AddressLegal);
+            s.Text = "Юр. адрес:";
+            s.AssociatedControlName = GlobalPropertyNames.AddressLegal;
+        }).GetHtml()
+        </td><td colspan="3">
+        @Html.DevExpress().Memo(s =>
+        {
+            s.Name = GlobalPropertyNames.AddressLegal;
+            s.ReadOnly = !haveEdit;
+            if (!s.ReadOnly)
+            {
+                s.Properties.NullText = "Введите юридический адрес...";
+                s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.AddressLegal);
+            }
+            s.ControlStyle.CssClass = "editor";
+            s.Height = 35;
+            s.ShowModelErrors = true;
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.AddressLegal).GetHtml()
+        </td></tr>
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Примечание:";
+            s.AssociatedControlName = GlobalPropertyNames.Memo;
+            s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Memo);
+        }).GetHtml()
+        </td><td colspan="3">
+        @Html.DevExpress().Memo(s =>
+        {
+            s.Name = GlobalPropertyNames.Memo;
+            s.ReadOnly = !haveEdit;
+            if (!s.ReadOnly)
+            {
+                s.Properties.NullText = "Введите примечание или описание банка...";
+                s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Memo);
+            }
+            s.ControlStyle.CssClass = "editor";
+            s.Height = 40;
+            s.ShowModelErrors = true;
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.Memo).GetHtml()
+             </td><tr>
+             </table>

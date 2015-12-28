@@ -1,0 +1,497 @@
+﻿@model DocumentsWeb.Areas.Marketings.Models.DocumentMktgModel
+@using DocumentsWeb.Areas.Marketings.Models;
+@using DocumentsWeb.Areas.Agents.Models;
+@using DocumentsWeb.Areas.General.Models;
+@using DocumentsWeb.Areas.Analitics.Models;
+@using DocumentsWeb.Models;
+@using BusinessObjects;
+@using BusinessObjects.Security;
+@using BusinessObjects.Web.Core;
+
+@{   
+    bool haveEdit = WADataProvider.FolderElementRightView.IsAllow(BusinessObjects.Security.Right.DOCEDIT, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_MKTG_MRAK).Id);
+}
+<input id="Id" name="Id" type="hidden" value="@Model.Id" />
+<input id="ModelId" name="ModelId" type="hidden" value="@Model.ModelId" />
+<input id="Name" name="Name" type="hidden" value="@Model.Name" />
+<input id="StateId" name="StateId" type="hidden" value="@Model.StateId" />
+<input id="IsReadOnly" name="IsReadOnly" type="hidden" value="@Model.IsReadOnly" />
+
+<input id="LastTM" name="LastTM" type="hidden" value="@Model.LastTM" />
+<input id="LastGT" name="LastGT" type="hidden" value="@Model.LastGT" />
+
+<input id="@GlobalPropertyNames.MainCompanyDepatmentId" name="@GlobalPropertyNames.MainCompanyDepatmentId" type="hidden" value="5" />
+
+<table class="edit_form_table" border="0">
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s => {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Дата:";
+                s.AssociatedControlName = "date";
+            }).GetHtml()
+            <br />
+            <br />
+            @Html.DevExpress().Label(s => {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Время:";
+                s.AssociatedControlName = "time";
+            }).GetHtml()
+        </td>
+        <td style="width: 100px;">
+            @Html.DevExpress().DateEdit(s => {
+                s.ControlStyle.CssClass = "editor";
+                s.Name = "date";
+                s.ReadOnly = !(haveEdit && !Model.IsReadOnly);
+                s.Properties.NullText = "Введите дату...";
+                s.Style.Add("float", "left");
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                s.Properties.ClientSideEvents.DateChanged = "function(s, e) { writeLog('CHANGEDATE', s.GetText()); }";
+                s.Properties.ClientSideEvents.GotFocus = "OnEditorGotFocus";
+                s.Properties.ClientSideEvents.LostFocus = "OnEditorLostFocus";
+            }).Bind(Model.Date).GetHtml()
+            @Html.DevExpress().TimeEdit(s => {
+                s.Name = "time";
+                s.ReadOnly = !(haveEdit && !Model.IsReadOnly);
+                s.Properties.EditFormatString = "HH:mm:ss";
+                s.Properties.DisplayFormatString = "HH:mm:ss";
+                s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                s.Properties.ClientSideEvents.ValueChanged = "function(s, e) { writeLog('CHANGETIME', s.GetText()); }";
+                s.Properties.ClientSideEvents.GotFocus = "OnEditorGotFocus";
+                s.Properties.ClientSideEvents.LostFocus = "OnEditorLostFocus";
+            }).Bind(Model.Time).GetHtml()
+        </td>
+        <td class="table_label" style="vertical-align: middle;">
+            <br />
+            @Html.DevExpress().Label(s => {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Номер:";
+                s.Style.Add("float", "left");
+                s.AssociatedControlName = GlobalPropertyNames.DocNumber;
+            }).GetHtml()
+        </td>
+        <td style="vertical-align: bottom;">
+            @Html.DevExpress().TextBox(s => {
+                s.ControlStyle.CssClass = "editor";
+                s.Name = GlobalPropertyNames.DocNumber;
+                s.ReadOnly = !(haveEdit && !Model.IsReadOnly);
+                s.Style.Add("float", "left");
+                s.Properties.NullText = "Введите номер документа...";
+                s.Width = 247;
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                s.Properties.ClientSideEvents.ValueChanged = "function(s, e) { writeLog('CHANGENUMBER', s.GetText()); }";
+                s.Properties.ClientSideEvents.GotFocus = "OnEditorGotFocus";
+                s.Properties.ClientSideEvents.LostFocus = "OnEditorLostFocus";
+            }).Bind(Model.DocNumber).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s => {
+                s.ControlStyle.CssClass = "label";
+                s.Style.Add("float", "left");
+                s.Text = "Подразделение:";
+                s.AssociatedControlName = GlobalPropertyNames.MainClientDepatmentId;
+            }).GetHtml()
+        </td>
+        <td colspan="3">
+            @Html.DevExpress().ComboBox(s => {
+                s.ControlStyle.CssClass = "editor";
+                s.Name = GlobalPropertyNames.MainClientDepatmentId;
+                s.ReadOnly = !(haveEdit && !Model.IsReadOnly);
+                s.Properties.ValueField = GlobalPropertyNames.Id;
+                s.Properties.TextField = GlobalPropertyNames.Name;
+                s.Properties.ValueType = typeof(int);
+                s.Properties.NullDisplayText = "Выберите подразделение...";
+                s.Width = 640;
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                s.Properties.ClientSideEvents.ValueChanged = "function(s, e) { ManagerId.PerformCallback(); }";
+                s.Properties.ClientSideEvents.GotFocus = "OnEditorGotFocus";
+                s.Properties.ClientSideEvents.LostFocus = "OnEditorLostFocus";
+            }).BindList(ClientModel.GetMyDepatments()).Bind(Model.MainClientDepatmentId == 0 ? null : (int?)Model.MainClientDepatmentId).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Менеджер:";
+                s.AssociatedControlName = "ManagerId";
+            }).GetHtml()
+        </td>
+        <td colspan="3">
+            <div style="width: 640px;">
+                @Html.Partial("ManagerPartial", Model)
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s => {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Клиент: ";
+                s.Style.Add("float", "left");
+                s.AssociatedControlName = "AgentFromName";
+            }).GetHtml()           
+        </td>
+        <td colspan="3">
+            <div style="width: 640px;">
+                @Html.Partial("MainCompanyPartial", Model, new ViewDataDictionary { { GlobalPropertyNames.MainClientDepatmentId, Model.MainClientDepatmentId } })
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s => {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Адрес: ";
+                s.Style.Add("float", "left");
+                s.AssociatedControlName = "Address";
+            }).GetHtml()           
+        </td>
+        <td colspan="3">
+            @Html.DevExpress().ButtonEdit(s => {
+               s.ControlStyle.CssClass = "editor";
+               s.Name = "Address";
+               s.Style.Add("float", "left");
+               //s.Properties.NullText = "Введите контактное лицо...";
+               s.Width = 640;
+               if (haveEdit && !Model.IsReadOnly) {
+                   EditButton btnView = s.Properties.Buttons.Add();
+                   btnView.Image.Url = "~/Images/edit10x10.png";
+               }
+               s.ShowModelErrors = true;
+               s.ReadOnly = true;
+               s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+               s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+               s.Properties.ClientSideEvents.ButtonClick = "Address_ButtonClick";
+               //s.Properties.ClientSideEvents.GotFocus = "OnEditorGotFocus";
+               //s.Properties.ClientSideEvents.LostFocus = "OnEditorLostFocus";
+            }).Bind(Model.Address).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s => {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Контактное лицо: ";
+                s.Style.Add("float", "left");
+                s.AssociatedControlName = "ContactFace";
+            }).GetHtml()           
+        </td>
+        <td colspan="3">
+            @Html.DevExpress().TextBox(s => {
+               s.ControlStyle.CssClass = "editor";
+               s.Name = "ContactFace";
+               s.ReadOnly = !(haveEdit && !Model.IsReadOnly);
+               s.Style.Add("float", "left");
+               s.Properties.NullText = "Введите контактное лицо...";
+               s.Width = 640;
+               s.ShowModelErrors = true;
+               s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+               s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+               s.Properties.ClientSideEvents.GotFocus = "OnEditorGotFocus";
+               s.Properties.ClientSideEvents.LostFocus = "OnEditorLostFocus";
+            }).Bind(Model.ContactFace).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s => {
+                s.ControlStyle.CssClass = "label";
+                s.Style.Add("float", "left");
+                s.Style.Add("display", "inline");
+                s.Text = "Должность:";
+                s.AssociatedControlName = "WorkpostId";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().ComboBox(s => {
+                s.ControlStyle.CssClass = "editor";
+                s.Name = "WorkpostId";
+                s.ReadOnly = !(haveEdit && !Model.IsReadOnly);
+                s.Style.Add("display", "inline");
+                s.Properties.ValueField = GlobalPropertyNames.Id;
+                s.Properties.TextField = GlobalPropertyNames.Name;
+                s.Properties.ValueType = typeof(int);
+                s.Properties.NullDisplayText = "Выберите должность контакного лица...";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                s.Properties.ClientSideEvents.GotFocus = "OnEditorGotFocus";
+                s.Properties.ClientSideEvents.LostFocus = "OnEditorLostFocus";
+            }).BindList(AnaliticModel.GetCollection("SYSTEM_WORKPOST")).Bind(Model.WorkpostId == 0 ? null : (int?)Model.WorkpostId).GetHtml()
+        </td>
+        <td class="table_label">
+            @Html.DevExpress().Label(s => {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Телефон: ";
+                s.Style.Add("float", "left");
+                s.AssociatedControlName = "Telephone";
+            }).GetHtml()           
+        </td>
+        <td>
+            @Html.DevExpress().TextBox(s => {
+               s.ControlStyle.CssClass = "editor";
+               s.Name = "Telephone";
+               s.ReadOnly = !(haveEdit && !Model.IsReadOnly);
+               s.Style.Add("float", "left");
+               s.Properties.MaskSettings.Mask = "000-000-00-00";
+               s.Properties.NullText = "Введите контактный телефон...";
+               s.Width = 247;
+               s.ShowModelErrors = true;
+               s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+               s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+               s.Properties.ClientSideEvents.GotFocus = "OnEditorGotFocus";
+               s.Properties.ClientSideEvents.LostFocus = "OnEditorLostFocus";
+            }).Bind(Model.Telephone).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s => {
+                s.ControlStyle.CssClass = "label";
+                s.Style.Add("float", "left");
+                s.Text = "Категория ТРТ:";
+                s.AssociatedControlName = "TPTypeId";
+            }).GetHtml()
+        </td>
+        <td colspan="3">
+            @Html.DevExpress().ComboBox(s => {
+                s.ControlStyle.CssClass = "editor";
+                s.Name = "TPTypeId";
+                s.ReadOnly = !(haveEdit && !Model.IsReadOnly);
+                s.Properties.ValueField = GlobalPropertyNames.Id;
+                s.Properties.TextField = GlobalPropertyNames.Name;
+                s.Properties.ValueType = typeof(int);
+                s.Properties.NullDisplayText = "Выберите тип торговой точки...";
+                s.Width = 640;
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                s.Properties.ClientSideEvents.GotFocus = "OnEditorGotFocus";
+                s.Properties.ClientSideEvents.LostFocus = "OnEditorLostFocus";
+            }).BindList(AnaliticModel.GetCollection(Hierarchy.SYSTEM_ANALITIC_AGENTTYPEOUTLET)).Bind(Model.TPTypeId == 0 ? null : (int?)Model.TPTypeId).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s => {
+                s.ControlStyle.CssClass = "label";
+                s.Style.Add("float", "left");
+                s.Text = "Площадь:";
+                s.AssociatedControlName = "TPAreaId";
+            }).GetHtml()
+        </td>
+        <td colspan="3">
+            @Html.DevExpress().ComboBox(s => {
+                s.ControlStyle.CssClass = "editor";
+                s.Name = "TPAreaId";
+                s.ReadOnly = !(haveEdit && !Model.IsReadOnly);
+                s.Properties.ValueField = GlobalPropertyNames.Id;
+                s.Properties.TextField = GlobalPropertyNames.Name;
+                s.Properties.ValueType = typeof(int);
+                s.Properties.NullDisplayText = "Выберите площадь торговой точки...";
+                s.Width = 640;
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                s.Properties.ClientSideEvents.GotFocus = "OnEditorGotFocus";
+                s.Properties.ClientSideEvents.LostFocus = "OnEditorLostFocus";
+            }).BindList(AnaliticModel.GetCollection(Hierarchy.SYSTEM_ANALITIC_AGENTMETRICAREA)).Bind(Model.TPAreaId == 0 ? null : (int?)Model.TPAreaId).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s => {
+                s.ControlStyle.CssClass = "label";
+                s.Style.Add("float", "left");
+                s.Text = "Расположение:";
+                s.AssociatedControlName = "TPPositionId";
+            }).GetHtml()
+        </td>
+        <td colspan="3">
+            @Html.DevExpress().ComboBox(s => {
+                s.ControlStyle.CssClass = "editor";
+                s.Name = "TPPositionId";
+                s.ReadOnly = !(haveEdit && !Model.IsReadOnly);
+                s.Properties.ValueField = GlobalPropertyNames.Id;
+                s.Properties.TextField = GlobalPropertyNames.Name;
+                s.Properties.ValueType = typeof(int);
+                s.Properties.NullDisplayText = "Выберите расположение торговой точки...";
+                s.Width = 640;
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                s.Properties.ClientSideEvents.GotFocus = "OnEditorGotFocus";
+                s.Properties.ClientSideEvents.LostFocus = "OnEditorLostFocus";
+            }).BindList(AnaliticModel.GetCollection(Hierarchy.SYSTEM_ANALITIC_OUTLETLOCATION)).Bind(Model.TPPositionId == 0 ? null : (int?)Model.TPPositionId).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s => {
+                s.ControlStyle.CssClass = "label";
+                s.Style.Add("float", "left");
+                s.Text = "График работы:";
+                s.AssociatedControlName = "TimePeriodId";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.Partial("cmbTimePeriodPartial", new ViewDataDictionary {
+                { "TimePeriodId", Model.TimePeriodId == 0 ? null : (int?)Model.TimePeriodId },
+                { "ModelReadOnly", !(haveEdit && !Model.IsReadOnly) }
+            })
+        </td>
+        <td class="table_label">
+            @Html.DevExpress().Label(s => {
+                s.ControlStyle.CssClass = "label";
+                s.Style.Add("float", "left");
+                s.Text = "График перерывов:";
+                s.AssociatedControlName = "BreakPeriodId";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.Partial("cmbBreakPeriodPartial", new ViewDataDictionary {
+                { "TimePeriodId", Model.BreakPeriodId == 0 ? null : (int?)Model.BreakPeriodId },
+                { "ModelReadOnly", !(haveEdit && !Model.IsReadOnly) }
+            })
+        </td>
+    </tr>
+
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s => {
+                s.ControlStyle.CssClass = "label";
+                s.Style.Add("float", "left");
+                s.Text = "Оценка общего состояния магазина:";
+                //s.AssociatedControlName = "BreakPeriodId";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.Partial("TrackBarPartial", Model, new ViewDataDictionary {
+                { "Name", "TPCondition" },         
+                { "Value", Model.TPCondition },
+                { "AnId", 957 }
+            })
+        </td>
+    </tr>
+
+    <tr>
+        <td>
+            @Html.DevExpress().Label(s => {
+                s.ControlStyle.CssClass = "label";
+                s.Style.Add("float", "left");
+                s.Text = "Товарные группы по которым готова сотрудничать торговая точка:";
+            }).GetHtml()
+        </td>
+        <td colspan="3">
+            @Html.Partial("CheckBoxListPartial", Model, new ViewDataDictionary
+            {
+               { "Name", "WorkingRelationship"},
+               { "Data", AnaliticModel.GetCollectionWONested(Hierarchy.SYSTEM_ANALITIC_TRADEGROUP) },
+               { "Value", (Model.WorkingRelationship == null ? "" : Model.WorkingRelationship) }
+            })
+        </td>
+    </tr>
+
+    <tr>
+        <td>
+            @Html.DevExpress().Label(s => {
+                s.ControlStyle.CssClass = "label";
+                s.Style.Add("float", "left");
+                s.Text = "Отношения торговой точки с Геркулесом:";
+            }).GetHtml()
+        </td>
+        <td colspan="3">
+            @Html.Partial("RadioButtonListPartial", Model, new ViewDataDictionary
+            {
+               { "Name", "ReasonTradePoint"},
+               { "Data", AnaliticModel.GetCollectionWONested("SYSTEM_REASONTRADEPOINT") },
+               { "Value", (Model.ReasonTradePoint == null ? "" : Model.ReasonTradePoint) },
+               { "ValueChangedScript", "if (str.indexOf('676') == -1) { $(\"tr[title='Overcharge']\").hide(); } else { $(\"tr[title='Overcharge']\").show(); } if (str.indexOf('677') == -1 && str.indexOf('675') == -1) { $(\"tr[title='Comment']\").hide(); } else { if (str.indexOf('675') != -1) { lbComment.innerText = \"Каких категорий не хватает?\"; } else { lbComment.innerText = \"Какие условия не подошли?\"; } $(\"tr[title='Comment']\").show(); Comment.SetText(''); }"}
+            })
+        </td>
+    </tr>
+
+    <tr style="display: none;" title="Comment">
+        <td class="table_label">
+            <div class="label" id="lbComment" style="float: left; font-size: 10pt;"></div>
+        </td>
+        <td colspan="3">
+            @Html.DevExpress().Memo(edtSettings =>
+            {
+                edtSettings.Name = "Comment";
+                edtSettings.Width = System.Web.UI.WebControls.Unit.Pixel(640);
+                edtSettings.Height = System.Web.UI.WebControls.Unit.Pixel(40);
+                edtSettings.Properties.ClientSideEvents.GotFocus = "OnEditorGotFocus";
+                edtSettings.Properties.ClientSideEvents.LostFocus = "OnEditorLostFocus";
+                edtSettings.ReadOnly = !(haveEdit && !Model.IsReadOnly);
+            }).Bind(Model.Comment).GetHtml()
+        </td>
+    </tr>
+
+    <tr style="display: none;" title="Overcharge">
+        <td>
+            @Html.DevExpress().Label(s => {
+                s.ControlStyle.CssClass = "label";
+                s.Style.Add("float", "left");
+                s.Text = "Товарные группы у которых слишком высокая цена:";
+            }).GetHtml()
+        </td>
+        <td colspan="3">
+            @Html.Partial("CheckBoxListPartial", Model, new ViewDataDictionary
+            {
+               { "Name", "Overcharge"},
+               { "Data", AnaliticModel.GetCollectionWONested(Hierarchy.SYSTEM_ANALITIC_TRADEGROUP) },
+               { "Value", (Model.Overcharge == null ? "" : Model.Overcharge) },
+               { "InitScript", "var rtp = document.getElementById(\"ReasonTradePoint\"); if (rtp.value.indexOf('676') == -1) { $(\"tr[title='Overcharge']\").hide(); } else { $(\"tr[title='Overcharge']\").show(); } if (rtp.value.indexOf('677') == -1 && rtp.value.indexOf('675') == -1) { $(\"tr[title='Comment']\").hide(); } else { if (rtp.value.indexOf('675') != -1) { lbComment.innerText = \"Каких категорий не хватает?\"; } else { lbComment.innerText = \"Какие условия не подошли?\"; } $(\"tr[title='Comment']\").show(); }" }
+            })
+        </td>
+    </tr>
+
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Примечание: ";
+                s.Style.Add("float", "left");
+            }).GetHtml()
+        </td>
+        <td colspan="3">
+            @Html.DevExpress().Memo(edtSettings =>
+            {
+                edtSettings.Name = GlobalPropertyNames.Memo;
+                edtSettings.Width = 640;
+                edtSettings.Properties.ClientSideEvents.GotFocus = "OnEditorGotFocus";
+                edtSettings.Properties.ClientSideEvents.LostFocus = "OnEditorLostFocus";
+                edtSettings.ReadOnly = !(haveEdit && !Model.IsReadOnly);
+            }).Bind(Model.Memo).GetHtml()
+        </td>
+    </tr>
+ </table>
+
+
+<br />
+<b>Информация об оборудовании:</b>
+<br />
+@Html.Partial("RefrigeratorsTypesPartial", Model) 
+
+<br />
+<b>Информация о продукции:</b>
+<br />
+@Html.Partial("RefrigeratorsPartial", Model)

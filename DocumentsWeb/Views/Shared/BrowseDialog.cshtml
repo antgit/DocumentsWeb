@@ -1,0 +1,107 @@
+﻿@using DocumentsWeb.Areas.General.Models
+@using DocumentsWeb.Models
+@model BrowseDialogModel
+<script type="text/javascript">
+    @*Такой синтаксис необходим для того чтобы два разных объекта BrowseDialog на одной странице не конфликтовали друг с другом*@
+    function @Model.Name@Html.Raw("MenuItemClick(s, e) {")
+        switch (e.item.name) {
+            case "mnuBrowseDialogSelect":
+                @Model.Name@Html.Raw("List.GetRowValues("+@Model.Name+"List.GetFocusedRowIndex(), 'Id;Name', "+@Model.Name+"GetRowValues);")
+                break;
+            case "mnuBrowseDialogCancel":
+                @Model.Name@Html.Raw(".Hide();")
+                break;
+            default:
+                alert(e.item.name);
+        }
+    }
+
+    function @Model.Name@Html.Raw("GetRowValues(values) {")
+        @Model.CallbackFunction@Html.Raw("(values);")
+        @Model.Name@Html.Raw(".Hide();")
+    }
+
+    function @Model.Name@Html.Raw("TreeNodeClick(s, e) {")
+        @Model.Name@Html.Raw("List.callbackUrl = ")'@DevExpressHelper.GetUrl(new { Area="", Controller = "BrowseDialog", Action = "BrowseDialogListPartial" })?hierarchyId=' + e.node.name;
+        @Model.Name@Html.Raw("List.PerformCallback();")
+    }
+
+    function @Model.Name@Html.Raw("TreeInit(s, e) {")
+        //var args = new ASPxClientTreeViewNodeClickEventArgs();
+        //args.node = s.GetRootNode().nodes[0].nodes[0];
+        //@Model.Name@Html.Raw("TreeNodeClick(s, args);")
+        //s.SetSelectedNode(args.node);        
+    }
+
+    function @Model.Name@Html.Raw("Shown(s,e){")
+        @Model.Name@Html.Raw("Splitter.SetHeight(s.height-100);")
+    }
+
+    function @Model.Name@Html.Raw("Resize(s,e){")
+        @Model.Name@Html.Raw("Splitter.SetHeight(s.height-100);")
+    }
+</script>
+
+@Html.DevExpress().PopupControl(settings =>{
+    settings.Name = Model.Name;
+    settings.Width = 647;
+    settings.Height = 400;
+    settings.AllowDragging = true;
+    settings.AllowResize = true;
+    settings.ResizingMode = ResizingMode.Postponed;
+    settings.CloseAction = CloseAction.CloseButton;
+    settings.EnableAnimation = false;
+    settings.HeaderText = Model.Caption;
+    settings.Modal = true;
+    settings.PopupHorizontalAlign = PopupHorizontalAlign.WindowCenter;
+    settings.PopupVerticalAlign = PopupVerticalAlign.WindowCenter;
+    settings.ClientSideEvents.Shown = Model.Name+"Shown";
+    settings.ClientSideEvents.Resize = Model.Name+"Resize";
+    settings.SetContent(() =>
+    {
+        Html.DevExpress().Menu(mnuSettings =>
+        {
+            mnuSettings.EnableHotTrack = true;
+            mnuSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            mnuSettings.Name = Model.Name+"Menu";
+            mnuSettings.ClientSideEvents.ItemClick = Model.Name + "MenuItemClick";
+            mnuSettings.Items.Add(item =>
+            {
+                item.Name = "mnuBrowseDialogSelect";
+                item.Text = "Выбрать";
+            });
+            mnuSettings.Items.Add(item =>
+            {
+                item.Name = "mnuBrowseDialogCancel";
+                item.Text = "Отмена";
+            });
+        }).GetHtml();
+        
+        Html.DevExpress().Splitter(s =>
+        {
+            s.Name = Model.Name + "Splitter";
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.Height = System.Web.UI.WebControls.Unit.Pixel(330);
+            s.Panes.Add(treePane =>
+            {
+                treePane.Name = Model.Name +"TreePane";
+                treePane.Size = System.Web.UI.WebControls.Unit.Percentage(33);
+                treePane.ShowCollapseBackwardButton = DefaultBoolean.True;
+                treePane.ScrollBars = System.Web.UI.WebControls.ScrollBars.Auto;
+                treePane.SetContent(() =>
+                {
+                    Html.RenderPartial("BrowseDialogTreePartial", new TreeModel(Model.RootHierarchy), new ViewDataDictionary() { { "ModelName", Model.Name } });
+                });
+            });
+            s.Panes.Add(listPane =>
+            {
+                listPane.Name = Model.Name + "ListPane";
+                listPane.ScrollBars = System.Web.UI.WebControls.ScrollBars.Auto;
+                listPane.SetContent(() =>
+                {
+                    Html.RenderPartial("BrowseDialogListPartial", new List<WebUnitModel>(), new ViewDataDictionary() { { "ModelName", Model.Name } });
+                });
+            });
+        }).GetHtml();
+    });
+}).GetHtml()

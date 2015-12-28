@@ -1,0 +1,61 @@
+﻿@using DevExpress.Web.Mvc.UI
+@using System.Web.UI.WebControls
+@inherits WebViewPage
+@{
+    ViewBag.Title = "Персональная страница";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script type="text/javascript">
+    function ShowPopupEdit(id) {
+        pcEdit.Load('@DevExpressHelper.GetUrl(new { Area = "UserPersonal", Controller = "Home", Action = "Edit" })/'+id, 600, 450);
+    }
+
+    function ShowPopupEdit2(id) {
+        pcEditUserNote.Load('@DevExpressHelper.GetUrl(new { Area = "UserPersonal", Controller = "UserNote", Action = "Edit" })/' + id, 600, 420);
+    }
+    function deleteNoteRow() {
+        if (gvViewMyNotes.GetFocusedRowIndex() != 0 && confirm("Удалить?")) {
+            var url = "UserNote/Delete?Id=" + gvViewMyNotes.GetRowKey(gvViewMyNotes.GetFocusedRowIndex());
+            $.get(url, function (data) {
+            }).success(function () {
+                gvViewMyNotes.PerformCallback('refresh=true');
+            });
+        }
+    }
+</script>
+
+@Html.Partial("NavpanelPartial")
+
+@Html.DevExpress().Splitter(settings =>
+{
+    settings.Name = "splFullScreenMode";
+    settings.Orientation = Orientation.Vertical;
+    settings.Styles.Pane.Paddings.Padding = 0;
+    settings.FullscreenMode = true;
+    
+    settings.Panes.Add(contentPane => contentPane.Panes.Add(gridPane =>
+        {
+            contentPane.ScrollBars = ScrollBars.Auto;
+            gridPane.Name = "GridPane";
+            gridPane.SetContent(() => Html.RenderPartial("IndexPartial"));
+        }));
+
+    settings.Panes.Add(footerPane =>{
+        footerPane.Size = 80;
+        footerPane.AllowResize = DefaultBoolean.False;
+        footerPane.ShowSeparatorImage = DefaultBoolean.False;
+        footerPane.SetContent(() => @Html.RenderPartial("FooterPartial"));
+    });
+}).GetHtml()
+
+@Html.Partial("PopupWindowPartial", new ViewDataDictionary { 
+    { "Title", "Личные данные" },
+    { "ShowFooter", true}
+})
+
+@Html.Partial("~/Areas/UserPersonal/Views/UserNote/PopupWindowPartial.cshtml", new ViewDataDictionary { 
+    { "Title", "Заметка..." },
+    { "AutoUpdateGrids", new[] { "gvViewMyNotes" } },
+    { "ShowFooter", true}
+})

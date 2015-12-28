@@ -1,0 +1,90 @@
+﻿@using DevExpress.Web.Mvc.UI
+@using System.Web.UI.WebControls
+@inherits System.Web.Mvc.WebViewPage
+             
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Пользователи";
+}
+                                                                                            
+<script type="text/javascript">
+    _aspxAttachEventToElement(window, "load", function () {
+        timeoutId = setTimeout(RefreshAllGridView, 20);
+    });
+    function RefreshAllGridView() {
+        dxGridViewUsers.ApplyFilter('StateId = 1');
+        var a = nbFeatures.GetItemByName('mnuFilterActive');
+        if (a != null) nbFeatures.SetSelectedItem(a);
+        dxGridViewUsers.SetVisible(true);
+    }
+    function ShowPopupEdit(id) {
+        pcEdit.Load('@DevExpressHelper.GetUrl(new { Controller = "User", Action = "Edit" })?Id=' + id, 600, 500);
+    }
+
+    function adjustSize() {
+        var height = splListActions.GetPaneByName('GridPane').GetClientHeight();
+        dxGridViewUsers.SetHeight(height);
+    }
+    function ControlUser() {
+        if (dxGridViewUsers.GetFocusedRowIndex() != -1) {
+            var id = dxGridViewUsers.GetRowKey(dxGridViewUsers.GetFocusedRowIndex());
+            window.open('@DevExpressHelper.GetUrl(new { Controller = "User", Action = "ControlView"})/' + id.toString(), '_blank');
+        }
+    }
+</script>
+
+@Html.Partial("NavpanelPartial")
+@Html.DevExpress().Splitter(settings =>
+{
+    settings.Name = "splFullScreenMode";
+    settings.Orientation = Orientation.Vertical;
+    settings.Styles.Pane.Paddings.Padding = 0;
+    settings.FullscreenMode = true;
+
+    settings.Panes.Add(contentPane =>
+    {
+        contentPane.Name = "contentPane";
+        contentPane.SetContent(() =>
+        {
+            @Html.DevExpress().Splitter(dpane =>
+            {
+                dpane.Name = "splListActions";
+                dpane.Orientation = Orientation.Vertical;
+                dpane.Styles.Pane.Paddings.Padding = 0;
+                dpane.Width = Unit.Percentage(100);
+                dpane.Height = Unit.Percentage(100);
+                dpane.Orientation = Orientation.Horizontal;
+                dpane.AllowResize = false;
+                dpane.Panes.Add(actionsPane =>
+                {
+                    actionsPane.Name = "ActionPane";
+                    actionsPane.AllowResize = DefaultBoolean.False;
+                    actionsPane.Size = 270;
+                    actionsPane.ShowCollapseBackwardButton = DefaultBoolean.True;
+                    actionsPane.ScrollBars = ScrollBars.None;
+                    actionsPane.SetContent(() => Html.RenderPartial("ActionsPartial"));
+                });
+                dpane.Panes.Add(cPane =>
+                {
+                    cPane.Name = "GridPane";
+                    cPane.SetContent(() => @Html.RenderPartial("IndexPartial", Model));
+                });
+                dpane.ClientSideEvents.PaneResized = "function (s, e) { adjustSize(); }";
+            }).Render();
+        });
+    });
+
+    settings.Panes.Add(footerPane =>{
+        footerPane.Size = 80;
+        footerPane.AllowResize = DefaultBoolean.False;
+        footerPane.ShowSeparatorImage = DefaultBoolean.False;
+        footerPane.SetContent(() => @Html.RenderPartial("FooterPartial"));
+    });
+}).GetHtml()
+
+
+@Html.Partial("PopupWindowPartial", new ViewDataDictionary { 
+    { "Title", "Пользователь" },
+    { "AutoUpdateGrids", new string[] { "dxGridViewUsers" } },
+    { "ShowFooter", true}
+})

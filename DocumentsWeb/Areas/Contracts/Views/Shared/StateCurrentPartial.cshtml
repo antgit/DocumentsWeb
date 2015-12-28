@@ -1,0 +1,17 @@
+﻿@using BusinessObjects
+@using DocumentsWeb.Areas.Analitics.Models
+@model DocumentsWeb.Areas.Contracts.Models.DocumentContractModel
+           
+@Html.DevExpress().ComboBox(s =>{
+    s.Name = "StateCurrentId";
+    s.Properties.ValueField = GlobalPropertyNames.Id;
+    s.Properties.TextField = GlobalPropertyNames.Name;
+    s.Properties.ValueType = typeof(int);
+    s.Properties.NullDisplayText = "Выберите состояние...";
+    //s.ControlStyle.CssClass = "editor";
+    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    s.ClientEnabled = !Model.IsReadOnly;
+    s.ShowModelErrors = true;
+    s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+}).BindList(AnaliticModel.GetCollection("CONTRACT_STATE")).Bind(Model.StateCurrentId).GetHtml()

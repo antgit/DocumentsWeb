@@ -1,0 +1,64 @@
+﻿@using BusinessObjects
+@using System.Web.UI.WebControls
+@using System.Drawing;
+@{
+    ViewBag.Title = "Документы...";
+}
+@if(false){<script src="~/Scripts/ASPxScriptIntelliSense.js" type="text/javascript"></script>}
+<script type="text/javascript">
+@*//<![CDATA[*@
+    function OnGridFocusedRowChanged(s, e) {
+        if(('PerformCallback' in gvDocuments)) {
+            gvDocuments.PerformCallback();
+        }
+    }
+@*// ]]>*@
+</script>
+@Html.Partial("NavpanelPartial")
+@Html.Partial("Ribbon")
+@Html.DevExpress().Splitter(settings =>{
+    settings.Name = "splResizing";
+    settings.Styles.Pane.Paddings.Padding = 0;
+    settings.Orientation = Orientation.Vertical;
+    settings.FullscreenMode = true;
+
+    settings.ClientSideEvents.PaneResized = "function (s, e) { var height = splResizing.GetPane(0).GetClientHeight(); gvDocuments.SetHeight(height);}";
+    
+    //settings.ClientSideEvents.PaneResized = "function (s, e) { if(s.name == 'gridContainer') { gvDocuments.SetHeight(s.GetHeight()); } }";
+
+    settings.Panes.Add(contentPane =>
+    {
+        //pane1.Name = "pane1";
+        contentPane.Panes.Add(treePane =>
+        {
+            treePane.Name = "treePane";
+            treePane.Size = 400;
+            treePane.ShowCollapseBackwardButton = DefaultBoolean.True;
+            treePane.ScrollBars = System.Web.UI.WebControls.ScrollBars.Auto;
+            treePane.SetContent(() =>
+            {
+                Html.RenderPartial("DocumentFoldersTreePartial", DocumentsWeb.Models.WADataProvider.GetViewFolders());
+            });
+        });
+        contentPane.Panes.Add(gridPane =>
+        {
+            gridPane.Name = "gridContainer";
+            //gridPane.ScrollBars = System.Web.UI.WebControls.ScrollBars.Auto;
+            gridPane.SetContent(() =>
+            {
+                Html.RenderPartial("IndexPartial");
+            });
+        });
+    });
+    settings.Panes.Add(footerPane =>
+    {
+        footerPane.Name = "footerPane";
+        footerPane.Size = 100;
+        footerPane.AllowResize = DefaultBoolean.False;
+        footerPane.ShowSeparatorImage = DefaultBoolean.False;
+        footerPane.SetContent(() =>
+        {
+            @Html.RenderPartial("FooterPartial");
+        });
+    });
+}).GetHtml()

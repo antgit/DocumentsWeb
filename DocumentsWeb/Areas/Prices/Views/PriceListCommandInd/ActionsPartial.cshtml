@@ -1,0 +1,100 @@
+﻿@using BusinessObjects
+@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentsWeb.Areas.Reports.Models
+@using DocumentsWeb.Controllers
+@using DocumentsWeb.Models
+@model DocumentsWeb.Areas.Prices.Models.DocumentPriceListModel
+           
+@Html.DevExpress().NavBar(
+settings =>
+{
+    settings.Name = "nbFeatures";
+    settings.AllowExpanding = true;
+    settings.AllowSelectItem = true;
+    settings.AutoCollapse = false;
+    settings.EnableHotTrack = true;
+    settings.EnableAnimation = true;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+    
+    settings.EncodeHtml = false;
+    settings.SaveStateToCookies = true;
+    settings.SaveStateToCookiesID = Url.RequestContext.RouteData.Values["controller"] + "Nav";
+
+    settings.Groups.Add(group => {
+        group.Text = "Действия";
+        group.HeaderImage.Url = Url.Content("~/Images/documentokey_x16.png");
+        group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+        group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.CssClass = "navpanellink";
+
+        group.Items.Add(item =>
+        {
+            item.Text = "Закрыть";
+            item.ToolTip = "Закрыть текущий документ без сохранения";
+            item.Image.Url = "~/Images/cross.png";
+            item.NavigateUrl = "javascript:window.open('', '_self', ''); window.close();";
+        });
+
+        group.Items.Add(item =>
+        {
+            item.Text = "Сохранить";
+            item.ToolTip = "Сохранить текущий документ возможно если заполнены все необходимые данные, требуемые для корректного оформления документа. Для больших документов рекомендуется сохраняться как можно чаще";
+            item.Image.Url = "~/Images/SAVE_X16.png";
+            item.NavigateUrl = "javascript:document.getElementById('documentEditForm').submit()";
+        });
+
+        DocumentsWeb.Code.LinkedDocumentsHelper.CreateChildDocuments(group, Model, this);
+
+    });
+
+    DocumentsWeb.Code.LinkedDocumentsHelper.CreateLinkedDocumentsGroup(settings, Model, ViewContext, Request, this);
+
+    if (Model.Id != 0)
+    {
+        settings.Groups.Add(group =>
+                                {
+                                    group.Text = "Процессы";
+                                    group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+                                    group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+                                    group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+                                    group.ItemStyle.CssClass = "navpanellink";
+                                    group.HeaderImage.Url = Url.Content("~/Images/gear_green_x16.png");
+
+
+                                });
+    }
+
+    settings.Groups.Add(group =>
+    {
+        group.Text = "Отчеты";
+        group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+        group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.CssClass = "navpanellink";
+        group.HeaderImage.Url = Url.Content("~/Images/REPORT_X16.png");
+        group.Expanded = true;
+        CoreDocumentControler controller = (CoreDocumentControler)ViewContext.Controller;
+        foreach (Library report in controller.LinkedReports())
+        {
+            if (WebReportModel.IsReportAllow(report.Code))
+            {
+                MVCxNavBarItem item = group.Items.Add(report.Name, string.Format("mnuReport{0}", report.Code), "~/Images/STIREPORT_X16.png");
+                item.ToolTip = report.Memo;
+                item.Target = "_blank";
+                item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "Report", Action = "Build", Area = "Reports" }) + "?id=" + report.Id;
+            }
+        }
+
+        if (WADataProvider.HiearchyElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_REPORTS))
+        {
+            MVCxNavBarItem item = group.Items.Add("Перейти в отчеты...", "mnuReportNavToReportsMain", "~/Images/arrowgreen.png");
+            item.ToolTip = "Перейти в раздел отчетов...";
+            item.NavigateUrl = Url.Action("Index", new {area = "Reports", Controller = "Report"});
+            item.Target = "_blank";
+        }
+    });
+}).GetHtml()
+@Html.Partial("WaitViewPartial")

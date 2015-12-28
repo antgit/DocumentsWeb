@@ -1,0 +1,74 @@
+﻿@using DocumentsWeb.Code;
+
+@{
+    string Name = (string)ViewData["Name"];
+    string ComboboxName = (string)ViewData["ComboboxName"];
+    string NomComboboxName = (string)ViewData["NomComboboxName"];
+    int ComboboxButtonIndex = (int)ViewData["ComboboxButtonIndex"];
+    bool showOnlyServices = ViewData["showOnlyServices"]==null ? false : (bool)ViewData["showOnlyServices"];
+    bool showOnlyProducts = ViewData["showOnlyProducts"] == null ? false : (bool)ViewData["showOnlyProducts"];
+}
+<script type="text/javascript">
+    function onSelectProductClick(s,e){
+        @Html.Raw("var id = gv" + Name + ".GetRowKey(gv" + Name + ".GetFocusedRowIndex());")
+        if (id != null) {
+            $.post('@DevExpressHelper.GetUrl(new { Area="Products", Controller = "Product", Action = "GetProductInfo" })',{id:id}).success(function (data) {
+                @Html.Raw(ComboboxName + ".AddItem(data.name, id);");
+                @Html.Raw(ComboboxName + ".SetValue(id);");
+                @if(NomComboboxName!=null)
+                {
+                    @Html.Raw(NomComboboxName + ".AddItem(data.nom, id);");
+                    @Html.Raw(NomComboboxName + ".SetValue(id);");
+                }
+            });
+            @Html.Raw(Name + ".Hide();");
+
+        }
+    }
+</script>
+
+
+@Html.DevExpress().PopupControl(pc =>
+{
+    pc.Name = Name;
+    pc.PopupElementID = ComboboxName + "_B" + ComboboxButtonIndex.ToString() + "Img";
+    pc.Height = 250;
+    pc.Width = 520;
+
+    pc.ShowFooter = false;
+    pc.ShowHeader = false;
+    pc.PopupHorizontalAlign = PopupHorizontalAlign.LeftSides;
+    pc.PopupVerticalAlign = PopupVerticalAlign.Below;
+    pc.EnableAnimation = true;
+    pc.AllowDragging = false;
+    pc.CloseAction = CloseAction.MouseOut;
+
+    pc.SetContent(() =>
+    {
+        ViewContext.Writer.Write("<table style=\"width: 100%;\"><tr><td>");
+        Html.RenderPartial("ProductsFinderGridPartial", new ViewDataDictionary { 
+            { "Name", Name },
+            { "showOnlyServices", showOnlyServices },
+            { "showOnlyProducts", showOnlyProducts }
+        });
+        ViewContext.Writer.Write("</td></tr><tr><td><table style=\"float:right;\"><tr><td>");
+        Html.DevExpress().Button(s =>
+        {
+            s.Name = "gv" + Name + "_btnSelectProduct";
+            s.Text = "Выбрать";
+            //s.ClientSideEvents.Click = "function (s, e) { var id = gv" + Name + ".GetRowKey(gv" + Name + ".GetFocusedRowIndex()); if (id != null) { " + ComboboxName + ".SetValue(id); gv" + Name + ".GetRowValues(gv" + Name + ".GetFocusedRowIndex(),'Name;', OnGetRowValues); } " + Name + ".Hide(); }";
+            s.ClientSideEvents.Click = "onSelectProductClick";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().Button(s =>
+        {
+            s.Name = "gv" + Name + "_btnCancelProduct";
+            s.Text = "Отмена";
+            s.ClientSideEvents.Click = "function (s, e) { " + Name + ".Hide(); }";
+        }).Render();
+        ViewContext.Writer.Write("</td></tr></table></td></tr></table>");
+    });
+
+    //pc.ClientSideEvents.PopUp = "function(s,e){ s.SetWindowPopupElementID('" + ComboboxName + "_B" + ComboboxButtonIndex.ToString() + "Img" + "'); }";  
+    //pc.ClientSideEvents.
+}).GetHtml()

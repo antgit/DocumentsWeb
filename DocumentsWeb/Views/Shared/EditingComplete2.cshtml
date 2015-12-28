@@ -1,0 +1,15 @@
+﻿@{
+    ViewBag.Title = "Редактирование завершено";
+}
+
+<h2>Редактирование завершено</h2>
+<script type="text/javascript">
+    //window.close();
+    if (typeof parent.pcEdit != 'undefined') {
+        parent.pcEdit.Hide();
+    }
+    else {
+        window.open('', '_self', '');
+        window.close();
+    }
+</script>

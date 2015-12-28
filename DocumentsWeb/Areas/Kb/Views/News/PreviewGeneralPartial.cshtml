@@ -1,0 +1,122 @@
+﻿@using BusinessObjects
+@model DocumentsWeb.Areas.Kb.Models.NewsModel
+<table class="edit_form_table2">
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Заголовок:";
+                    settings.AssociatedControlName = GlobalPropertyNames.Name;
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = GlobalPropertyNames.Name;
+                    settings.Properties.Style.Font.Bold = true;
+                }).Bind(Model.Name).GetHtml() 
+        </td>
+    </tr>
+        <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                                   {
+                                       settings.Text = "Кратко:";
+                                       settings.AssociatedControlName = GlobalPropertyNames.NameFull;
+                                   }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                                   {
+                                       settings.Name = GlobalPropertyNames.NameFull;
+                                       settings.Properties.Style.Font.Bold = true;
+                                   }).Bind(Model.NameFull).GetHtml() 
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Код:";
+                    settings.AssociatedControlName = GlobalPropertyNames.Code;
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = GlobalPropertyNames.Code;
+                    settings.Properties.Style.Font.Bold = true;
+                }).Bind(Model.Code).GetHtml() 
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Код поиска:";
+                    settings.AssociatedControlName = GlobalPropertyNames.CodeFind;
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = GlobalPropertyNames.CodeFind;
+                    settings.Properties.Style.Font.Bold = true;
+                }).Bind(Model.CodeFind).GetHtml() 
+        </td>
+    </tr>
+    
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Дата публикации:";
+                    settings.AssociatedControlName = GlobalPropertyNames.SendDate;
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = GlobalPropertyNames.SendDate;
+                    settings.Properties.Style.Font.Bold = true;
+                }).Bind(Model.SendDate.HasValue? Model.SendDate.Value.ToShortDateString(): string.Empty).GetHtml() 
+                
+                @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = GlobalPropertyNames.SendTime;
+                    settings.Properties.Style.Font.Bold = true;
+                }).Bind(Model.SendTime).GetHtml() 
+        </td>
+    </tr>
+
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Автор:";
+                    //settings.AssociatedControlName = GlobalPropertyNames.SendDate;
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                {
+                    //settings.Name = GlobalPropertyNames.AgentOwnerName;
+                    settings.Properties.Style.Font.Bold = true;
+                }).Bind(Model.AgentOwnerName).GetHtml() 
+                
+        </td>
+    </tr>
+
+    <tr>
+        
+        <td colspan="2">
+            <hr /> <b>Сообщение:</b> <br />                      
+            @Html.DevExpress().Label(settings =>
+                                   {
+                                       settings.Name = GlobalPropertyNames.Memo;
+                                       settings.EncodeHtml = false;
+                                   }).Bind(string.IsNullOrEmpty(Model.Memo)? "<К сожалению описание данной аналитики отсутствует!>": Model.Memo).GetHtml() 
+            <hr />
+        </td>
+    </tr>
+</table>

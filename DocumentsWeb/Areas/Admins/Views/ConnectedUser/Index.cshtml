@@ -1,0 +1,33 @@
+﻿@using DevExpress.Web.Mvc.UI
+@using System.Web.UI.WebControls
+@inherits WebViewPage
+@{
+    ViewBag.Title = "Пользователи на сайте...";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+    
+@Html.Partial("NavpanelPartial")
+@{
+    var currentUser = Membership.GetUser();
+}
+@Html.DevExpress().Splitter(settings =>
+{
+    settings.Name = "splFullScreenMode";
+    settings.Orientation = Orientation.Vertical;
+    settings.Styles.Pane.Paddings.Padding = 0;
+    settings.FullscreenMode = true;
+
+    settings.Panes.Add(contentPane =>
+    {
+        contentPane.ScrollBars = ScrollBars.Auto;
+        contentPane.SetContent(() => @Html.RenderPartial("IndexPartial", Model));
+    });
+
+    settings.Panes.Add(footerPane =>{
+        footerPane.Size = 80;
+        footerPane.AllowResize = DefaultBoolean.False;
+        footerPane.ShowSeparatorImage = DefaultBoolean.False;
+        footerPane.SetContent(() => @Html.RenderPartial("FooterPartial"));
+    });
+}).GetHtml()
+)

@@ -1,0 +1,339 @@
+﻿@using DocumentsWeb.Models
+@using System.Web.UI.WebControls
+@using DocumentsWeb.Areas.Agents.Models
+@model ClientModel
+
+@{
+    bool showWorkers = true;
+    bool showTraders = true;
+    bool showDismissed = true;
+
+    try { showWorkers = bool.Parse(Request.Cookies["MyDepatmentWorkersFiler_cbWorkers"].Value); }
+    catch { }
+    try { showTraders = bool.Parse(Request.Cookies["MyDepatmentWorkersFiler_cbTrader"].Value); }
+    catch { }
+    try { showDismissed = bool.Parse(Request.Cookies["MyDepatmentWorkersFiler_cbDismissed"].Value); }
+    catch { }
+}
+
+@Html.DevExpress().GridView(s =>
+{
+    s.Name = "gvWorkers";
+    s.CallbackRouteValues = new { Controller = "MyDepatment", Action = "MyDepatmentControlWorkersPartial", mId = Model.ModelId };
+    s.SettingsEditing.AddNewRowRouteValues = new { Controller = "MyDepatment", Action = "MyDepatmentControlWorkersAddNew", mId = Model.ModelId };
+    s.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    s.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+    s.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;    
+    s.KeyFieldName = "Id";
+    s.SettingsBehavior.AllowFocusedRow = true;
+    s.SettingsBehavior.AutoExpandAllGroups = true;
+    s.Settings.ShowFilterRow = true;
+    
+    //s.Settings.ShowVerticalScrollBar = true;
+    s.Settings.ShowHorizontalScrollBar = false;
+
+       
+    MVCxGridViewColumn colAction = s.Columns.Add("", "Действия");
+    colAction.Width = Unit.Pixel(75);
+    colAction.SetDataItemTemplateContent(c =>
+    {
+        ViewContext.Writer.Write("<table><tr>");
+
+        if (WADataProvider.CommonRightView.AdminEnterprize)
+        {
+            ViewContext.Writer.Write("<td>");
+            Html.DevExpress().HyperLink(st =>
+            {
+                st.Properties.ImageUrl = Url.Content("~/Images/remove_x16.png");
+                st.ToolTip = "Удалить";
+                st.NavigateUrl = "javascript:processWorker('" + c.KeyValue.ToString() + "', 'delete');";
+            }).Render();
+            ViewContext.Writer.Write("</td>");
+        }
+
+        if ((ClientChainState)DataBinder.Eval(c.DataItem, "AgentState") == ClientChainState.Worker)
+        {
+            ViewContext.Writer.Write("<td>");
+            Html.DevExpress().HyperLink(st =>
+            {
+                st.Properties.ImageUrl = Url.Content("~/Images/dismiss_x16.gif");
+                st.ToolTip = "Уволить";
+                st.NavigateUrl = "javascript:processWorker('" + c.KeyValue.ToString() + "', 'dismiss');";
+            }).Render();
+
+            ViewContext.Writer.Write("</td><td>");
+            Html.DevExpress().HyperLink(st =>
+            {
+                st.Properties.ImageUrl = Url.Content("~/Images/commercial_x16.gif");
+                st.ToolTip = "Сделать торговым агентом";
+                st.NavigateUrl = "javascript:processWorker('" + c.KeyValue.ToString() + "', 'make_trader');";
+            }).Render();
+        }
+
+        if ((ClientChainState)DataBinder.Eval(c.DataItem, "AgentState") == ClientChainState.Trader)
+        {
+            ViewContext.Writer.Write("</td><td>");
+            Html.DevExpress().HyperLink(st =>
+            {
+                st.Properties.ImageUrl = Url.Content("~/Images/dismiss_x16.gif");
+                st.ToolTip = "Уволить";
+                st.NavigateUrl = "javascript:processWorker('" + c.KeyValue.ToString() + "', 'dismiss');";
+            }).Render();
+        }
+
+        if ((ClientChainState)DataBinder.Eval(c.DataItem, "AgentState") == ClientChainState.Dissmised)
+        {
+            ViewContext.Writer.Write("</td><td>");
+            Html.DevExpress().HyperLink(st =>
+            {
+                st.Properties.ImageUrl = Url.Content("~/Images/worker_x16.gif");
+                st.ToolTip = "Принять на работу";
+                st.NavigateUrl = "javascript:processWorker('" + c.KeyValue.ToString() + "', 'make_worker');";
+            }).Render();
+        }
+        
+        ViewContext.Writer.Write("</td></tr></table>");
+    });
+    MVCxGridViewColumn colChain = s.Columns.Add("AgentStateName", "Связь");
+    colChain.GroupIndex = 0;
+    MVCxGridViewColumn colName = s.Columns.Add("Agent.Name", "Имя");
+    colName.SortOrder = DevExpress.Data.ColumnSortOrder.Ascending;
+    colName.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+ 
+    //s.Columns.Add("TaxNumber", "ИНН").Settings.AutoFilterCondition = AutoFilterCondition.BeginsWith;
+    //s.Columns.Add("Phone", "Телефон").Settings.AutoFilterCondition = AutoFilterCondition.BeginsWith;
+    //s.Columns.Add("MyCompanyName", "Филиал").Settings.AutoFilterCondition = AutoFilterCondition.BeginsWith;
+    
+    MVCxGridViewColumn colState = s.Columns.Add("Agent.StateName", "Состояние");
+    colState.Width = 100;
+    colState.Settings.AutoFilterCondition = AutoFilterCondition.BeginsWith;
+    
+    MVCxGridViewColumn colMemo = s.Columns.Add("Agent.DisplayMemo", "Примечание");
+    colMemo.Width = 100;
+    colMemo.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+
+    /*s.CommandColumn.Visible = true;
+    s.CommandColumn.Width = 75;
+    s.CommandColumn.Caption = "Действия";
+    s.CommandColumn.DeleteButton.Visible = true;
+    s.CommandColumn.EditButton.Text = "Изменить";
+    s.CommandColumn.EditButton.Visible = true;*/
+    
+    s.SettingsPager.PageSize = Utils.GetPageSize(s);
+    s.SettingsPager.Position = System.Web.UI.WebControls.PagerPosition.Top;
+    s.SettingsPager.AlwaysShowPager = true;
+
+    s.SetPagerBarTemplateContent(c =>
+    {
+        Html.RenderPartial("TablePager", new ViewDataDictionary
+        {
+            { "ContentObject", c }
+        });
+    });
+
+    s.Settings.ShowTitlePanel = true;
+    s.SetTitlePanelTemplateContent(c =>
+    {
+        Html.DevExpress().Menu(ms =>
+        {
+            ms.Name = "WorkersFilterMenu";
+            ms.Width = Unit.Percentage(100);
+            ms.ShowAsToolbar = true;
+            ms.EnableClientSideAPI = true;
+            ms.AllowSelectItem = false;
+            ms.AutoSeparators = AutoSeparatorMode.RootOnly;
+            ms.Styles.Style.SeparatorWidth = 0;
+
+            MVCxMenuItem cbWorkers = ms.Items.Add("");
+            cbWorkers.ToolTip = "Сотрудники";
+            cbWorkers.BeginGroup = true;
+            cbWorkers.GroupName = "G2";
+            cbWorkers.Image.Url = Url.Content("~/Images/worker_x16.gif");
+            cbWorkers.Name = "cbWorkers";
+            cbWorkers.Checked = showWorkers;
+
+            MVCxMenuItem cbTrader = ms.Items.Add("");
+            cbTrader.ToolTip = "Торговые";
+            cbTrader.BeginGroup = true;
+            cbTrader.GroupName = "G1";
+            cbTrader.Image.Url = Url.Content("~/Images/commercial_x16.gif");
+            cbTrader.Name = "cbTrader";
+            cbTrader.Checked = showTraders;
+
+            MVCxMenuItem cbDismissed = ms.Items.Add("");
+            cbDismissed.ToolTip = "Уволенные";
+            cbDismissed.BeginGroup = true;
+            cbDismissed.GroupName = "G3";
+            cbDismissed.Image.Url = Url.Content("~/Images/dismissed_x16.gif");
+            cbDismissed.Name = "cbDismissed";
+            cbDismissed.Checked = showDismissed;
+
+            ms.ClientSideEvents.ItemClick = "function (s, e) { ASPxClientUtils.SetCookie('MyDepatmentWorkersFiler_' + e.item.name, e.item.GetChecked().toString()); gvWorkers.PerformCallback(); }";
+
+        }).Render();
+    });
+
+    s.SetEditFormTemplateContent(et =>
+    {
+        ViewContext.Writer.Write("<table style=\"width: 100%;\">");
+
+        ViewContext.Writer.Write("<tr><td colspan=\"2\">");
+        ViewContext.Writer.Write("<table><tr><td>");
+        Html.DevExpress().Button(btnSettings =>
+        {
+            btnSettings.Name = "btnUpdate";
+            btnSettings.ControlStyle.CssClass = "button";
+            btnSettings.Text = "Сохранить";
+            btnSettings.ClientSideEvents.Click = "function(s, e){ gvWorkers.UpdateEdit(); }";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().Button(btnSettings =>
+        {
+            btnSettings.Name = "btnCancel";
+            btnSettings.ControlStyle.CssClass = "button";
+            btnSettings.Text = "Отмена";
+            btnSettings.ClientSideEvents.Click = "function(s, e){ gvWorkers.CancelEdit(); }";
+        }).Render();
+        ViewContext.Writer.Write("</td></tr></table>");
+        ViewContext.Writer.Write("</td></tr>");
+        
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(lb =>
+        {
+            lb.ControlStyle.CssClass = "label";
+            lb.Text = "Наименование:";
+            lb.AssociatedControlName = "NewAgentName";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.Hidden("MyCompanyId", Model.Id);
+        Html.DevExpress().TextBox(tb =>
+        {
+            tb.Name = "NewAgentName";
+            tb.Width = Unit.Percentage(100);
+            tb.ShowModelErrors = true;
+            tb.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            tb.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(ViewData["NewAgentName"]).Render();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(lb =>
+        {
+            lb.ControlStyle.CssClass = "label";
+            lb.Text = "ИНН:";
+            lb.AssociatedControlName = "NewAgentINN";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TextBox(tb =>
+        {
+            tb.Name = "NewAgentINN";
+            tb.Width = Unit.Percentage(100);
+        }).Bind(ViewData["NewAgentINN"]).Render();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td colspan=\"2\">");
+        ViewContext.Writer.Write("<hr />");
+        ViewContext.Writer.Write("</td></tr>");
+        
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(lb =>
+        {
+            lb.ControlStyle.CssClass = "label";
+            lb.Text = "Фамилия:";
+            lb.AssociatedControlName = "NewAgentF";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TextBox(tb =>
+        {
+            tb.Name = "NewAgentF";
+            tb.Width = Unit.Percentage(100);
+            tb.ShowModelErrors = true;
+            tb.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            tb.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(ViewData["NewAgentF"]).Render();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(lb =>
+        {
+            lb.ControlStyle.CssClass = "label";
+            lb.Text = "Имя:";
+            lb.AssociatedControlName = "NewAgentI";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TextBox(tb =>
+        {
+            tb.Name = "NewAgentI";
+            tb.Width = Unit.Percentage(100);
+            tb.ShowModelErrors = true;
+            tb.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            tb.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(ViewData["NewAgentI"]).Render();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(lb =>
+        {
+            lb.ControlStyle.CssClass = "label";
+            lb.Text = "Отчество:";
+            lb.AssociatedControlName = "NewAgentO";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TextBox(tb =>
+        {
+            tb.Name = "NewAgentO";
+            tb.Width = Unit.Percentage(100);
+            tb.ShowModelErrors = true;
+            tb.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            tb.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(ViewData["NewAgentO"]).Render();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td colspan=\"2\">");
+        ViewContext.Writer.Write("<hr />");
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(lb =>
+        {
+            lb.ControlStyle.CssClass = "label";
+            lb.Text = "Мат. ответственный:";
+            lb.AssociatedControlName = "NewAgentMO";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().ComboBox(tb =>
+        {
+            tb.Name = "NewAgentMO";
+            tb.Width = Unit.Percentage(100);
+            tb.Properties.ValueField = "Id";
+            tb.Properties.TextField = "Name";
+            tb.Properties.ValueType = typeof(int);
+        }).BindList(new ComboboxModel[] { new ComboboxModel { Id = 0, Name = "Нет" }, new ComboboxModel { Id = 1, Name = "Да" } }).Bind(ViewData["NewAgentMO"] == null ? 0 : ViewData["NewAgentMO"]).Render();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(lb =>
+        {
+            lb.ControlStyle.CssClass = "label";
+            lb.Text = "Таб. номер:";
+            lb.AssociatedControlName = "NewAgentTN";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TextBox(tb =>
+        {
+            tb.Name = "NewAgentTN";
+            tb.Width = Unit.Percentage(100);
+        }).Bind(ViewData["NewAgentTN"]).Render();
+        ViewContext.Writer.Write("</td></tr>");
+        
+        ViewContext.Writer.Write("</table>");
+    });
+    
+    s.Settings.ShowFooter = true;
+
+    s.SetFooterRowTemplateContent(c =>
+    {
+        ViewContext.Writer.Write("<div style=\"width: 100%; text-align: center; font-size: 10pt;\"><a href=\"javascript:gvWorkers.AddNewRow();\">Создать</a></div>");
+    });
+}).Bind(Model.ChainAgents.Where(w => w.StateId != BusinessObjects.State.STATEDELETED && w.AgentState != ClientChainState.Deleted && ((showWorkers && w.AgentState == ClientChainState.Worker) || (showTraders && w.AgentState == ClientChainState.Trader) || (showDismissed && w.AgentState == ClientChainState.Dissmised)))).GetHtml()

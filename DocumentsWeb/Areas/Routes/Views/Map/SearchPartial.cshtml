@@ -1,0 +1,23 @@
+﻿<table style="border-collapse: collapse; width: 100%;">
+    <tr>
+        <td style="padding: 5px; height: 1px;">
+            @Html.DevExpress().TextBox(s => {
+                s.Name = "tbSearch";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ShowModelErrors = false;
+                s.Properties.ClientSideEvents.KeyPress = "function (s, e) { if (e.htmlEvent.keyCode == 13) { search(); } }";
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr id="searchResult" style="display: none;">
+        <td style="padding: 5px;">
+            @Html.DevExpress().ListBox(s => {
+                s.Name = "lbSearchResult";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.Height = System.Web.UI.WebControls.Unit.Pixel(150);
+                s.Properties.EnableClientSideAPI = true;
+                s.Properties.ClientSideEvents.SelectedIndexChanged = "function (s, e) { selectSearchRow(s.GetItem(e.index).value); }";
+            }).GetHtml()
+        </td>
+    </tr>
+</table>

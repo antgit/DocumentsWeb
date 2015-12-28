@@ -1,0 +1,22 @@
+﻿@model DocumentsWeb.Areas.Taxes.Models.DocumentTaxModel
+@using BusinessObjects
+
+@Html.DevExpress().ComboBox(settings=>
+{
+    settings.Name = GlobalPropertyNames.DeliveryCondition;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.ClientEnabled = !Model.IsReadOnly;
+    settings.ShowModelErrors = !Model.IsReadOnly && Model.MainCompanyDepatmentId.HasValue && Model.MainCompanyDepatmentId.Value != 0;
+    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    settings.Properties.DropDownStyle = DropDownStyle.DropDown;
+    
+    settings.Properties.ValueType = typeof(string);
+    settings.Properties.Items.Add("Договір поставки");
+    settings.Properties.Items.Add("Двусторонний куплі-продажу");
+    settings.Properties.Items.Add("Рахунок");
+    settings.Properties.Items.Add("Згідно з накладною");
+    settings.Properties.Items.Add("Договір виконання робіт");
+}).Bind(Model.DeliveryCondition).GetHtml()

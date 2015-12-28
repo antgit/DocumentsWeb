@@ -1,0 +1,50 @@
+﻿@using BusinessObjects
+@Html.DevExpress().GridView(settings=>{
+    settings.Name="gvDocuments";
+    settings.CallbackRouteValues = new { Controller = "Document", Action = "DogovorPartial" };
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.SettingsBehavior.AllowFocusedRow = true;
+    settings.KeyFieldName = GlobalPropertyNames.Id;
+    settings.Settings.ShowGroupPanel = true;
+    settings.Settings.ShowFilterRow = true;
+    settings.Settings.ShowFilterRowMenu = true;
+    settings.Settings.ShowFilterBar = GridViewStatusBarMode.Visible;
+    settings.SettingsCustomizationWindow.Enabled = true;
+    settings.Columns.Add(column =>
+    {
+        column.Width = 20;
+        column.SetDataItemTemplateContent(c =>
+        {
+            if ((int)DataBinder.Eval(c.DataItem, "StateId") == BusinessObjects.State.STATEACTIVE)
+            {
+                ViewContext.Writer.Write("<img src=\"" + Url.Content("~/Images/DOCUMENTDONE_X16.png") + "\" />");
+            }
+            else
+            {
+                ViewContext.Writer.Write("<img src=\"" + Url.Content("~/Images/DOCUMENTNOTDONE_X16.png") + "\" />");
+            }
+        });
+    });
+    settings.Columns.Add(column =>
+    {
+        column.FieldName = GlobalPropertyNames.Date;
+        column.Caption = "Дата";
+        column.Width = 70;
+        column.PropertiesEdit.DisplayFormatString = "d";
+    });
+    settings.Columns.Add("DocNumber", "Номер").Width = 100;
+    settings.Columns.Add("Name", "Имя");
+    settings.Columns.Add(column =>
+    {
+        column.FieldName = GlobalPropertyNames.Summa;
+        column.Caption = "Сумма";
+        column.Width = 100;
+        column.PropertiesEdit.DisplayFormatString = "0.00";
+    });
+    settings.Columns.Add("AgentFromName", "Кто").Width = 150;
+    settings.Columns.Add("AgentToName", "Кому").Width = 150;
+    settings.Columns.Add("StateName", "Состояние").Width = 100;
+    settings.Columns.Add("MyCompanyName", "Владелец").Visible = false;
+    settings.Columns.Add("MyCompanyCode", "Владелец (Код)").Width = 100;
+    settings.ClientSideEvents.BeginCallback = "function(s,e){ e.customArgs['folderId'] = gvFoldersTree.GetRowKey(gvFoldersTree.GetFocusedRowIndex());}"; 
+}).Bind(Model).GetHtml()

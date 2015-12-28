@@ -1,0 +1,96 @@
+﻿@using DevExpress.Web.Mvc.UI
+@using System.Web.UI.WebControls
+
+@inherits WebViewPage
+@{
+    ViewBag.Title = "База знаний";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script type="text/javascript">
+    var change_hie_root = false;
+    _aspxAttachEventToElement(window, "load", function () {
+        ShowOnlyActive();
+        setTimeout(function () {
+            dxGridViewKnowledge.SetVisible(true);
+        }, 100);
+    });
+    function CreateHyperlink() {
+        if (tvHierarchiesFilter.GetSelectedNode() != null) {
+            ShowPopupEdit(0, @BusinessObjects.Knowledge.KINDID_ONLINE);
+        } else {
+            alert('Необходимо выбрать иерархию');
+        }
+    }
+    function CreateLocal() {
+        if (tvHierarchiesFilter.GetSelectedNode() != null) {
+            ShowPopupEdit(0, @BusinessObjects.Knowledge.KINDID_LOCAL);
+        } else {
+            alert('Необходимо выбрать иерархию');
+        }
+    }
+    function ShowPopupEdit(id, kind) {
+        var hie_id = 0;
+
+        if (tvHierarchiesFilter.GetSelectedNode() != null) {
+            hie_id = tvHierarchiesFilter.GetSelectedNode().name;
+        }
+        pcEdit.Load('@DevExpressHelper.GetUrl(new { Area = "Kb", Controller = "KbBase", Action = "Edit" })/' + id + '?KindId=' + kind + '&HieId=' + hie_id, 750, 350);
+    }
+    function AdjustGridSize() {
+        var height = splFullScreenMode.GetPaneByName('GridPane').GetClientHeight();
+        dxGridViewKnowledge.SetHeight(height);
+    }
+</script>
+
+@Html.Partial("NavpanelPartial")
+@Html.DevExpress().Splitter(settings =>
+{
+    settings.Name = "splFullScreenMode";
+    settings.Orientation = Orientation.Vertical;
+    settings.Styles.Pane.Paddings.Padding = 0;
+    settings.FullscreenMode = true;
+    settings.ClientSideEvents.PaneResized = "function (s, e) { AdjustGridSize(); }";
+    
+    settings.Panes.Add(contentPane =>
+    {
+        contentPane.ScrollBars = ScrollBars.Auto;
+        contentPane.Panes.Add(actionsPane =>
+        {
+            actionsPane.Name = "actionPane";
+            actionsPane.Size = 270;
+            actionsPane.MinSize = 270;
+            actionsPane.AllowResize = DefaultBoolean.True;
+            actionsPane.ShowCollapseBackwardButton = DefaultBoolean.True;
+            actionsPane.SetContent(() => Html.RenderPartial("ActionsPartial"));
+        });
+        
+        contentPane.Panes.Add(gridPane =>
+        {
+            gridPane.Name = "GridPane";
+            gridPane.SetContent(() => Html.RenderPartial("IndexPartial"));
+        });
+
+        contentPane.Panes.Add(reportsPane =>
+        {
+            reportsPane.Name = "reportsPane";
+            reportsPane.Size = 270;
+            reportsPane.MinSize = 270;
+            reportsPane.AllowResize = DefaultBoolean.True;
+            reportsPane.ShowCollapseForwardButton = DefaultBoolean.True;
+            reportsPane.SetContent(() => Html.RenderPartial("ReportsPartial"));
+        });
+    });
+
+    settings.Panes.Add(footerPane =>{
+        footerPane.Size = 80;
+        footerPane.AllowResize = DefaultBoolean.False;
+        footerPane.ShowSeparatorImage = DefaultBoolean.False;
+        footerPane.SetContent(() => @Html.RenderPartial("FooterPartial"));
+    });
+}).GetHtml()
+
+@Html.Partial("PopupWindowPartial", new ViewDataDictionary { 
+    { "Title", "" },
+    { "AutoUpdateGrids", new[] { "dxGridViewKnowledge" } },
+    { "ShowFooter", true }
+})

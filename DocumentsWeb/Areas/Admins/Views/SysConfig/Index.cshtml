@@ -1,0 +1,66 @@
+﻿@using DocumentsWeb.Areas.Admins.Models
+@using System.Web.UI.WebControls;
+@model SysConfigModel
+
+@{
+    ViewBag.Title = "Настройки системы";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src="@Url.Content("~/Scripts/Demo.js")" type="text/javascript"></script>
+<script type="text/javascript">
+    DXDemo.CurrentThemeCookieKey = "@Utils.CurrentThemeCookieKey";
+</script>
+@Html.Partial("NavpanelPartial")
+
+<script type="text/javascript">
+    function OnSysConfigMenuItemClick(s, e) {
+        switch (e.item.name) {
+            case "mnuSave":
+                document.getElementById('SysConfigForm').submit();
+                break;
+            default:
+                alert(e.item.name);
+                break;
+        }
+    }
+</script>
+
+@Html.DevExpress().Menu(settings =>
+{
+    settings.EnableHotTrack = true;
+    settings.Name = "mSysConfig";
+    settings.ClientSideEvents.ItemClick = "OnSysConfigMenuItemClick";
+    settings.Width = Unit.Percentage(100);
+    
+    settings.Items.Add(item =>
+    {
+        item.Name = "mnuSave";
+        item.Text = "Сохранить";
+        item.Image.Url = @Url.Content("~/Images/SAVE_X16.png");
+    });
+}).GetHtml()
+
+@using (Html.BeginForm("Save", "SysConfig", FormMethod.Post, new { @class = "edit_form", @id = "SysConfigForm" }))
+{
+    @Html.DevExpress().Splitter(settings =>
+    {
+        settings.Name = "splFullScreenMode";
+        settings.Orientation = Orientation.Vertical;
+        settings.Styles.Pane.Paddings.Padding = 0;
+        settings.FullscreenMode = true;
+
+        settings.Panes.Add(contentPane =>
+        {
+            contentPane.ScrollBars = ScrollBars.Auto;
+            contentPane.SetContent(() => @Html.RenderPartial("IndexPartial", Model));
+        });
+
+        settings.Panes.Add(footerPane =>
+        {
+            footerPane.Size = 80;
+            footerPane.AllowResize = DefaultBoolean.False;
+            footerPane.ShowSeparatorImage = DefaultBoolean.False;
+            footerPane.SetContent(() => @Html.RenderPartial("FooterPartial"));
+        });
+    }).GetHtml()
+}

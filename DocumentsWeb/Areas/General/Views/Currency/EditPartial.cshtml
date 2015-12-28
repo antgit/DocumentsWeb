@@ -1,0 +1,170 @@
+﻿@using BusinessObjects
+@using DevExpress.Web.Mvc.UI
+@using DocumentsWeb.Areas.General.Models
+@using DocumentsWeb.Controllers
+@model DocumentsWeb.Areas.General.Models.WebCurrencyModel
+
+@Html.DevExpress().PageControl(settings =>
+{
+    settings.Name = "tsPropDpcs";
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.ClientSideEvents.Init = "OnPropDpcsInit";
+    settings.Styles.Content.CssClass = "tabcontent";   
+    settings.TabPages.Add("Главная").SetContent(() =>
+    {
+        ViewContext.Writer.Write("<input type=\"hidden\" id=\"KindId\" name=\"KindId\" value=\"" + Model.KindId + "\" />");
+        ViewContext.Writer.Write("<table style=\"width: 500px;\">");
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        @Html.DevExpress().Label(s =>{
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Наименование:";
+            s.AssociatedControlName = GlobalPropertyNames.Name;
+        }).GetHtml();
+        ViewContext.Writer.Write("</td><td>");
+        @Html.DevExpress().TextBox(s =>{
+            s.Name = GlobalPropertyNames.Name;
+            s.Properties.NullText = "Введите наименование валюты...";
+            s.ControlStyle.CssClass = "editor";
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.ShowModelErrors = true;
+            s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.Name).GetHtml();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        @Html.DevExpress().Label(s =>{
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Сокращение:";
+            s.AssociatedControlName = GlobalPropertyNames.Code;
+        }).GetHtml();
+        ViewContext.Writer.Write("</td><td>");
+        @Html.DevExpress().TextBox(s =>{
+            s.Name = GlobalPropertyNames.Code;
+            s.Properties.NullText = "Введите код валюты...";
+            s.ControlStyle.CssClass = "editor";
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.ShowModelErrors = true;
+            s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.Code).GetHtml();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Код:";
+            s.AssociatedControlName = "IntCode";
+        }).GetHtml();
+        ViewContext.Writer.Write("</td><td>");
+        @Html.DevExpress().SpinEdit(s =>
+        {
+            s.Name = "IntCode";
+            s.Properties.NullText = "Введите код валюты...";
+            s.ControlStyle.CssClass = "editor";
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.ShowModelErrors = true;
+            s.Properties.MaxValue = 9999;
+            s.Properties.MinValue = 9999;
+            s.Properties.NumberType = SpinEditNumberType.Integer;
+            s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.IntCode).GetHtml();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        @Html.DevExpress().Label(s =>{
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Описание:";
+            s.AssociatedControlName = GlobalPropertyNames.Memo;
+        }).GetHtml();
+        ViewContext.Writer.Write("</td><td>");
+        @Html.DevExpress().Memo(s =>{
+            s.Name = GlobalPropertyNames.Memo;
+            s.Properties.NullText = "Введите примечание или писание валюты...";
+            s.ControlStyle.CssClass = "editor";
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.Height = 120;
+            s.ShowModelErrors = true;
+            s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.Memo).GetHtml();
+        ViewContext.Writer.Write("</td></tr></table>");
+    });
+
+    MVCxTabPage hie = settings.TabPages.Add("Иерархия");
+    hie.SetContent(() =>
+    {
+        CoreController<Currency> controller = (CoreController<Currency>)ViewContext.Controller;
+        Html.RenderAction("GroupsControlPartial", new
+        {
+            Area = "General",
+            Controller = "Hierarchy",
+            RootList = HierarchyModel.GetLinkedHierarchies(controller.RootHierachy, HierarchyModel.EDIT_HIERARCHY_CHAIN).Select(s => s.Code).ToArray(),
+            Model = Model,
+            IsReadonly = Model.IsReadOnly
+        });
+    });
+    
+    MVCxTabPage prop = settings.TabPages.Add("Свойства");
+    prop.Visible = DocumentsWeb.Models.WADataProvider.CommonRightView.AdminEnterprize;
+    prop.SetContent(() =>
+    {
+        ViewContext.Writer.Write("<table style=\"width: 500px;\">");
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Идентификатор:";
+            s.AssociatedControlName = "txtId";
+        }).GetHtml();
+        ViewContext.Writer.Write("</td><td>");
+        @Html.DevExpress().TextBox(s =>
+        {
+            s.Name = "txtId";
+            s.ControlStyle.CssClass = "editor";
+            s.ReadOnly = true;
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        }).Bind(Model.Id).GetHtml();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Имя пользователя:";
+            s.AssociatedControlName = GlobalPropertyNames.UserName;
+        }).GetHtml();
+        ViewContext.Writer.Write("</td><td>");
+        @Html.DevExpress().TextBox(s =>
+        {
+            s.Name = GlobalPropertyNames.UserName;
+            s.ControlStyle.CssClass = "editor";
+            s.ReadOnly = true;
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        }).Bind(Model.UserName).GetHtml();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Дата изменения:";
+            s.AssociatedControlName = GlobalPropertyNames.DateModified;
+        }).GetHtml();
+        ViewContext.Writer.Write("</td><td>");
+        @Html.DevExpress().TextBox(s =>
+        {
+            s.Name = GlobalPropertyNames.DateModified;
+            s.ControlStyle.CssClass = "editor";
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.ReadOnly = true;
+        }).Bind(Model.DateModified).GetHtml();
+        ViewContext.Writer.Write("</td></tr></table>");
+    });
+}).GetHtml()

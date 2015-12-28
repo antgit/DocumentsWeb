@@ -1,0 +1,76 @@
+﻿@model DocumentsWeb.Areas.Contracts.Models.DocumentContractModel
+@using System.Globalization
+@using DocumentsWeb.Models
+@using BusinessObjects
+
+@Html.DevExpress().GridView(settings=>{
+    settings.Name = "gvFiles";
+    settings.KeyFieldName = "RowId";
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control; 
+
+    settings.CallbackRouteValues = new { Controller = "Revision", Action = "FileGridPartial", modelId = Model.ModelId };
+    //settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Document", Action = "DocumentDetailSaleAddNewPartial", ownewrModelId=Model.ModelId };
+    settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Revision", Action = "FileGridEdit", ownewrModelId = Model.ModelId };
+    settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Revision", Action = "FileGridDelete", ownewrModelId = Model.ModelId };
+    settings.SettingsBehavior.AllowFocusedRow = true;
+    
+    //settings.Columns.Add(column =>
+    //{
+    //    column.Caption = "Действия";
+    //    column.Width = 110;
+    //    column.SetDataItemTemplateContent(c =>
+    //    {
+    //        ViewContext.Writer.Write("<a href=\"#\" onclick=\"pcEdit.SetContentUrl('"+
+    //            DevExpressHelper.GetUrl(new { Area="", Controller = "FileData", Action = "EditModel", rowId = DataBinder.Eval(c.DataItem, "RowId") }) +
+    //            "');pcEdit.Show()\">Изменить</a> ");
+    //        ViewContext.Writer.Write("<a href=\"#\" onclick=\"if(confirm('Удалить файл?'))gvFiles.DeleteRowByKey('" + DataBinder.Eval(c.DataItem, "RowId").ToString() + "')\">Удалить</a>");
+    //    });
+    //});
+
+    settings.Columns.Add(cc =>
+    {
+        cc.Name = "colImageAction";
+        cc.Width = System.Web.UI.WebControls.Unit.Pixel(40);
+        cc.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+        cc.Settings.AllowDragDrop = DefaultBoolean.False;
+        cc.Settings.AllowSort = DefaultBoolean.False;
+        cc.SetDataItemTemplateContent(c =>
+        {
+            ViewContext.Writer.Write("<table><tr>");
+            ViewContext.Writer.Write("<td>");
+            Html.DevExpress().HyperLink(hl =>
+            {
+                hl.Properties.ImageUrl = Url.Content("~/Images/edit10x10.png");
+                hl.ToolTip = "Изменить";
+                hl.NavigateUrl = "javascript:pcEdit.SetContentUrl('" +
+                    DevExpressHelper.GetUrl(new { Area = "General", Controller = "File", Action = "EditModel", rowId = DataBinder.Eval(c.DataItem, "RowId") }) +
+                    "');pcEdit.Show()";
+            }).Render();
+            ViewContext.Writer.Write("</td><td>");
+            Html.DevExpress().HyperLink(hl =>
+            {
+                hl.Properties.ImageUrl = Url.Content("~/Images/DELETEDELEMENT_X16.png");
+                hl.ToolTip = "Удалить";
+                hl.NavigateUrl = "javascript:if (confirm(\"Удалить строку документа?\")) {gvFiles.DeleteRow(" + c.ItemIndex.ToString(CultureInfo.InvariantCulture) + ");}";
+            }).Render();
+            ViewContext.Writer.Write("</td></tr></table>");
+        });
+    });
+    
+    settings.Columns.Add(column =>
+        {
+            column.Caption = "Имя";
+            column.SetDataItemTemplateContent(c =>
+                {
+                    Html.DevExpress().HyperLink(s =>
+                        {
+                            s.Properties.Text = (string)DataBinder.Eval(c.DataItem, "Name");
+                            s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "General", Controller = "File", Action = "GetFile", rowId = DataBinder.Eval(c.DataItem, "RowId") });
+                        }).Render();
+                });
+        });
+    settings.Columns.Add("Category", "Категория");
+    settings.Columns.Add("ContentType", "Тип содержимого");
+    settings.Columns.Add("Theme", "Тема");
+}).Bind(Model.Files).GetHtml()

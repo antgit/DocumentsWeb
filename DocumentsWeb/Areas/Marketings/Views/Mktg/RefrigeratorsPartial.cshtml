@@ -1,0 +1,336 @@
+﻿@model DocumentsWeb.Areas.Marketings.Models.DocumentMktgModel
+@using DocumentsWeb.Models
+@using DocumentsWeb.Areas.Analitics.Models
+@using BusinessObjects
+@using BusinessObjects.Security;
+@using BusinessObjects.Web.Core;
+
+@{   
+    bool haveEdit = WADataProvider.FolderElementRightView.IsAllow(BusinessObjects.Security.Right.DOCEDIT, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_MKTG_MRAK).Id);
+}
+
+@Html.DevExpress().GridView(settings=> {
+    settings.Name = "gvDocRefrigerators";
+    settings.KeyFieldName = "RowId";
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    //settings.Height = 100;
+
+    settings.CallbackRouteValues = new { Area = "Marketings", Controller = "Mktg", Action = "RefrigeratorsPartial", mId = Model.ModelId };
+    settings.SettingsEditing.AddNewRowRouteValues = new { Area = "Marketings", Controller = "Mktg", Action = "RefrigeratorsAddPartial", mId = Model.ModelId };
+    settings.SettingsEditing.UpdateRowRouteValues = new { Area = "Marketings", Controller = "Mktg", Action = "RefrigeratorsUpdatePartial", mId = Model.ModelId };
+    settings.SettingsEditing.DeleteRowRouteValues = new { Area = "Marketings", Controller = "Mktg", Action = "RefrigeratorsDeletePartial", mId = Model.ModelId };
+    settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+    settings.SettingsBehavior.AllowFocusedRow = true;
+    settings.SettingsBehavior.AutoExpandAllGroups = true;
+    settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control; 
+        
+    settings.ClientSideEvents.BeginCallback = "function (s, e) { if(!gvDocRefrigeratorsTypes.InCallback()) { gvDocRefrigeratorsTypes.CancelEdit(); } }";
+
+    settings.Settings.ShowFooter = true;
+
+    settings.CommandColumn.Visible = true;
+    settings.CommandColumn.Width = 130;
+    settings.CommandColumn.Caption = "Действия";
+    //settings.CommandColumn.NewButton.Visible = true;
+    settings.CommandColumn.DeleteButton.Visible = haveEdit && !Model.IsReadOnly;
+    settings.CommandColumn.EditButton.Text = "Изменить";
+    settings.CommandColumn.EditButton.Visible = true;
+
+    settings.Columns.Add("GroupName", "Группа товаров").GroupIndex = 0;
+    settings.Columns.Add("AnaliticName", "Торговая марка").GroupIndex = 1;
+    settings.Columns.Add("Analitic2Name", "Подгруппа товаров").Width = 200;
+    settings.Columns.Add("SummValue1", "Литраж").PropertiesEdit.DisplayFormatString = "0";
+    settings.Columns.Add(GlobalPropertyNames.Memo, "Примечание");
+
+    settings.SetFooterRowTemplateContent(c =>
+    {
+        if (haveEdit && !Model.IsReadOnly)
+        {
+            ViewContext.Writer.Write("<div style=\"width: 100%; text-align: center; font-size: 10pt;\"><a href=\"javascript:gvDocRefrigerators.AddNewRow();\">Создать</a>&nbsp;&nbsp;[<a href=\"javascript:Refrigerators_CreateGroup();\">Колбаса/Молоко</a>]</div>");
+        }
+    });
+    
+    settings.SetEditFormTemplateContent(c =>
+    {
+        ViewContext.Writer.Write(Html.Hidden("RowId", (c.ItemIndex >=0 ? DataBinder.GetPropertyValue(c.DataItem, "RowId") : "")));
+        ViewContext.Writer.Write(Html.Hidden("Id", (c.ItemIndex >= 0 ? DataBinder.GetPropertyValue(c.DataItem, "Id") : 0)));
+
+        ViewContext.Writer.Write("<table><tr><td colspan=\"2\">");
+        Html.DevExpress().Button(btnSettings =>
+        {
+            btnSettings.Name = "btnUpdate";
+            btnSettings.ControlStyle.CssClass = "button";
+            btnSettings.Text = "Сохранить";
+            btnSettings.ClientEnabled = haveEdit && !Model.IsReadOnly; ;
+            btnSettings.ClientSideEvents.Click = "function(s, e){ gvDocRefrigerators.UpdateEdit(); }";
+        }).Render();
+        Html.DevExpress().Button(btnSettings =>
+        {
+            btnSettings.Name = "btnCancel";
+            btnSettings.ControlStyle.CssClass = "button";
+            btnSettings.Text = "Отмена";
+            btnSettings.ClientSideEvents.Click = "function(s, e){ gvDocRefrigerators.CancelEdit(); }";
+        }).Render();
+        ViewContext.Writer.Write("</div>");
+
+        ViewContext.Writer.Write("</td></tr><tr><td>");
+
+        // Группа товаров
+        ViewContext.Writer.Write("<div>");
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Группа товаров: ";
+            s.Style.Add("float", "left");
+        }).Render();
+        ViewContext.Writer.Write("<br />");
+        Html.DevExpress().ComboBox(s =>
+        {
+            s.ControlStyle.CssClass = "editor";
+            s.Name = "GroupId";
+            s.Properties.ValueField = GlobalPropertyNames.Id;
+            s.Properties.TextField = GlobalPropertyNames.Name;
+            s.Properties.ValueType = typeof(int);
+            EditButton b = s.Properties.Buttons.Add();
+            b.Image.Url = "~/Images/reply_x10.gif";
+            b.ToolTip = "Последнее значение";
+            s.Width = 250;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            s.Properties.ClientSideEvents.SelectedIndexChanged = "GT_SelectedIndexChanged";
+            //s.Properties.ClientSideEvents.SelectedIndexChanged = "function (s, e) { $(\"#SummSKU\").show(); $(\"tr[id^='Line']\").hide(); SummValue3.SetEnabled(true); switch (s.GetValue()) { case 4: $('#Line2').show(); break; case 5: $(\"#SummSKU\").hide(); break; case 6: case 7: $('#Line2').show(); $('#Line3').show(); break; case 8: case 9: Analitic2Id.PerformCallback(); SummValue3.SetEnabled(false); $('#Line1').show(); break; } if (GroupId.GetValue() != 8 && GroupId.GetValue() != 9) { $.ajax({ type: 'GET', url: '" + Url.Content("~/Marketings/Mktg/GetSKU") + "', async: false, data: { mId: '" + Model.ModelId + "', GpId: GroupId.GetValue(), AnId: AnaliticId.GetValue() }, success: function(data) { SummValue3.SetValue(data); } }); $.ajax({ type: 'GET', url: '" + Url.Content("~/Marketings/Mktg/GetPFGroups") + "', async: false, data: { mId: '" + Model.ModelId + "', GpId: GroupId.GetValue(), AnId: AnaliticId.GetValue() }, success: function(data) { $(\"#StringValue1\").val(data); StringValue1_Rebuild(); } }); } }";
+            s.Properties.ClientSideEvents.Init = "function (s, e) { $(\"#SummSKU\").show(); $(\"tr[id^='Line']\").hide(); SummValue3.SetEnabled(true); switch (s.GetValue()) { case 4: $('#Line2').show(); break; case 5: $(\"#SummSKU\").hide(); break; case 6: case 7: $('#Line2').show(); $('#Line3').show(); break; case 8: case 9: Analitic2Id.PerformCallback(); SummValue3.SetEnabled(false); $('#Line1').show(); break; } }";
+            s.Properties.ClientSideEvents.ButtonClick = "GT_ButtonClick";
+        }).BindList(AnaliticGroupModel.GetGroups().Where(w => w.KindId == AnaliticGroupKind.MktgProductType)).Bind((c.ItemIndex >= 0 ? ((int?)DataBinder.Eval(c.DataItem, "GroupId") == 0 ? null : DataBinder.Eval(c.DataItem, "GroupId")) : null)).Render();
+        ViewContext.Writer.Write("</div>");
+        ViewContext.Writer.Write("</td></tr><tr><td>");
+        
+        // Торговая марка
+        ViewContext.Writer.Write("<div>");
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Торговая марка: ";
+            s.Style.Add("float", "left");
+        }).Render();
+        ViewContext.Writer.Write("<br />");
+        Html.RenderPartial("RefrigeratorsTMPartial", new ViewDataDictionary { { "AnaliticId", (c.ItemIndex >= 0 ? ((int?)DataBinder.Eval(c.DataItem, "AnaliticId") == 0 ? null : DataBinder.Eval(c.DataItem, "AnaliticId")) : null) } });
+        @*Html.DevExpress().ComboBox(s =>
+        {
+            s.ControlStyle.CssClass = "editor";
+            s.Name = "AnaliticId";
+            s.Properties.ValueField = GlobalPropertyNames.Id;
+            s.Properties.TextField = GlobalPropertyNames.Name;
+            s.Properties.ValueType = typeof(int);
+            s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+            s.Properties.FilterMinLength = 3;
+            EditButton b = s.Properties.Buttons.Add();
+            b.Image.Url = "~/Images/add10x10.png";
+            b.ToolTip = "Создать новую";
+            b = s.Properties.Buttons.Add();
+            b.Image.Url = "~/Images/reply_x10.gif";
+            b.ToolTip = "Последнее значение";
+            s.Width = 250;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            s.Properties.ClientSideEvents.SelectedIndexChanged = "TM_SelectedIndexChanged";
+            //s.Properties.ClientSideEvents.SelectedIndexChanged = "function (s, e) { if (GroupId.GetValue() != 8 && GroupId.GetValue() != 9) { $.ajax({ type: 'GET', url: '" + Url.Content("~/Marketings/Mktg/GetSKU") + "', async: false, data: { mId: '" + Model.ModelId + "', GpId: GroupId.GetValue(), AnId: AnaliticId.GetValue() }, success: function(data) { SummValue3.SetValue(data); } }); $.ajax({ type: 'GET', url: '" + Url.Content("~/Marketings/Mktg/GetPFGroups") + "', async: false, data: { mId: '" + Model.ModelId + "', GpId: GroupId.GetValue(), AnId: AnaliticId.GetValue() }, success: function(data) { $(\"#StringValue1\").val(data); StringValue1_Rebuild(); } }); } }";
+            s.Properties.ClientSideEvents.ButtonClick = "TM_ButtonClick";
+        }).BindList(AnaliticModel.GetCollection(Hierarchy.SYSTEM_ANALITIC_BRANDS)).Bind((c.ItemIndex >= 0 ? ((int?)DataBinder.Eval(c.DataItem, "AnaliticId") == 0 ? null : DataBinder.Eval(c.DataItem, "AnaliticId")) : null)).Render();*@
+        ViewContext.Writer.Write("</div>");
+        ViewContext.Writer.Write("</td><td>");
+
+        // Суммарное SKU
+        ViewContext.Writer.Write("<div id=\"SummSKU\">");
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Общее количество SKU для ТМ: ";
+            s.Style.Add("float", "left");
+        }).Render();
+        ViewContext.Writer.Write("<br />");
+        Html.DevExpress().SpinEdit(edtSettings =>
+        {
+            edtSettings.Name = "SummValue3";
+            edtSettings.ControlStyle.CssClass = "editor";
+            edtSettings.Width = 250;
+            edtSettings.Style.Add("float", "left");
+            edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            edtSettings.Properties.DisplayFormatString = "0";
+            edtSettings.Properties.DisplayFormatInEditMode = true;
+            edtSettings.Properties.NumberType = SpinEditNumberType.Integer;
+            edtSettings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+            edtSettings.Properties.MaxValue = 10000;
+            edtSettings.Properties.MinValue = 0;
+        }).Bind((c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "SummValue3") : 0.0)).Render();
+        ViewContext.Writer.Write("</div>");
+        ViewContext.Writer.Write("</td></tr><tr id=\"Line1\" style=\"display: none;\"><td>");
+
+        // Подгруппа товаров
+        ViewContext.Writer.Write("<div>");
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Подгруппа товара: ";
+            s.Style.Add("float", "left");
+        }).Render();
+        ViewContext.Writer.Write("<br />");
+        ViewContext.Writer.Write(Html.Partial("ProductSubTypePartial", new ViewDataDictionary
+        {
+            { "Analitic2Id", (c.ItemIndex >= 0 ? ((int?)DataBinder.Eval(c.DataItem, "Analitic2Id") == 0 ? null : DataBinder.Eval(c.DataItem, "Analitic2Id")) : null) }
+        }));    
+        ViewContext.Writer.Write("</div>");
+        ViewContext.Writer.Write("</td><td>");
+
+        // SKU
+        ViewContext.Writer.Write("<div>");
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Количество SKU в подгруппе: ";
+            s.Style.Add("float", "left");
+        }).Render();
+        ViewContext.Writer.Write("<br />");
+        Html.DevExpress().SpinEdit(edtSettings =>
+        {
+            edtSettings.Name = "SummValue2";
+            edtSettings.ControlStyle.CssClass = "editor";
+            edtSettings.Width = 250;
+            edtSettings.Style.Add("float", "left");
+            edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            edtSettings.Properties.DisplayFormatString = "0";
+            edtSettings.Properties.DisplayFormatInEditMode = true;
+            edtSettings.Properties.NumberType = SpinEditNumberType.Integer;
+            edtSettings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+            edtSettings.Properties.MaxValue = 10000;
+            edtSettings.Properties.MinValue = 0;
+        }).Bind((c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "SummValue2") : 0.0)).Render();
+        ViewContext.Writer.Write("</div>");
+        ViewContext.Writer.Write("</td></tr><tr id=\"Line2\" style=\"display: none;\"><td>");
+        
+        // Принадлежность
+        ViewContext.Writer.Write("<div>");
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Принадлежность: ";
+            s.Style.Add("float", "left");
+        }).Render();
+        ViewContext.Writer.Write("<br />");
+        Html.DevExpress().ComboBox(s =>
+        {
+            s.ControlStyle.CssClass = "editor";
+            s.Name = "Group2Id";
+            s.Properties.ValueField = GlobalPropertyNames.Id;
+            s.Properties.TextField = GlobalPropertyNames.Name;
+            s.Properties.ValueType = typeof(int);
+            s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+            s.Width = 250;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).BindList(AnaliticGroupModel.GetGroups().Where(w => w.KindId == AnaliticGroupKind.MktgRefrigeratorOwn)).Bind((c.ItemIndex >= 0 ? ((int?)DataBinder.Eval(c.DataItem, "Group2Id") == 0 ? null : DataBinder.Eval(c.DataItem, "Group2Id")) : null)).Render();
+        ViewContext.Writer.Write("</div>");
+        ViewContext.Writer.Write("</td><td>");
+        
+        // Литраж
+        ViewContext.Writer.Write("<div>");
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Литраж: ";
+            s.Style.Add("float", "left");
+        }).Render();
+        ViewContext.Writer.Write("<br />");
+        /*Html.DevExpress().SpinEdit(edtSettings =>
+        {
+            edtSettings.Name = "SummValue1";
+            edtSettings.ControlStyle.CssClass = "editor";
+            edtSettings.Width = 250;
+            edtSettings.Style.Add("float", "left");
+            edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            edtSettings.Properties.DisplayFormatString = "0";
+            edtSettings.Properties.DisplayFormatInEditMode = true;
+            edtSettings.Properties.NumberType = SpinEditNumberType.Integer;
+            edtSettings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+            edtSettings.Properties.MinValue = 0;
+        }).Bind((c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "SummValue1") : 0.0)).Render();*/
+        Html.DevExpress().ComboBox(edtSettings =>
+        {
+            edtSettings.Name = "SummValue1";
+            edtSettings.ControlStyle.CssClass = "editor";
+            edtSettings.Width = 250;
+            edtSettings.Style.Add("float", "left");
+            edtSettings.Properties.ValueType = typeof(decimal);
+            edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            edtSettings.Properties.DisplayFormatString = "0";
+            edtSettings.Properties.DisplayFormatInEditMode = true;
+        }).BindList(new int[] { 125, 200, 250, 300, 350, 400, 500, 600, 800, 1000, 2000 }).Bind((c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "SummValue1") : 0)).Render();
+        ViewContext.Writer.Write("</div>");
+        ViewContext.Writer.Write("</td><td>");
+        
+        // Кол-во сеток
+        ViewContext.Writer.Write("<div>");
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Кол-во сеток: ";
+            s.Style.Add("float", "left");
+        }).Render();
+        ViewContext.Writer.Write("<br />");
+        Html.DevExpress().SpinEdit(edtSettings =>
+        {
+            edtSettings.Name = "SummValue4";
+            edtSettings.ControlStyle.CssClass = "editor";
+            edtSettings.Width = 250;
+            edtSettings.Style.Add("float", "left");
+            edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            edtSettings.Properties.DisplayFormatString = "0.00";
+            edtSettings.Properties.MaxValue = 10000;
+            edtSettings.Properties.MinValue = 0;
+        }).Bind((c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "SummValue4") : 0.0)).Render();
+        ViewContext.Writer.Write("</div>");
+        ViewContext.Writer.Write("</td></tr><tr id=\"Line3\" style=\"display: none;\"><td>");
+        
+        // Группы полуфабрикатов
+        ViewContext.Writer.Write("<div>");
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Группы полуфабрикатов: ";
+            s.Style.Add("float", "left");
+        }).Render();
+        ViewContext.Writer.Write("<br />");
+        ViewContext.Writer.Write(Html.Partial("CheckBoxListPartial", Model, new ViewDataDictionary
+        {
+            { "Name", "StringValue1"},
+            { "Data", new ComboboxModel[] { 
+                new ComboboxModel { Id = 1, Name = "Пельмени"},
+                new ComboboxModel { Id = 2, Name = "Вареники"},
+                new ComboboxModel { Id = 3, Name = "Блинчики"},
+                new ComboboxModel { Id = 4, Name = "Котлеты"},
+                new ComboboxModel { Id = 5, Name = "Тесто"},
+                new ComboboxModel { Id = 6, Name = "Пицца и основа"},
+                new ComboboxModel { Id = 7, Name = "Другое"}
+            } },
+            { "Value", (c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "StringValue1") : "") },
+            { "ColsCount", 2 },
+            { "Width", 250 }
+        }));
+        ViewContext.Writer.Write("</div>");
+        ViewContext.Writer.Write("</td></tr><tr><td colspan=\"3\">");
+
+        // Примечание
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Примечание: ";
+            s.Style.Add("float", "left");
+        }).Render();
+        ViewContext.Writer.Write("<br />");
+        Html.DevExpress().Memo(edtSettings =>
+        {
+            edtSettings.Name = GlobalPropertyNames.Memo;
+            edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        }
+        ).Bind(c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "Memo") : "").Render();
+        ViewContext.Writer.Write("</td></tr><tr><td>");
+        
+        ViewContext.Writer.Write("</table>");
+    });
+}).Bind(Model.Analitics.Where(w => w.StateId != State.STATEDELETED && ((w.GroupId >= 4 && w.GroupId <= 9) || w.GroupId == 14 || w.GroupId == 15))).GetHtml()

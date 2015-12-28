@@ -1,0 +1,19 @@
+﻿@using System.Web.Mvc
+@model DocumentsWeb.Areas.Kb.Models.TaskModel
+
+ @Html.DevExpress().PopupControl(settings =>
+    {
+        settings.Name = "pcEditFlags";
+        settings.Width = 550;
+        settings.Height = 350;
+        settings.HeaderText = "Редактирование пользовательских флагов";
+        settings.ShowFooter = true;
+        settings.SetContent(() =>
+        {
+            ViewContext.Writer.Write("<table style=\"width: 100%;\"><tr><td>");
+            Html.RenderPartial("UserFlagsPartial", Model, new ViewDataDictionary { { "UpdatingControlName", "FlagString" } });
+            ViewContext.Writer.Write("</td></tr><tr><td><table style=\"float:right;\"><tr><td>");
+            ViewContext.Writer.Write("</td></tr></table></td></tr></table>");
+        });   
+        settings.FooterText = string.Empty;
+    }).GetHtml()

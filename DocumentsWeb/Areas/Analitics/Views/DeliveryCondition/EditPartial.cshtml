@@ -1,0 +1,109 @@
+﻿@using BusinessObjects
+@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentsWeb.Areas.Analitics.Models
+@using DocumentsWeb.Models
+@model AnaliticModel
+@{
+    bool haveEdit = Model.Id == 0 && !Model.IsReadOnly && WADataProvider.LibrariesElementRightView.IsAllow(Right.UIEDIT, WebModuleNames.WEB_MODULE_DICTIONARY_ANALITICDELIVERY) && !WADataProvider.CommonRightView.ReadOnly;
+}
+@if (!ViewContext.ViewData.ModelState.IsValid)
+{
+    <p id="error_pane"> &nbsp");
+    <a class="triggerError" href="#">Ошибки</a>
+    </p>
+    <div id="error_container" class="panelError">
+    <a href="javascript:OnErrorPanelClose();">&nbsp;Закрыть</a>
+    @Html.ValidationSummary(false)
+    </div>
+}
+<input type="hidden" id="KindId" name="KindId" value="@Model.KindId" />
+<table style="width: 500px;">
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>{
+                                             s.ControlStyle.CssClass = "label";
+                                             s.Text = "Наименование:";
+                                             if (string.IsNullOrEmpty(Model.Name))
+                                                 s.ControlStyle.ForeColor = System.Drawing.Color.Red;
+                                             s.AssociatedControlName = GlobalPropertyNames.Name;
+                                             s.ToolTip = AnaliticData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Name);
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBox(s =>{
+                                               s.Name = GlobalPropertyNames.Name;
+                                               s.ControlStyle.CssClass = "editor";
+                                               s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                                               s.ShowModelErrors = true;
+                                               s.ReadOnly = !haveEdit;
+                                               if(!s.ReadOnly)
+                                               {
+                                                   s.Properties.NullTextStyle.ForeColor = System.Drawing.Color.FromArgb(249, 97, 97);
+                                                   s.Properties.NullText = "Введите наименование условия поставки...";
+                                                   s.ToolTip = AnaliticData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Name);
+                                               }
+                                               s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                                               s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.Name).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>
+                {
+                    s.ControlStyle.CssClass = "label";
+                    s.Text = "Печать:";
+                    s.AssociatedControlName = GlobalPropertyNames.NameFull;
+                    s.ToolTip = AnaliticData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.NameFull);
+                }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Memo(s =>
+                {
+                    s.Name = GlobalPropertyNames.NameFull;
+                    s.ControlStyle.CssClass = "editor";
+                    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    s.ShowModelErrors = true;
+                    s.ReadOnly = !haveEdit;
+                    if (!s.ReadOnly)
+                    {
+                        s.Properties.NullText = "Введите печатное наименование...";
+                        s.ToolTip = AnaliticData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.NameFull);
+                    }
+                    s.Height = 40;
+                    s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                    s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                }).Bind(Model.NameFull).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>{
+                                             s.ControlStyle.CssClass = "label";
+                                             s.Text = "Описание:";
+                                             s.AssociatedControlName = GlobalPropertyNames.Memo;
+                                             s.ToolTip = AnaliticData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Memo);
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Memo(s =>{
+                                            s.Name = GlobalPropertyNames.Memo;
+                                            s.ReadOnly = !haveEdit;
+                                            if (!s.ReadOnly)
+                                            {
+                                                s.Properties.NullText = "Введите примечание или описание условия поставки...";
+                                                s.ToolTip = AnaliticData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Memo);
+                                            }
+                                            s.Properties.ConvertEmptyStringToNull = true;
+                                            s.ControlStyle.CssClass = "editor";
+                                            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                                            s.Height = 120;
+                
+                                            s.ShowModelErrors = true;
+                                            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                                            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.Memo).GetHtml()
+        </td>
+        </tr>
+</table>

@@ -1,0 +1,182 @@
+﻿@using System;
+@using BusinessObjects
+@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentWeb.Extentions
+@using DocumentsWeb.Areas.Reports.Models
+@using DocumentsWeb.Models
+@{   
+    //bool haveCreate = WADataProvider.LibrariesElementRightView.IsAllow(Right.UICREATE, WebModuleNames.WEB_SUPPLYER);
+    //bool haveEdit = WADataProvider.LibrariesElementRightView.IsAllow(Right.UIEDIT, WebModuleNames.WEB_SUPPLYER);
+    //bool haveDelete = WADataProvider.LibrariesElementRightView.IsAllow(Right.UITRASH, WebModuleNames.WEB_SUPPLYER);
+    //bool haveView = WADataProvider.LibrariesElementRightView.IsAllow(Right.UIVIEW, WebModuleNames.WEB_SUPPLYER);
+    
+}
+
+@Html.DevExpress().NavBar(
+nbrSettings =>
+{
+    nbrSettings.Name = "nbReports";
+    nbrSettings.AllowExpanding = true;
+    nbrSettings.AllowSelectItem = true;
+    nbrSettings.AutoCollapse = false;
+    nbrSettings.EnableHotTrack = true;
+    nbrSettings.EnableAnimation = true;
+    nbrSettings.Width = System.Web.UI.WebControls.Unit.Pixel(250);
+    nbrSettings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+    nbrSettings.EncodeHtml = false;
+    
+    nbrSettings.Groups.Add(group => {
+        group.Text = "Основные отчеты";
+        group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+        group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.CssClass = "navpanellink";
+        group.Expanded = true;
+        group.HeaderStyle.Font.Bold = true;
+        MVCxNavBarItem item = null;
+        Library report = null;
+
+        if (WebReportModel.IsReportAllow("WEBREPORT_PRICE_PRICELISTACTUAL"))
+        {
+            report = WADataProvider.WA.Cashe.GetCasheData<Library>().ItemCode<Library>("WEBREPORT_PRICE_PRICELISTACTUAL");
+            item = group.Items.Add(report.Name, "mnuReportWEBREPORT_PRICE_PRICELISTACTUAL", "~/Images/stireportv4_x16.png");
+            item.ToolTip = string.IsNullOrEmpty(report.Memo)? string.Empty: report.Memo;
+            item.Target = "_blank";
+            if (report != null)
+            {
+                item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "Report", Action = "Build", Area = "Reports" }) + "?id=" + report.Id;
+            }
+        }
+        
+        if (WebReportModel.IsReportAllow("WEBREPORT_PRICE_PRICELIST"))
+        {
+            report = WADataProvider.WA.Cashe.GetCasheData<Library>().ItemCode<Library>("WEBREPORT_PRICE_PRICELIST");
+            item = group.Items.Add(report.Name, "mnuReportWEBREPORT_PRICE_PRICELIST", "~/Images/stireportv4_x16.png");
+            item.ToolTip = string.IsNullOrEmpty(report.Memo)? string.Empty: report.Memo;
+            item.Target = "_blank";
+            if (report != null)
+            {
+                item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "Report", Action = "Build", Area = "Reports" }) + "?id=" + report.Id;
+            }
+        }
+
+        if (WebReportModel.IsReportAllow("WEBREPORT_PRICE_PRICELISTIND"))
+        {
+            report = WADataProvider.WA.Cashe.GetCasheData<Library>().ItemCode<Library>("WEBREPORT_PRICE_PRICELISTIND");
+            item = group.Items.Add(report.Name, "mnuReportWEBREPORT_PRICE_PRICELISTIND", "~/Images/stireportv4_x16.png");
+            item.ToolTip = string.IsNullOrEmpty(report.Memo) ? string.Empty : report.Memo;
+            item.Target = "_blank";
+            if (report != null)
+            {
+                item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "Report", Action = "Build", Area = "Reports" }) + "?id=" + report.Id;
+            }
+        }
+        
+        if (WebReportModel.IsReportAllow("WEBREPORT_PRICE_PRICELISTSUPPLYER"))
+        {
+            report = WADataProvider.WA.Cashe.GetCasheData<Library>().ItemCode<Library>("WEBREPORT_PRICE_PRICELISTSUPPLYER");
+            item = group.Items.Add(report.Name, "mnuReportWEBREPORT_PRICE_PRICELISTSUPPLYER", "~/Images/stireportv4_x16.png");
+            item.ToolTip = string.IsNullOrEmpty(report.Memo) ? string.Empty : report.Memo;
+            item.Target = "_blank";
+            if (report != null)
+            {
+                item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "Report", Action = "Build", Area = "Reports" }) + "?id=" + report.Id;
+            }
+        }
+
+        if (WebReportModel.IsReportAllow("WEBREPORT_PRICE_PRICELISTCOMPETITOR"))
+        {
+            report = WADataProvider.WA.Cashe.GetCasheData<Library>().ItemCode<Library>("WEBREPORT_PRICE_PRICELISTCOMPETITOR");
+            item = group.Items.Add(report.Name, "mnuReportWEBREPORT_PRICE_PRICELISTCOMPETITOR", "~/Images/stireportv4_x16.png");
+            item.ToolTip = string.IsNullOrEmpty(report.Memo) ? string.Empty : report.Memo;
+            item.Target = "_blank";
+            if (report != null)
+            {
+                item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "Report", Action = "Build", Area = "Reports" }) + "?id=" + report.Id;
+            }
+        }
+        
+        item = group.Items.Add("Перейти в отчеты...", "mnuReportNavToReportsMain", "~/Images/arrowgreen.png");
+        item.ToolTip = "Перейти в раздел отчетов...";
+        item.NavigateUrl = Url.Action("Index", new { area = "Reports", Controller = "Report" });        
+    });
+    nbrSettings.Groups.Add(group =>
+    {
+        group.Text = "Реестры документов";
+        group.Expanded = true;
+        group.HeaderStyle.Font.Bold = true;
+        group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+        group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.CssClass = "navpanellink";
+        MVCxNavBarItem item = null;
+        Library report = null;
+        
+        if (WebReportModel.IsReportAllow("WEBREPORT_PRICE_DOCLISTPRICELIST"))
+        {
+            report = WADataProvider.WA.Cashe.GetCasheData<Library>().ItemCode<Library>("WEBREPORT_PRICE_DOCLISTPRICELIST");
+            item = group.Items.Add("Прайс листы", "mnuReportWEBREPORT_PRICE_DOCLISTPRICELIST", "~/Images/stireportv4_x16.png");
+            item.ToolTip = string.IsNullOrEmpty(report.Memo) ? string.Empty : report.Memo;
+            item.Target = "_blank";
+            if (report != null)
+            {
+                item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "Report", Action = "Build", Area = "Reports" }) + "?id=" + report.Id;
+            }
+        }
+
+        if (WebReportModel.IsReportAllow("WEBREPORT_PRICE_DOCLISTPRICELISTIND"))
+        {
+            report = WADataProvider.WA.Cashe.GetCasheData<Library>().ItemCode<Library>("WEBREPORT_PRICE_DOCLISTPRICELISTIND");
+            item = group.Items.Add("Индивидуальные прайс листы", "mnuReportWEBREPORT_PRICE_DOCLISTPRICELISTIND", "~/Images/stireportv4_x16.png");
+            item.ToolTip = string.IsNullOrEmpty(report.Memo) ? string.Empty : report.Memo;
+            item.Target = "_blank";
+            if (report != null)
+            {
+                item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "Report", Action = "Build", Area = "Reports" }) + "?id=" + report.Id;
+            }
+        }
+
+        if (WebReportModel.IsReportAllow("WEBREPORT_PRICE_DOCLISTPRICELISTSUPPLYER"))
+        {
+            report = WADataProvider.WA.Cashe.GetCasheData<Library>().ItemCode<Library>("WEBREPORT_PRICE_DOCLISTPRICELISTSUPPLYER");
+            item = group.Items.Add("Прайс листы поставщиков", "mnuReportWEBREPORT_PRICE_DOCLISTPRICELISTSUPPLYER", "~/Images/stireportv4_x16.png");
+            item.ToolTip = string.IsNullOrEmpty(report.Memo) ? string.Empty : report.Memo;
+            item.Target = "_blank";
+            if (report != null)
+            {
+                item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "Report", Action = "Build", Area = "Reports" }) + "?id=" + report.Id;
+            }
+        }
+
+        if (WebReportModel.IsReportAllow("WEBREPORT_PRICE_DOCLISTPRICELISTCOMPETITOR"))
+        {
+            report = WADataProvider.WA.Cashe.GetCasheData<Library>().ItemCode<Library>("WEBREPORT_PRICE_DOCLISTPRICELISTCOMPETITOR");
+            item = group.Items.Add("Прайс листы конкурентов", "mnuReportWEBREPORT_PRICE_DOCLISTPRICELISTCOMPETITOR", "~/Images/stireportv4_x16.png");
+            item.ToolTip = string.IsNullOrEmpty(report.Memo) ? string.Empty : report.Memo;
+            item.Target = "_blank";
+            if (report != null)
+            {
+                item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "Report", Action = "Build", Area = "Reports" }) + "?id=" + report.Id;
+            }
+        }
+        
+        item = group.Items.Add("Перейти в отчеты...", "mnuReportNavToReports", "~/Images/arrowgreen.png");
+        item.ToolTip = "Перейти в раздел отчетов...";
+        item.NavigateUrl = Url.Action("Index", new {area = "Reports", Controller = "Report"});
+
+    });
+
+    nbrSettings.Groups.Add(group =>
+    {
+        group.Text = "Избранное";
+        group.Expanded = false;
+        group.HeaderStyle.Font.Bold = true;
+        group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+        group.ItemStyle.CssClass = "navpanellink";
+        MVCxNavBarItem item = null;
+
+        
+    });
+
+}).GetHtml()

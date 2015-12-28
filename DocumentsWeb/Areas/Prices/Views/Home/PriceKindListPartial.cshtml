@@ -1,0 +1,15 @@
+﻿@Html.DevExpress().CallbackPanel(cp => {
+    cp.Name = "CallbackPricesKinds";
+    cp.CallbackRouteValues = new { Controller = "Home", Action = "PriceKindListPartial" };
+    cp.SetContent(() => {
+        foreach (DocumentsWeb.Areas.Prices.Models.PriceNameModel model in PriceListHelper.GetPriceNames())
+        {
+            Html.DevExpress().HyperLink(l =>
+            {
+                l.NavigateUrl = "#";
+                l.Properties.Text = string.Format("{0} ({1})", model.Name, model.MyCompanyName);
+            }).Render();
+            ViewContext.Writer.Write("</br>");
+        }
+    });
+}).GetHtml()

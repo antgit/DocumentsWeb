@@ -1,0 +1,122 @@
+﻿@using System.Web.UI.WebControls
+@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentsWeb.Models
+@model DocumentsWeb.Areas.Analitics.Models.AnaliticModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Аналитика - " + Model.Name;
+    bool haveEdit = (!Model.IsReadOnly && WADataProvider.LibrariesElementRightView.IsAllow(Right.UIEDIT, WebModuleNames.WEB_METRICAREA) 
+        && !WADataProvider.CommonRightView.ReadOnly
+        && WADataProvider.IsCompanyIdAllowEditToCurrentUser(Model.MyCompanyId)) | WADataProvider.CommonRightView.AdminEnterprize;
+    string sourceControllerName = string.Empty;
+    if(ViewContext.RouteData.Values.ContainsKey("controller"))
+    {
+        sourceControllerName = ViewContext.RouteData.Values["controller"].ToString();
+    }
+}
+<script src="@Url.Content("~/Scripts/jAnaliticActionsView.js")" type="text/javascript"></script>
+
+@Html.DevExpress().Menu(mnuSettings =>
+                        {
+                            mnuSettings.EnableHotTrack = true;
+                            mnuSettings.Name = "menuUiViewAnalitic";
+                            mnuSettings.ClientSideEvents.ItemClick = "OnViewAnaliticControlMenuItemClick";
+                            mnuSettings.Width = Unit.Percentage(100);
+
+                            mnuSettings.Items.Add(item =>
+                                {
+                                    item.Name = "mnuClose";
+                                    item.Text = "Закрыть";
+                                    item.ToolTip = "Закрыть текущее окно или страницу";
+                                    item.Image.Url = @Url.Content("~/Images/cross.png");
+                                });
+                            if (haveEdit)
+                            {
+                                mnuSettings.Items.Add(item =>
+                                {
+                                    item.Name = "mnuEdit";
+                                    item.Text = "Изменить";
+                                    item.ToolTip = "Редактировать данные";
+                                    item.Image.Url = @Url.Content("~/Images/editdoc_x16.png");
+                                    item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "MetricArea", Action = "ControlView", id = Model.Id });
+                                });
+                            }
+
+                        }).GetHtml()
+
+@Html.DevExpress().Splitter(settings =>
+{
+    settings.Name = "splFullScreenMode";
+    settings.Orientation = Orientation.Vertical;
+    settings.Styles.Pane.Paddings.Padding = 0;
+    settings.FullscreenMode = true;
+    settings.Panes.Add(contentPane =>
+    {
+        contentPane.ScrollBars = ScrollBars.Auto;
+        contentPane.Panes.Add(actionsPane =>
+        {
+            actionsPane.Name = "actionPane";
+            actionsPane.ScrollBars = ScrollBars.Auto;
+            actionsPane.SetContent(() =>
+                {
+                @Html.DevExpress().RoundPanel(
+                    pnSettings =>
+                        {
+                            pnSettings.Name = "rpGeneralInfo";
+                            pnSettings.HeaderText = "Общая информация";
+                            pnSettings.ToolTip = "Общая информация об аналитике";
+                            if (!string.IsNullOrEmpty(sourceControllerName))
+                                pnSettings.HeaderNavigateUrl = DevExpressHelper.GetUrl(new { Controller = sourceControllerName, Action = "Edit", id = Model.Id });
+                            pnSettings.HeaderImage.Url = Url.Content("~/Images/MISCCUSTOM17_X16.png");
+                            pnSettings.ShowHeader = true;
+                            pnSettings.Width = Unit.Percentage(100);
+                            pnSettings.PreRender = (sender, e) =>
+                                {
+                                    MVCxRoundPanel panel = (MVCxRoundPanel) sender;
+                                    panel.ContentPaddings.PaddingLeft = 0;
+                                    panel.ContentPaddings.PaddingTop = 0;
+                                    panel.ContentPaddings.PaddingRight = 0;
+                                    panel.ContentPaddings.PaddingBottom = 0;
+                                };
+                            pnSettings.SetContent(() => Html.RenderPartial("PreviewGeneralPartial", Model));
+                        }).Render();
+
+                
+                @Html.DevExpress().RoundPanel(
+                    pnSettings =>
+                        {
+                            pnSettings.Name = "rpSystemInfo";
+                            pnSettings.HeaderText = "Системная информация";
+                            pnSettings.ToolTip = "Системная информация об аналитике";
+                            pnSettings.HeaderImage.Url = Url.Content("~/Images/property.png");
+                            pnSettings.ShowHeader = true;
+                            pnSettings.Width = Unit.Percentage(100);
+
+                            pnSettings.PreRender = (sender, e) =>
+                                {
+                                    MVCxRoundPanel panel = (MVCxRoundPanel) sender;
+                                    panel.ContentPaddings.PaddingLeft = 0;
+                                    panel.ContentPaddings.PaddingTop = 0;
+                                    panel.ContentPaddings.PaddingRight = 0;
+                                    panel.ContentPaddings.PaddingBottom = 0;
+                                };
+                            pnSettings.SetContent(() => Html.RenderPartial("PreviewSystemPartial", Model));
+                        }).Render();
+            });
+        });
+        
+    });
+
+    settings.Panes.Add(footerPane =>{
+        footerPane.Size = 80;
+        footerPane.AllowResize = DefaultBoolean.False;
+        footerPane.ShowSeparatorImage = DefaultBoolean.False;
+        footerPane.SetContent(() => @Html.RenderPartial("FooterPartial"));
+    });
+}).GetHtml()
+
+
+
+
+

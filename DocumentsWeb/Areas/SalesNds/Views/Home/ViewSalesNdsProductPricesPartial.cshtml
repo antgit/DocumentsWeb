@@ -1,0 +1,160 @@
+﻿@using BusinessObjects
+@using DocumentsWeb.Models
+            @Html.DevExpress().GridView(settings=>{
+                                                settings.Settings.ShowTitlePanel = true;
+                                                settings.Name = "gvSaleNdsProductPrices";
+                                                settings.SetTitlePanelTemplateContent(c =>
+                                                                                          {
+                                                                                              ViewContext.Writer.Write("<div style=\"width: 100%; text-align: center; font-size: 10pt;\">");
+                                                                                              Html.DevExpress().HyperLink(hl =>
+                                                                                              {
+                                                                                                  hl.Properties.ImageUrl = Url.Content("~/Images/REFRESHGREEN_X16.png");
+                                                                                                  hl.ToolTip = "Обновить";
+                                                                                                  hl.Style.Add("float", "left");
+                                                                                                  hl.NavigateUrl = "javascript:gvSaleNdsProductPrices.PerformCallback('refresh=true');";
+                                                                                              }).Render();
+                                                                                              //Html.DevExpress().HyperLink(hl =>
+                                                                                              //{
+                                                                                              //    hl.Name = "ServicesNdsCreate";
+                                                                                              //    hl.Properties.Text = "Создать";
+                                                                                              //    hl.NavigateUrl = Url.Action("Create", "SaleAccountIn");
+                                                                                              //    hl.Properties.Target = "_blank";
+                                                                                              //    hl.ClientVisible = haveCreate;
+                                                                                              //    hl.ClientEnabled = haveCreate;
+                                                                                              //}).Render();
+                                                                                              @Html.DevExpress().HyperLink(s =>
+                                                                                              {
+                                                                                                  s.Style.Add("float", "right");
+                                                                                                  s.Properties.Text = " вернутся в \"Управление продажами\"";
+                                                                                                  s.NavigateUrl = Url.Action("Index", "Home", new { area = "SalesNds", controller = "Home" });
+                                                                                              }).Render();
+                                                                                              ViewContext.Writer.Write("</div>");
+                                                                                              
+                                                                                          });
+
+                                                settings.ClientSideEvents.Init = "function(s, e) { adjustSize() }";
+                                                settings.ClientSideEvents.EndCallback = "function(s, e) { adjustSize() }";
+
+                                                settings.CallbackRouteValues = new { Controller = "Home", Action = Url.RequestContext.RouteData.Values["action"].ToString().EndsWith("Partial") ? Url.RequestContext.RouteData.Values["action"] : Url.RequestContext.RouteData.Values["action"] + "Partial" };
+                                                //settings.CallbackRouteValues = new { Controller = "Document", Action = "IndexPartial" };
+                                                settings.Settings.ShowFilterBar = GridViewStatusBarMode.Hidden;
+                                                settings.SettingsBehavior.AllowFocusedRow = true;
+                                                settings.KeyFieldName = GlobalPropertyNames.Id;
+                                                settings.Settings.ShowGroupPanel = true;
+                                                settings.Settings.ShowFilterRow = true;
+                                                settings.Settings.ShowFilterRowMenu = true;
+                                                settings.Settings.ShowVerticalScrollBar = true;
+                                                settings.Settings.ShowHorizontalScrollBar = true;
+                                                settings.Styles.Cell.Font.Size = System.Web.UI.WebControls.FontUnit.Point(11);
+                                                settings.Styles.Cell.Paddings.Padding = System.Web.UI.WebControls.Unit.Pixel(2);
+                                                settings.Styles.Cell.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+                                                settings.Settings.VerticalScrollableHeight = 0;
+
+                                                settings.SettingsPager.PageSize = Utils.GetPageSize(settings);
+                                                settings.SettingsPager.Position = System.Web.UI.WebControls.PagerPosition.Top;
+                                                settings.SettingsPager.AlwaysShowPager = true;
+                                                settings.SetPagerBarTemplateContent(c =>
+                                                {
+                                                    Html.RenderPartial("TablePager", new ViewDataDictionary
+                                                    {
+                                                        { "ContentObject", c },
+                                                        { "TableCaption", "Цены" }
+                                                    });
+                                                });
+                                                settings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+                                                settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+                                                //settings.ClientSideEvents.EndCallback = "function (s, e) { var height = splResizing.GetPane(0).GetClientHeight(); s.SetHeight(height); }";
+                                                //settings.ClientSideEvents.Init = "function (s, e) { var height = splResizing.GetPane(0).GetClientHeight(); s.SetHeight(height); }";
+                
+                                                settings.Columns.Add(column =>
+                                                                         {
+                                                                             column.Caption = "";
+                                                                             column.Width = 20;
+                                                                             column.SetDataItemTemplateContent(c =>
+                                                                                                                   {
+                                                                                                                       string icon = Url.Content("~/Images/PRODUCT_X16.png");
+                                                                                                                       ViewContext.Writer.Write("<img src=\"" + icon + "\" onclick=\"EditDocument(" + DataBinder.Eval(c.DataItem, "Id") + ")\" style=\"cursor: pointer;\" />");
+                                                                                                                   });
+                                                                         });
+
+                                                
+                                               settings.CommandColumn.Visible = true;
+                                               settings.CommandColumn.ShowSelectCheckbox = true;
+                                               settings.CommandColumn.Caption = "";
+                                                settings.CommandColumn.Width = 25;
+
+                                                
+                                                //col_productSelect.Settings.AutoFilterCondition = AutoFilterCondition.n;
+                                                //col_productSelect.Width = 150;
+           
+                                                MVCxGridViewColumn col_productNom = settings.Columns.Add("Nomenclature", "Номенклатура");
+                                                col_productNom.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+                                                col_productNom.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+                                                col_productNom.Width = 150;
+
+                                                //MVCxGridViewColumn col_productName = settings.Columns.Add("Name", "Наименование");
+                                                //col_productName.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+                                                //col_productName.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+                                                //col_productName.Width = 450;
+
+                                                MVCxGridViewColumn col_productName = settings.Columns.Add("Name", "Наименование");
+                                                col_productName.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+                                                col_productName.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+                                                col_productName.Width = 450;
+                                                col_productName.SetDataItemTemplateContent(c =>
+                                                                                               {
+                                                                                                   Html.DevExpress().HyperLink(s =>
+                                                                                                   {
+                                                                                                       s.Properties.Text = (string)DataBinder.Eval(c.DataItem, "Name");
+                                                                                                       int id = (int) DataBinder.Eval(c.DataItem, "Id");
+                                                                                                       s.NavigateUrl = string.Format("javascript:ShowProductProperty({0});", id); //(string)DataBinder.Eval(c.DataItem, "Name");
+                                                                                                       //s.Properties.Target = "_blank";
+                                                                                                       /*
+                                                                                                        var id = gvSaleNdsProductPrices.GetRowKey(dxGridViewProducts.GetFocusedRowIndex());
+                                                                                                        if (id == null)
+                                                                                                            break;
+                                                                                                        ShowPopupEdit(id);
+                                                                                                        */
+                                                                                                   }).Render();
+                                                                                               });
+                                                col_productName.Settings.AllowAutoFilter = DefaultBoolean.True;
+           
+                                                /*
+                                                 column.SetDataItemTemplateContent(c =>
+                                             {
+                                                 Html.DevExpress().HyperLink(s =>
+                                                 {
+                                                     s.Properties.Text = "Построить";
+                                                     s.NavigateUrl = (string)DataBinder.Eval(c.DataItem, "NavigateUrl");
+                                                     s.Properties.Target = "_blank";
+                                                 }).Render();
+                                             });
+                                                 */
+
+                                                MVCxGridViewColumn col_productBrend = settings.Columns.Add("Brend", "Бренд");
+                                                col_productBrend.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+                                                col_productBrend.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+                                                col_productBrend.Width = 250;
+
+                                                MVCxGridViewColumn col_productManufacturer = settings.Columns.Add("Manufacturer", "Производитель");
+                                                col_productManufacturer.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+                                                col_productManufacturer.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+                                                col_productManufacturer.Width = 250;
+           
+                                                settings.Columns.Add(column =>
+                                                                         {
+                                                                             column.FieldName = GlobalPropertyNames.Price;
+                                                                             column.Caption = "Цена";
+                                                                             column.Width = 100;
+                                                                             column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                                                                             column.PropertiesEdit.DisplayFormatString = "0.00";
+                                                                             column.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+                                                                         });
+
+
+                                                
+                                                
+    
+                                                //settings.ClientSideEvents.BeginCallback = "function(s,e){ e.customArgs['folderId'] = gvFoldersTree.IsGroupRow(gvFoldersTree.GetFocusedRowIndex())? -1 : gvFoldersTree.GetRowKey(gvFoldersTree.GetFocusedRowIndex());}"; 
+       }).Bind(Model).GetHtml()

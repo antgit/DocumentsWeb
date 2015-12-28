@@ -1,0 +1,26 @@
+﻿@using BusinessObjects
+@using DocumentsWeb.Areas.Agents.Models
+
+@Html.DevExpress().ComboBox(s =>
+{
+    s.Name = "RegistratorId";
+    s.CallbackRouteValues = new { Controller = Url.RequestContext.RouteData.Values["controller"], Action = "RegistratorIdPartial" };
+    s.Properties.ValueField = GlobalPropertyNames.Id;
+    s.Properties.TextField = GlobalPropertyNames.Name;
+    s.Properties.ValueType = typeof(int);
+    s.Properties.NullDisplayText = "Выберите регистратора...";
+    s.ControlStyle.CssClass = "editor";
+    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    s.ClientEnabled = !Model.IsReadOnly;
+    s.ShowModelErrors = true;
+    
+    EditButton b = s.Properties.Buttons.Add();
+    b.Image.Url = "~/Images/search_x10.png";
+    b.ToolTip = "Поиск";
+    
+    s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+    s.Properties.ClientSideEvents.BeginCallback = "function(s,e){ e.customArgs['MainCompanyDepatmentId'] = MainCompanyDepatmentId.GetValue(); e.customArgs['Id'] = " + @Model.Id + ";}";
+    s.Properties.ClientSideEvents.EndCallback = "function(s,e){s.SetSelectedIndex(-1);}";
+    s.Properties.ClientSideEvents.ButtonClick = "function(s, e) { switch(e.buttonIndex) { case 0: PeopleFinderRegistrator.Show(); break; } }";
+}).BindList(ClientModel.GetWorkersByCompany(((int?)ViewData[GlobalPropertyNames.MainCompanyDepatmentId]) ?? 0)).Bind(Model.RegistratorId).GetHtml()

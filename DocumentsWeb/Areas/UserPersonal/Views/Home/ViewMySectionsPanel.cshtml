@@ -1,0 +1,39 @@
+﻿@using DocumentsWeb.Areas.UserPersonal.Controllers
+@Html.DevExpress().RoundPanel(
+                settings =>
+                    {
+                        settings.Name = "rpMyDocumentSections";
+                        settings.HeaderText = "Мои разделы";
+                        settings.ToolTip = "Основные разделы в которых Вы имеете возможность работь";
+                        settings.HeaderNavigateUrl = Url.Content("~/");
+                        settings.HeaderImage.Url = "~/Images/DOCUMENTDONE_X16.png";
+                        settings.ShowHeader = true;
+                        settings.ControlStyle.CssClass = "navigator_item";
+                        settings.Width = 250;
+                        //settings.Height = 300;
+                        settings.ContentHeight = 200; //System.Web.UI.WebControls.Unit.Percentage(100);
+                        //settings.ContentHeight = 115;
+                        settings.PreRender = (sender, e) =>
+                        {
+                            MVCxRoundPanel panel = (MVCxRoundPanel)sender;
+                            panel.ContentPaddings.PaddingLeft = 0;
+                            panel.ContentPaddings.PaddingTop = 0;
+                            panel.ContentPaddings.PaddingRight = 0;
+                            panel.ContentPaddings.PaddingBottom = 0;
+                        };
+                        settings.SetContent(() =>
+                                                {
+                                                    foreach (var mySection in HomeController.GetMySections())
+                                                    {
+                                                        Html.DevExpress().HyperLink(linkSettings =>
+                                                        {
+                                                            linkSettings.NavigateUrl = DevExpressHelper.GetUrl(new { Area = DataBinder.Eval(mySection, "NavigateUrl"), Controller = "Home", Action = "Index" });
+                                                            linkSettings.ToolTip = "Перейти в раздел";
+                                                            linkSettings.Properties.Text = (string)DataBinder.Eval(mySection, "Name");
+
+                                                        }).Render();
+                                                        ViewContext.Writer.Write("<br/>");
+                                                    }
+                                                }
+                            );
+                    }).GetHtml()

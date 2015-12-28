@@ -1,0 +1,46 @@
+﻿@using (Html.BeginForm("MultiFileSelection", "Contract", FormMethod.Post, new { @class = "edit_form" }))
+{
+    <table border="0">
+    <tr>
+    <td>
+    @Html.DevExpress().UploadControl(
+        settings =>
+        {
+            settings.Name = "ucMultiSelection";
+            settings.CallbackRouteValues = new { Controller = "Contract", Action = "MultiSelectionImageUpload", ownewrModelId = Model.ModelId };
+
+            settings.Width = System.Web.UI.WebControls.Unit.Pixel(380);
+            settings.AdvancedModeSettings.EnableMultiSelect = true;
+
+            settings.ValidationSettings.Assign(DocumentsWeb.Areas.Contracts.Controllers.ContractController.ValidationSettings);
+
+            settings.ClientSideEvents.FileUploadStart = "function(s,e) { /*ClearFileContainer();*/ Uploader_OnFileUploadStart(); }";
+            settings.ClientSideEvents.FilesUploadComplete = "function(s,e) { Uploader_OnFilesUploadComplete(e);  gvFiles.PerformCallback(); }";
+            settings.ClientSideEvents.UploadingProgressChanged = "function(s, e) { Uploader_ProgressChanged(e); }";
+            settings.ClientSideEvents.TextChanged = "function(s, e) { UpdateUploadButton(); }";
+        }).GetHtml()
+        </td>
+        <td>
+    @Html.DevExpress().Button(
+        settings =>
+        {
+            settings.Name = "btnUpload";
+            settings.Text = "Загрузить";
+            settings.Style.Add("padding", "5px");
+            settings.Height = 15;
+            settings.ClientEnabled = false;
+            settings.ClientSideEvents.Click = "function(s,e) { ucMultiSelection.Upload(); }";
+        }).GetHtml()
+        </td>
+        </tr>
+        </table>
+}
+<table id="tableDetalsProduct" style="width:98%">
+    <tr>
+        <td>
+            @Html.Partial("FileGridPartial")
+        </td>
+    </tr>
+</table>
+
+<div style="width: 100%; height: 50px;"></div>

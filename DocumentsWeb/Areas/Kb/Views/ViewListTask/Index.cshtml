@@ -1,0 +1,83 @@
+﻿@using BusinessObjects
+@using DevExpress.Web.Mvc.UI
+@using System.Web.UI.WebControls
+@using DocumentsWeb.Models
+@inherits WebViewPage
+@{
+    ViewBag.Title = "Задачи";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    Analitic defaulanState = WADataProvider.WA.Cashe.GetCasheData<Analitic>().ItemCode<Analitic>(Task.TASK_STATE_INPROGRESS);
+}
+<script type="text/javascript">
+    _aspxAttachEventToElement(window, "load", function () {
+        
+        dxGridViewTasks.ApplyFilter('StateId = 1 AND TaskStateId=' + '@defaulanState.Id');
+        var item = nbFeatures.GetItemByName('mnuFilterOnProgress');
+        if (item != null) {
+            nbFeatures.SetSelectedItem(item);
+        }
+        setTimeout(function () {
+//            if (dxGridViewTasks.InCallback()) {
+//                setTimeout(function()
+//                {
+//                    dxGridViewTasks.SetVisible(true);
+//                }, 1000);
+//            }
+//            else {
+//                dxGridViewTasks.SetVisible(true);
+//            }
+            dxGridViewTasks.SetVisible(true);
+        }, 100);
+    });
+    function AdjustGridSize() {
+        var height = splFullScreenMode.GetPaneByName('GridPane').GetClientHeight();
+        dxGridViewTasks.SetHeight(height);
+    }
+</script>
+
+@Html.Partial("NavpanelPartial")
+@Html.DevExpress().Splitter(settings =>
+{
+    settings.Name = "splFullScreenMode";
+    settings.Orientation = Orientation.Vertical;
+    settings.Styles.Pane.Paddings.Padding = 0;
+    settings.FullscreenMode = true;
+    settings.ClientSideEvents.PaneResized = "function (s, e) { AdjustGridSize(); }";
+    
+    settings.Panes.Add(contentPane =>
+    {
+        contentPane.ScrollBars = ScrollBars.Auto;
+        contentPane.Panes.Add(actionsPane =>
+        {
+            actionsPane.Name = "actionPane";
+            actionsPane.Size = 270;
+            actionsPane.MinSize = 270;
+            actionsPane.AllowResize = DefaultBoolean.True;
+            actionsPane.ShowCollapseBackwardButton = DefaultBoolean.True;
+            actionsPane.SetContent(() => Html.RenderPartial("ActionsPartial"));
+        });
+        
+        contentPane.Panes.Add(gridPane =>
+        {
+            gridPane.Name = "GridPane";
+            gridPane.SetContent(() => Html.RenderPartial("IndexPartial"));
+        });
+
+        contentPane.Panes.Add(reportsPane =>
+        {
+            reportsPane.Name = "reportsPane";
+            reportsPane.Size = 270;
+            reportsPane.MinSize = 270;
+            reportsPane.AllowResize = DefaultBoolean.True;
+            reportsPane.ShowCollapseForwardButton = DefaultBoolean.True;
+            reportsPane.SetContent(() => Html.RenderPartial("ReportsPartial"));
+        });
+    });
+
+    settings.Panes.Add(footerPane =>{
+        footerPane.Size = 80;
+        footerPane.AllowResize = DefaultBoolean.False;
+        footerPane.ShowSeparatorImage = DefaultBoolean.False;
+        footerPane.SetContent(() => @Html.RenderPartial("FooterPartial"));
+    });
+}).GetHtml()

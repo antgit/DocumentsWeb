@@ -1,0 +1,129 @@
+﻿@using BusinessObjects
+@model DocumentsWeb.Areas.Agents.Models.ClientModel
+<table class="edit_form_table2">
+    
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings =>
+       {
+           settings.Text = "Мфо банка:";
+           settings.AssociatedControlName = GlobalPropertyNames.Mfo;
+       }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+       {
+           settings.Name = GlobalPropertyNames.Mfo;
+           settings.Properties.Style.Font.Bold = true;
+           settings.Properties.Style.ForeColor = string.IsNullOrEmpty(Model.Mfo) ? System.Drawing.Color.Red : settings.Properties.Style.ForeColor;
+       }).Bind(string.IsNullOrEmpty(Model.Mfo) ? "<Данные отсутствуют!>" : Model.Mfo).GetHtml() 
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings =>
+       {
+           settings.Text = "Номер свидетельства регистрации НБУ:";
+           settings.AssociatedControlName = GlobalPropertyNames.SertificateNo;
+       }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+       {
+           settings.Name = GlobalPropertyNames.SertificateNo;
+           settings.Properties.Style.Font.Bold = true;
+           settings.Properties.Style.ForeColor = string.IsNullOrEmpty(Model.SertificateNo) ? System.Drawing.Color.Red : settings.Properties.Style.ForeColor;
+       }).Bind(string.IsNullOrEmpty(Model.SertificateNo) ? "<Данные отсутствуют!>" : Model.SertificateNo).GetHtml() 
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings =>
+       {
+           settings.Text = "Дата свидетельства регистрации НБУ:";
+           settings.AssociatedControlName = GlobalPropertyNames.SertificateDate;
+       }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+       {
+           settings.Name = GlobalPropertyNames.SertificateDate;
+           settings.Properties.Style.Font.Bold = true;
+           settings.Properties.Style.ForeColor = !Model.SertificateDate.HasValue ? System.Drawing.Color.Red : settings.Properties.Style.ForeColor;
+       }).Bind(!Model.SertificateDate.HasValue ? "<Данные отсутствуют!>" : Model.SertificateDate.Value.ToShortDateString()).GetHtml() 
+        </td>   
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings =>
+       {
+           settings.Text = "Номер банковской лицензии:";
+           settings.AssociatedControlName = GlobalPropertyNames.LicenseNo;
+       }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+       {
+           settings.Name = GlobalPropertyNames.LicenseNo;
+           settings.Properties.Style.Font.Bold = true;
+           settings.Properties.Style.ForeColor = string.IsNullOrEmpty(Model.LicenseNo) ? System.Drawing.Color.Red : settings.Properties.Style.ForeColor;
+       }).Bind(string.IsNullOrEmpty(Model.LicenseNo) ? "<Данные отсутствуют!>" : Model.LicenseNo).GetHtml() 
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Text = "Дата банковской лицензии:";
+                    settings.AssociatedControlName = GlobalPropertyNames.LicenseDate;
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = GlobalPropertyNames.LicenseDate;
+                    settings.Properties.Style.Font.Bold = false;
+                    settings.Properties.Style.ForeColor = !Model.LicenseDate.HasValue ? System.Drawing.Color.Red : settings.Properties.Style.ForeColor;
+                }).Bind(!Model.LicenseDate.HasValue ? "<Данные отсутствуют!>" : Model.LicenseDate.Value.ToShortDateString()).GetHtml() 
+        </td>
+    </tr>
+    
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Text = "S.W.I.F.T.:";
+                    settings.AssociatedControlName = GlobalPropertyNames.Swift;
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = GlobalPropertyNames.Swift;
+                    settings.Properties.Style.Font.Bold = false;
+                    settings.Properties.Style.ForeColor = string.IsNullOrEmpty(Model.Swift) ? System.Drawing.Color.Red : settings.Properties.Style.ForeColor;
+                }).Bind(string.IsNullOrEmpty(Model.Swift) ? "<Данные отсутствуют!>" : Model.Swift).GetHtml() 
+        </td>
+    </tr>
+    
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings =>
+       {
+           settings.Text = "Корреспондентский счет:";
+           settings.AssociatedControlName = GlobalPropertyNames.CorrBankAccount;
+       }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+       {
+           settings.Name = GlobalPropertyNames.CorrBankAccount;
+           settings.Properties.Style.Font.Bold = false;
+           settings.Properties.Style.ForeColor = string.IsNullOrEmpty(Model.CorrBankAccount) ? System.Drawing.Color.Red : settings.Properties.Style.ForeColor;
+       }).Bind(string.IsNullOrEmpty(Model.CorrBankAccount) ? "<Данные отсутствуют!>" : Model.CorrBankAccount).GetHtml() 
+        </td>
+    </tr>
+</table>
+                                           
+
+

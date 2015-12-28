@@ -1,0 +1,26 @@
+﻿@model DocumentsWeb.Areas.Services.Models.DocumentServiceModel
+@using DocumentsWeb.Models
+@using BusinessObjects
+
+@Html.DevExpress().ComboBox(s =>
+{
+    s.Name = "PrcNameId";
+    s.CallbackRouteValues = new { Controller = Url.RequestContext.RouteData.Values["controller"], Action = "PriceNamePartial", modelId = Model.ModelId };
+    s.ToolTip = "Выберите прайс-лист из списка доступных для автоматической подстановки цен в документе";
+    s.Properties.ValueField = GlobalPropertyNames.Id;
+    s.Properties.TextField = GlobalPropertyNames.Name;
+    s.Properties.ValueType = typeof(int);
+    s.Properties.NullDisplayText = "Выберите прайс-лист";
+    s.ClientEnabled = !Model.IsReadOnly;
+    s.ShowModelErrors = !Model.IsReadOnly && Model.MainCompanyDepatmentId.HasValue && Model.MainCompanyDepatmentId.Value != 0; 
+    s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+    s.Properties.TextFormatString = "{0}";
+    s.Properties.Columns.Add("Name", "Наименование", 150);
+    if (WADataProvider.CurrentUserCompanyMultyCount())
+    {
+        s.Properties.Columns.Add("MyCompanyName", "Компания-владелец", 150);
+    }
+    s.Properties.ClientSideEvents.BeginCallback = "function(s, e) { e.customArgs['MainClientDepatmentId'] = MainClientDepatmentId.GetValue();}";
+}).BindList(WADataProvider.GetPriceNames(PriceName.KINDID_PRICENAME, Model.MainCompanyDepatmentId, Model.PrcNameId)).Bind(Model.PrcNameId == 0 ? null : (int?)Model.PrcNameId).GetHtml()

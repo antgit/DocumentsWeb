@@ -1,0 +1,179 @@
+﻿@using BusinessObjects.Web.Core
+@using DevExpress.Web.Mvc.UI;
+@using DevExpress.Web.Mvc;
+@using DocumentsWeb.Areas.Agents.Models;
+@using BusinessObjects.Security
+@using DocumentsWeb.Models
+@using DocumentsWeb.Controllers;
+@using BusinessObjects;
+@using DevExpress.Web.ASPxGridView;
+@using DocumentsWeb.Areas.General.Models
+@using DevExpress.Utils;
+@using DocumentsWeb;
+@using DevExpress.Web.ASPxClasses;
+@using System.Globalization
+
+@{   
+    bool haveCreate = true;//WADataProvider.LibrariesElementRightView.IsAllow(Right.UICREATE, WebModuleNames.WEB_BANKS) && !WADataProvider.CommonRightView.ReadOnly;
+    bool haveEdit = true;//WADataProvider.LibrariesElementRightView.IsAllow(Right.UIEDIT, WebModuleNames.WEB_BANKS) && !WADataProvider.CommonRightView.ReadOnly;
+    bool haveDelete = true;//WADataProvider.LibrariesElementRightView.IsAllow(Right.UITRASH, WebModuleNames.WEB_BANKS) && !WADataProvider.CommonRightView.ReadOnly;
+    bool haveView = true;//WADataProvider.LibrariesElementRightView.IsAllow(Right.UIVIEW, WebModuleNames.WEB_BANKS);
+    
+}
+
+@Html.DevExpress().GridView(s => {
+	s.Name = "dxGridViewAutos";
+
+	s.CallbackRouteValues = new { Controller = "Auto", Action = "IndexPartial" };
+	
+	s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+	s.SettingsPager.PageSize = 200;
+
+	s.SettingsBehavior.AllowGroup = true;
+	s.Settings.ShowGroupPanel = true;
+
+	s.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+	s.KeyFieldName = GlobalPropertyNames.Id;
+	
+	s.Columns.Add(cc =>
+	{
+		cc.Name = "colImageAction";
+		if (haveEdit || haveView || haveDelete)
+		{
+			cc.Width = 10;
+			cc.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+			cc.Settings.AllowDragDrop = DefaultBoolean.False;
+			cc.Settings.AllowSort = DefaultBoolean.False;
+			cc.ShowInCustomizationForm = false;
+			cc.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+			cc.SetDataItemTemplateContent(c =>
+			{
+				if (haveEdit || haveView)
+				{
+					Html.DevExpress().HyperLink(hl =>
+					{
+						hl.Properties.ImageUrl = Url.Content("~/Images/edit10x10.png");
+						hl.ToolTip = "Изменить данные о складе";
+						if (haveEdit)
+							hl.NavigateUrl = "javascript:ShowPopupEdit(" + DataBinder.Eval(c.DataItem, "Id") + ");";
+						hl.ClientEnabled = haveEdit || haveView;
+						hl.ClientVisible = haveEdit || haveView;
+					}).Render();
+				}
+				if (haveDelete)
+				{
+					Html.DevExpress().HyperLink(hl =>
+					{
+						hl.Properties.ImageUrl = Url.Content("~/Images/DELETEDELEMENT_X16.png");
+						hl.ToolTip = "Удалить данные о складе";
+						hl.NavigateUrl = "javascript:deleteRow(" + c.ItemIndex.ToString(CultureInfo.InvariantCulture) + ");";//"javascript:deleteRow(0);";
+					}).Render();
+				}
+			});
+		}
+	});
+
+	s.Columns.Add(column =>
+	{
+		column.Caption = "Гос. номер";
+		column.Name = "GosNumber";
+		column.FieldName = "GosNumber";
+		column.Width = 50;
+		//column.Width = System.Web.UI.WebControls.Unit.Pixel(50);
+		column.Settings.AllowAutoFilter = DefaultBoolean.True;
+		column.Settings.AutoFilterCondition = AutoFilterCondition.BeginsWith;
+		column.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+	});
+
+	s.Columns.Add(column =>
+	{
+		column.Caption = "Марка";
+		column.Name = "EquipmentName";
+		column.FieldName = "EquipmentName";
+		column.Width = 50;
+		//column.Width = System.Web.UI.WebControls.Unit.Pixel(50);
+		column.Settings.AllowAutoFilter = DefaultBoolean.True;
+		column.Settings.AutoFilterCondition = AutoFilterCondition.BeginsWith;
+		column.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+	});
+
+	s.Columns.Add(column =>
+	{
+		column.Caption = "Тип ТС";
+		column.Name = "EquipmentTypeName";
+		column.FieldName = "EquipmentTypeName";
+		column.Width = 50;
+		//column.Width = System.Web.UI.WebControls.Unit.Pixel(50);
+		column.Settings.AllowAutoFilter = DefaultBoolean.True;
+		column.Settings.AutoFilterCondition = AutoFilterCondition.BeginsWith;
+		column.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+	});
+
+	s.Columns.Add(column =>
+	{
+		column.Caption = "Принадлежность";
+		column.Name = "MyCompanyName";
+		column.FieldName = "MyCompanyName";
+		column.Width = 50;
+		//column.Width = System.Web.UI.WebControls.Unit.Pixel(50);
+		column.Settings.AllowAutoFilter = DefaultBoolean.True;
+		column.Settings.AutoFilterCondition = AutoFilterCondition.BeginsWith;
+		column.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+	});
+
+	s.Settings.ShowGroupPanel = true;
+	s.Settings.ShowFilterRow = DocumentsWeb.Code.LayoutHelper.GetCurrentSetting(Url.RequestContext.RouteData.Values["controller"].ToString()).Current.ShowFilterPanel;
+	s.Settings.ShowFilterRowMenu = true;
+	s.Settings.ShowFilterBar = GridViewStatusBarMode.Visible;
+	s.SettingsPager.PageSize = Utils.GetPageSize(s);
+	s.SettingsPager.Position = System.Web.UI.WebControls.PagerPosition.Top;
+	s.SettingsPager.AlwaysShowPager = true;
+	//s.SettingsBehavior.AllowFocusedRow = true;
+	s.SettingsCustomizationWindow.Enabled = true;
+	s.SettingsCustomizationWindow.PopupVerticalAlign = PopupVerticalAlign.Below;
+	s.SettingsCustomizationWindow.PopupHorizontalAlign = PopupHorizontalAlign.OutsideRight;
+
+	s.SetPagerBarTemplateContent(c =>
+	{
+		Html.RenderPartial("TablePager", new ViewDataDictionary
+	    {
+	        { "ContentObject", c },
+	        { "TableCaption", "<b><a href=\"" + Url.Action("Index", new { area = "Ourp", controller = "Auto", action = "Index" }) + "\">Управление ремонтами</a>\\Автомобили</b>" }
+	    });
+	});
+	
+	s.CustomCallback = (sender, e) =>
+	{
+		//MVCxGridView grid = (MVCxGridView)sender;
+		//string refreshArg = e.Parameters.Split('&').FirstOrDefault(s => s.StartsWith("refresh"));
+		//bool refresh = (refreshArg != null) && (refreshArg.EndsWith("true"));
+		//if (refresh)
+		//{
+		//    int[] roots = Utils.GetHieRoots(s);
+		//    if (roots.Contains(0))
+		//    {
+		//        CoreController<Agent> c = (CoreController<Agent>)ViewContext.Controller;
+		//        //grid.DataSource = ClientModel.GetCollection(HierarchyModel.GetLinkedHierarchies(c.RootHierachy, HierarchyModel.FILTER_HIERARCHY_CHAIN).Select(s => s.Code).ToArray<string>(), true);
+		//        grid.DataSource = ClientModel.GetWorkersCollection(c.RootHierachy, true);
+		//    }
+		//    else
+		//    {
+		//        grid.DataSource = ClientModel.GetWorkersCollectionWONested(roots);
+		//    }
+		//    grid.DataBind();
+		//}
+		
+
+		MVCxGridView grid = (MVCxGridView)sender;
+		string refreshArg = e.Parameters.Split('&').FirstOrDefault(ss => ss.StartsWith("refresh"));
+		bool refresh = (refreshArg != null) && (refreshArg.EndsWith("true"));
+		if (refresh)
+		{
+			grid.DataSource = DocumentsWeb.Areas.Ourp.Models.AutoModel.GetCollection(true);
+			grid.DataBind();
+		}
+	};
+	
+	
+
+}).Bind(DocumentsWeb.Areas.Ourp.Models.AutoModel.GetCollection()).GetHtml()

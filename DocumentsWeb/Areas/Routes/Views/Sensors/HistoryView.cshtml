@@ -1,0 +1,255 @@
+﻿@{
+    ViewBag.Title = "История";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script type="text/javascript" src="@Url.Content("~/Scripts/jquery.flot.min.js")"></script>
+<script type="text/javascript">
+    var in_query = false;
+    var plot = null;
+    var gdata = null;
+    var previousPoints = [];
+
+    function ChangePaneSize(s, e) {
+        if (plot != null) {
+            plot.resize();
+            plot.setupGrid();
+            plot.draw();
+        }
+    }
+
+    function DateChange(s, e) {
+        update();
+    }
+
+    for (var i = 0; i < 8; i++) {
+        previousPoints.push(null);
+    }
+
+    function showTooltip(x, y, contents) {
+        $('<div id="tooltip">' + contents + '</div>').css({
+            position: 'absolute',
+            display: 'none',
+            top: y + 5,
+            left: x + 5,
+            border: '1px solid #fdd',
+            padding: '2px',
+            'background-color': '#fee',
+            opacity: 0.80
+        }).appendTo("body").fadeIn(200);
+    }
+
+    function getDataByPort(data, portNo) {
+        var port = [];
+
+        for (var i = 0; i < data.length; i++) {
+            if (data[i]['MessageId' + portNo.toString()] == 0) {
+                port.push([data[i].JavaScriptTimeStamp, data[i]['Value' + portNo.toString()]]);
+            }
+        }
+        return port;
+    }
+
+    function getMessagesByPort(data, portNo) {
+        var port = [];
+        var points = getDataByPort(data, portNo);
+        var i = 0;
+        var summ = 0;
+
+        if (points.length > 0) {
+            for (i = 0; i < points.length; i++) {
+                summ += points[i][1];
+            }
+            summ = Math.round(summ / points.length, 2);
+        } else {
+            summ = 0;
+        }
+
+        for (i = 0; i < data.length; i++) {
+            if (data[i]['MessageId' + portNo.toString()] != 0) {
+                port.push([data[i].JavaScriptTimeStamp, summ]);
+            }
+        }
+        return port;
+    }
+
+    function getFormattedDate(date) {
+        date.setHours(date.getHours() + (date.getTimezoneOffset() / 60));
+        var then = date.getDate() + '.' + (date.getMonth() + 1) + '.' + date.getFullYear();
+        then += ' ' + date.getHours() + ':' + date.getMinutes();
+        return then;
+    }
+
+    function getFormattedMessage(msgId) {
+        var msgText = '';
+        switch (msgId) {
+            case 240: msgText = 'Вычисленное значение заведомо неверно.'; break;
+            case 241: msgText = 'Ошибка в пакете OWEN, пришел фарш.'; break;
+            case 242: msgText = 'Ошибка CRC пакета OWEN.'; break;
+            case 243: msgText = 'Нет ответа от модуля ввода'; break;
+            case 247: msgText = 'Датчик отключен.';
+            case 248: msgText = 'Велика температура холодного спая.'; break;
+            case 249: msgText = 'Мала температура холодного спая.'; break;
+            case 250: msgText = 'Вычисленное значение слишком велико.'; break;
+            case 251: msgText = 'Вычисленное значение слишком мало.'; break;
+            case 252: msgText = 'Короткое замыкание.'; break;
+            case 253: msgText = 'Обрыв датчика.'; break;
+            case 254: msgText = 'Отсутствие связи с АЦП.'; break;
+            case 255: msgText = 'Некорректный калибровочный коэффициент.'; break;
+        }
+        return msgText;
+    }
+
+    function messageId(datetime, idx) {
+        for (var i = 0; i < gdata.length; i++) {
+            if (gdata[i].JavaScriptTimeStamp == datetime) {
+                return gdata[i]['MessageId' + (idx + 1).toString()];
+            }
+        }
+        return 0;
+    }
+
+    function setHoverListener() {
+        $("#historyChart").bind("plothover", function (event, pos, item) {
+            if (item) {
+                if (previousPoints[4] != item.dataIndex) {
+                    previousPoints[4] = item.dataIndex;
+
+                    $("#tooltip").remove();
+                    var x = item.datapoint[0],
+                    y = item.datapoint[1].toFixed(2);
+
+                    var msgId = messageId(x, 3);
+                    if (msgId == 0) {
+                        showTooltip(item.pageX, item.pageY, getFormattedDate(new Date(x)) + ' <b>' + y + '</b>');
+                    } else {
+                        showTooltip(item.pageX, item.pageY, getFormattedDate(new Date(x)) + ' ' + getFormattedMessage(msgId));
+                    }
+                }
+            }
+            else {
+                $("#tooltip").remove();
+                previousPoints[4] = null;
+            }
+        });
+    }
+
+    function padStr(i) {
+        return (i < 10) ? "0" + i : "" + i;
+    }
+
+    function update() {
+        if (!in_query) {
+            in_query = true;
+            var dt = DateSet.GetSelectedDate();
+            if (dt == null) {
+                dt = new Date();
+            }
+            var dt_txt = dt.getFullYear().toString() + padStr(1 + dt.getMonth()) + padStr(dt.getDate());
+            $.getJSON('@Url.Content("~/Routes/Logger/GetValuesByDate")', { deviceId: @Request.Params["deviceId"], date: dt_txt, tmps: new Date().getTime() }, function (data) {
+                gdata = data;
+                plot = $.plot($("#historyChart"),
+                [{
+                    data: getDataByPort(data, @Request.Params["portNo"]),
+                },
+                {
+                    data: getMessagesByPort(data, @Request.Params["portNo"]),
+                    lines: { show: false },
+                    points: { show: true, symbol: function cross(ctx, x, y, radius, shadow) {
+                        var size = radius * Math.sqrt(Math.PI) / 2;
+                        ctx.moveTo(x - size, y - size);
+                        ctx.lineTo(x + size, y + size);
+                        ctx.moveTo(x - size, y + size);
+                        ctx.lineTo(x + size, y - size);
+                    }},
+                    color: "rgb(255, 0, 0)"
+                }],
+                {
+                    grid: { clickable: false, hoverable: true },
+                    series: {
+                        lines: { show: true },
+                        points: { show: true }
+                    },
+                    xaxis: {
+                        mode: "time",
+                        timeformat: "%d.%m.%y<br/>%H:%M"
+                    }
+                });
+                in_query = false;
+                setHoverListener();
+                buildTable(@Request.Params["portNo"]-1);
+            });
+        }
+    }
+
+    function buildTable(idx) {
+        var tb = '<div>Всего записей: ' + gdata.length + '</div><table><tr><th>Дата</th><th>Значение</th></tr>';
+
+        for (var i = 0; i < gdata.length; i++) {
+            if (gdata[i]['MessageId' + (idx + 1).toString()] == 0) {
+                tb += '<tr><td>' + getFormattedDate(new Date(gdata[i].JavaScriptTimeStamp)) + '</td><td>' + gdata[i]['Value' + (idx + 1).toString()] + '</td></tr>';
+            } else {
+                tb += '<tr style="background-color: #FF6347; color: white;"><td>' + getFormattedDate(new Date(gdata[i].JavaScriptTimeStamp)) + '</td><td>' + getFormattedMessage(gdata[i]['MessageId' + (idx + 1).toString()]) + '</td></tr>';
+            }
+            /*if (gdata[i].JavaScriptTimeStamp == datetime) {
+                return gdata[i]['MessageId' + (idx + 1).toString()];
+            }*/
+        }
+
+        tb += '</table>';
+        $('#historyTable').html(tb);
+    }
+
+    $(document).ready(function () {
+        update();
+    });
+</script>
+
+@*Html.Partial("NavpanelPartial")*@
+@Html.DevExpress().Splitter(settings =>
+{
+    settings.Name = "splFullScreenMode";
+    settings.Orientation = System.Web.UI.WebControls.Orientation.Vertical;
+    settings.Styles.Pane.Paddings.Padding = 0;
+    settings.FullscreenMode = true;
+
+    settings.Panes.Add(contentPane =>
+    {
+        contentPane.ScrollBars = System.Web.UI.WebControls.ScrollBars.None;
+       @* contentPane.Panes.Add(actionsPane =>
+        {
+            actionsPane.Name = "actionPane";
+            actionsPane.AllowResize = DefaultBoolean.True;
+            actionsPane.Size = 270;
+            actionsPane.MinSize = 270;
+            actionsPane.ShowCollapseBackwardButton = DefaultBoolean.True;
+            actionsPane.ScrollBars = ScrollBars.None;
+            actionsPane.SetContent(() =>
+            {
+                Html.RenderPartial("ActionsPartial");
+            });
+        });*@
+        contentPane.Panes.Add(mapPane =>
+        {
+            mapPane.Name = "HistoryPain";
+            mapPane.ScrollBars = System.Web.UI.WebControls.ScrollBars.None;
+            mapPane.SetContent(() =>
+            {
+                Html.RenderPartial("HistoryViewPartial");
+            });
+        });
+    });
+
+    settings.Panes.Add(footerPane =>
+    {
+        footerPane.Size = 80;
+        footerPane.AllowResize = DefaultBoolean.False;
+        footerPane.ShowSeparatorImage = DefaultBoolean.False;
+        footerPane.SetContent(() =>
+        {
+            @Html.RenderPartial("FooterPartial");
+        });
+    });
+
+    settings.ClientSideEvents.PaneResized = "ChangePaneSize";
+}).GetHtml()

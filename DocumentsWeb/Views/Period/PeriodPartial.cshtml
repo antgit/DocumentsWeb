@@ -1,0 +1,14 @@
+﻿@using DocumentsWeb.Models
+@using System.Web.UI.WebControls
+@model PeriodModel
+
+@Html.DevExpress().CallbackPanel(s =>
+{
+    s.Name = "cbpPeriod";
+    s.CallbackRouteValues = new { Area = "Admins", Controller = "UserConfig", Action = "ChangePeriod" };
+    s.SetContent(() =>
+    {
+        Html.RenderPartial("../Period/PeriodTemplate", Model);
+    });
+    s.ClientSideEvents.BeginCallback = "function (s, e) { e.customArgs[\"PeriodAction\"] = PeriodAction; e.customArgs[\"Date\"] = PeriodDate; PeriodChanged = true; }";
+}).GetHtml()

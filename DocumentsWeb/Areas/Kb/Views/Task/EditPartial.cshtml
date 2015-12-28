@@ -1,0 +1,96 @@
+﻿@using BusinessObjects
+@using BusinessObjects.Security
+@using DocumentsWeb.Controllers
+@using DocumentsWeb.Areas.General.Models
+@model DocumentsWeb.Areas.Kb.Models.TaskModel
+
+@Html.DevExpress().NavBar(nbSettings =>
+    {
+        nbSettings.Name = "nbDocContracts";
+        nbSettings.AllowExpanding = true;
+        nbSettings.AllowSelectItem = true;
+        nbSettings.AutoCollapse = false;
+        nbSettings.EnableHotTrack = true;
+        nbSettings.EnableAnimation = true;
+        nbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        nbSettings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+        nbSettings.EncodeHtml = false;
+
+        if (!ViewContext.ViewData.ModelState.IsValid)
+        {
+            nbSettings.Groups.Add(group =>
+            {
+                group.Text = "Ошибки!";
+                group.HeaderStyle.Font.Bold = true;
+                group.HeaderImage.Url = Url.Content("~/Images/ERROR_X16.png");
+                group.SetContentTemplateContent(c => ViewContext.Writer.Write(@Html.ValidationSummary(false).ToHtmlString()));
+            });
+        }
+    
+        nbSettings.Groups.Add(group =>
+            {
+                @group.Text = Model.Id == 0 ? "Новая задача" : Model.Name;
+                group.HeaderStyle.Font.Bold = true;
+        
+            group.Expanded = true;
+            group.HeaderStyle.HoverStyle.Font.Underline = true;
+            group.HeaderImage.Url = Url.Content("~/Images/DOCUMENTDONE_X16.png");
+        
+            group.SetContentTemplateContent(c =>
+            {          
+            @Html.DevExpress().PageControl(settings =>{
+                settings.Name = "tsEditDocument";
+                settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                settings.Height = 430;
+                settings.TabPages.Add("Главная").SetContent(() =>
+                {
+                    Html.RenderPartial("PageMainPartial", Model);
+                });
+
+                settings.TabPages.Add("Файлы").SetContent(() =>
+                {
+                    Html.RenderAction("FileGridWithUploader", new { Area = "General", Controller = "File", modelId = Model.ModelId });
+                });
+
+                settings.TabPages.Add("Примечания").SetContent(() =>
+                {
+                    Html.RenderAction("NotesGrid", new { Area = "General", Controller = "Note", modelId = Model.ModelId });
+                });
+
+                settings.TabPages.Add("Иерархия").SetContent(() =>
+                {
+                    CoreController<Task> controller = (CoreController<Task>)ViewContext.Controller;
+                    Html.RenderAction("GroupsControlPartial", new
+                    {
+                        Area = "General",
+                        Controller = "Hierarchy",
+                        RootList = HierarchyModel.GetLinkedHierarchies(controller.RootHierachy, HierarchyModel.EDIT_HIERARCHY_CHAIN).Select(s => s.Code).ToArray(),
+                        Model = Model
+                    });
+                });
+    
+                if(User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                {
+                    settings.TabPages.Add("Свойства").SetContent(() =>
+                    {
+                        Html.RenderPartial("PagePropertiesPartial", Model);
+                    });
+                }
+            }).GetHtml();
+        });
+    });
+
+    nbSettings.Groups.Add(group =>
+    {
+        group.Text = "Детализация - примечание...";
+        group.Expanded = true;
+        group.HeaderStyle.Font.Bold = true;
+        group.HeaderStyle.HoverStyle.Font.Underline = true;
+        group.HeaderImage.Url = Url.Content("~/Images/note_x16.png");
+        group.SetContentTemplateContent(c =>
+        {
+            @Html.RenderPartial("MemoPartial", Model);
+            ViewContext.Writer.Write("<div style=\"width: 100%; height: 50px;\"></div>");
+        });
+    });
+}).GetHtml()

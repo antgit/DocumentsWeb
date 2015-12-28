@@ -1,0 +1,136 @@
+﻿@{
+    GridViewPagerBarTemplateContainer c = (GridViewPagerBarTemplateContainer)ViewData["ContentObject"];    
+    MVCxGridView grid = null;
+    Control control = c.NamingContainer;
+    while (control != null)
+    {
+        if (control is MVCxGridView)
+        {
+            grid = (MVCxGridView)control;
+            break;
+        }
+        control = control.NamingContainer;
+    }
+
+    Dictionary<string, string> dic = Utils.CastAnonymous(grid.CallbackRouteValues);
+    string controller = dic["Controller"];
+    string action = dic["Action"];
+    string grid_name = c.Grid.ID;
+    
+    string TableCaption = "";
+    try { TableCaption = ViewData["TableCaption"].ToString(); } catch { }
+  
+    int[] pageSizes = new[] { 15, 20, 25, 30, 35, 40, 45, 50, 100 };
+}
+
+<table style="width: 100%;">
+    <tr>
+        @*http://stackoverflow.com/questions/2700000/how-to-disable-text-selection-using-jquery*@
+        <td nowrap="nowrap" style="width: auto; -o-user-select: none; -user-select: none; -ms-user-select: none; -khtml-user-select: none; -webkit-touch-callout: none; -moz-user-select: none;-webkit-user-select: none;" onselectstart="return false;" onmousedown="return false;" >
+            @Html.DevExpress().Label(s => {
+                s.Style.Add("font-size", "10pt;");
+                
+                if (TableCaption.Length > 0)
+                {
+                    s.EncodeHtml = false;
+                    s.Text = TableCaption;
+                }
+            }).GetHtml()
+        </td>
+        <td style="float: right;">
+            <table>
+                <tr>
+                    <td>
+                        @Html.DevExpress().ComboBox(editorSettings =>
+                        {
+                            editorSettings.Name = "PageSize";
+                            editorSettings.ControlStyle.CssClass = "editor";
+                            editorSettings.Properties.DropDownRows = 8;
+                            editorSettings.Properties.ValueType = typeof(int);
+                            editorSettings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                            editorSettings.Properties.DropDownStyle = DropDownStyle.DropDown;
+                            editorSettings.Width = 50;
+                            editorSettings.Height = 15;
+                            foreach (int pageSize in pageSizes)
+                            {
+                                editorSettings.Properties.Items.Add(pageSize.ToString(), pageSize);
+                            }
+                            editorSettings.Properties.ClientSideEvents.SelectedIndexChanged = "function (s, e) { $.ajax({ type: 'POST', url: '" + Url.Content("~/Admins/UserConfig/SetGridPager") + "', async: false, data: { Controller: '" + controller + "', Action: '" + action + "', GridName: '" + grid_name + "', PagesCount: s.GetValue() } }); " + grid_name + ".PerformCallback(); }";
+                        }).Bind(Utils.GetPageSize(controller, action, grid_name)).GetHtml()
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td style="float: right;">
+            <table>
+                <tr>
+                    <td>
+                        @Html.DevExpress().HyperLink(s =>
+                                       {
+                                           s.Name = "First";
+                                           s.NavigateUrl = "javascript:" + grid_name + ".GotoPage(0);";
+                                           s.ControlStyle.CssClass = "button";
+                                           s.Enabled = grid.PageIndex > 0;
+                                           s.Properties.Text = "<<";
+                                       }).GetHtml()
+                    </td>
+                    <td>
+                        @Html.DevExpress().HyperLink(s =>
+                                       {
+                                           s.Name = "Prev";
+                                           s.NavigateUrl = "javascript:" + grid_name + ".PrevPage();";
+                                           s.ControlStyle.CssClass = "button";
+                                           s.Style.Add("margin-left", "10px");
+                                           s.Enabled = grid.PageIndex > 0;
+                                           s.Properties.Text = "<";
+                                       }).GetHtml()
+                    </td>
+                    <td>
+                        @Html.DevExpress().Label(s => {
+                                        s.Text = "Страница:";
+                        }).GetHtml()
+                    </td>
+                    <td>
+                        @Html.DevExpress().TextBox(editorSettings =>
+                                     {
+                                         editorSettings.Name = "CurrentPage";
+                                         editorSettings.ControlStyle.CssClass = "editor";
+                                         editorSettings.Properties.Size = 2;
+                                         editorSettings.Properties.MaskSettings.Mask = "<1.." + grid.PageCount.ToString() + ">";
+                                         editorSettings.Properties.ValidationSettings.Display = Display.None;
+                                         editorSettings.Text = (grid.PageIndex + 1).ToString();
+                                         editorSettings.Properties.ClientSideEvents.TextChanged = "function(s, e){ " + grid_name + ".GotoPage(parseInt(s.GetValue()) - 1); }";
+                                         editorSettings.Height = 21;
+                                     }).GetHtml()
+                    </td>
+                    <td>
+                        @Html.DevExpress().Label(s => {
+                                        s.Text = "из " + grid.PageCount.ToString();
+                        }).GetHtml()
+                    </td>
+                    <td>
+                        @Html.DevExpress().HyperLink(s =>
+                                       {
+                                           s.Name = "Next";
+                                           s.NavigateUrl = "javascript:" + grid_name + ".NextPage();";
+                                           s.ControlStyle.CssClass = "button";
+                                           s.Enabled = grid.PageIndex < grid.PageCount - 1;
+                                           s.Properties.Text = ">";
+                                       }).GetHtml()
+                    </td>
+                    <td>
+                        @Html.DevExpress().HyperLink(s =>
+                                       {
+                                           s.Name = "Last";
+                                           s.NavigateUrl = "javascript:" + grid_name + ".GotoPage(" + grid_name + ".GetPageCount() - 1);";
+                                           s.ControlStyle.CssClass = "button";
+                                           s.Style.Add("margin-left", "10px");
+                                           s.Enabled = grid.PageIndex < grid.PageCount - 1;
+                                           s.Properties.Text = ">>";
+                                       }).GetHtml()
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>

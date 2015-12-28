@@ -1,0 +1,23 @@
+﻿@using BusinessObjects
+@Html.DevExpress().GridView(settings=>{
+    settings.Name="gvFoldersTree";
+    settings.CallbackRouteValues = new { Controller = "Document", Action = "DocumentFoldersTreePartial"};
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.SettingsBehavior.AllowFocusedRow = true;
+    settings.Styles.GroupRow.Font.Bold = true;
+    settings.Settings.GroupFormat = "{1} {2}";
+    settings.KeyFieldName = GlobalPropertyNames.Id;
+    settings.Columns.Add("HierarchyName", "Группа").Width = 50;
+    settings.Columns.Add("Name", "Имя").Width = 300;
+    settings.PreRender = (source, e) =>
+    {
+        ASPxGridView gridView = (ASPxGridView)source;
+        gridView.GroupBy(gridView.Columns["HierarchyName"]);
+        gridView.ExpandAll();
+        gridView.FocusedRowIndex++;
+    };
+    settings.Settings.ShowGroupPanel = false;
+    settings.SettingsBehavior.EnableRowHotTrack = true;
+    settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+    settings.ClientSideEvents.FocusedRowChanged = "OnGridFocusedRowChanged";
+}).Bind(Model).GetHtml()

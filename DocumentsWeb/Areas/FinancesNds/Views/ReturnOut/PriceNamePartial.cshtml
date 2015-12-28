@@ -1,0 +1,22 @@
+﻿@model DocumentsWeb.Areas.Finances.Models.DocumentFinanceModel
+@using DocumentsWeb.Models
+@using BusinessObjects
+
+@Html.DevExpress().ComboBox(s =>
+{
+    s.Name = "PrcNameId";
+    //s.CallbackRouteValues = new { Controller = "SaleActOut", Action = "PriceNamePartial", modelId = Model.ModelId };
+    s.Properties.ValueField = GlobalPropertyNames.Id;
+    s.Properties.TextField = GlobalPropertyNames.Name;
+    s.Properties.ValueType = typeof(int);
+    s.Properties.NullDisplayText = "Выберите прайс-лист";
+    //s.ControlStyle.CssClass = "editor";
+    //s.Width = 150;
+    s.ClientEnabled = !Model.IsReadOnly;
+    s.ShowModelErrors = true;
+    s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+    //s.Properties.ClientSideEvents.BeginCallback = "function(s, e) { e.customArgs['MainCompanyDepatmentId'] = MainCompanyDepatmentId.GetValue(); e.customArgs['Id'] = " + @Model.Id + "}";
+    //s.Properties.ClientSideEvents.EndCallback = "function(s, e) { s.SetSelectedIndex(-1);}";
+}).BindList(WADataProvider.GetPriceNames(PriceName.KINDID_PRICENAME)).Bind(Model.PrcNameId == 0 ? null : (int?)Model.PrcNameId).GetHtml()

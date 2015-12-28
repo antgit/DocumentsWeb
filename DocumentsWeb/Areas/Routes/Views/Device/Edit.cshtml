@@ -1,0 +1,21 @@
+﻿@using DocumentsWeb.Areas.Routes.Models
+@model DeviceModel
+
+@{
+    Html.EnableClientValidation();
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+<script type="text/javascript">
+    @if(Model.IsSystem | Model.IsReadOnly) { ViewContext.Writer.Write("if (typeof parent.pcEdit != 'undefined') { parent.pcEdit.SetVisibleSaveButton(false); }"); }
+
+    function OntsEditDeviceInit(s, e) {
+        s.SetHeight($(window).height());
+    }
+</script>
+
+@using (Html.BeginForm("Edit", "Device", FormMethod.Post, new { @class = "edit_form", @id = "editForm" }))
+{ 
+    @Html.Partial("EditPartial", Model)
+}

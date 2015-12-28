@@ -1,0 +1,319 @@
+﻿@using BusinessObjects
+@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentsWeb.Models
+@using DocumentsWeb.Areas.Agents.Models
+@using DocumentsWeb.Areas.Analitics.Models
+@using DocumentsWeb.Controllers
+@using DocumentsWeb.Areas.General.Models
+@model ClientModel
+@{
+    bool haveEdit = !Model.IsReadOnly && WADataProvider.LibrariesElementRightView.IsAllow(Right.UIEDIT, WebModuleNames.WEB_EMPLOERS) && !WADataProvider.CommonRightView.ReadOnly;
+}
+
+        <table style="width:600px;">
+        
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+   {
+       s.ControlStyle.CssClass = "label";
+       s.Text = "Признак:";
+       s.AssociatedControlName = GlobalPropertyNames.Code;
+       s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Code);
+   }).GetHtml()
+        </td><td colspan="3">
+        @Html.DevExpress().TextBox(s =>
+   {
+       s.Name = GlobalPropertyNames.Code;
+       s.ReadOnly = !haveEdit;
+       if (!s.ReadOnly)
+       {
+           s.Properties.NullText = "Введите признак...";
+           s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Code);
+       }
+       s.ControlStyle.CssClass = "editor";
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+       s.ShowModelErrors = true;
+       s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+       s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+   }).Bind(Model.Code).GetHtml()
+        </td></tr>
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+   {
+       s.ControlStyle.CssClass = "label";
+       s.Text = "Код поиска:";
+       s.AssociatedControlName = GlobalPropertyNames.CodeFind;
+       s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.CodeFind);
+   }).GetHtml()
+        </td><td colspan="3">
+        @Html.DevExpress().TextBox(s =>
+   {
+       s.Name = GlobalPropertyNames.CodeFind;
+       s.ReadOnly = !haveEdit;
+       if (!s.ReadOnly)
+       {
+           s.Properties.NullText = "Введите код поиска...";
+           s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.CodeFind);
+       }
+       s.ControlStyle.CssClass = "editor";
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+       s.ShowModelErrors = true;
+       s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+       s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+   }).Bind(Model.CodeFind).GetHtml()
+        </td></tr>
+        
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+   {
+       s.ControlStyle.CssClass = "label";
+       s.Text = "Пол:";
+       s.AssociatedControlName = GlobalPropertyNames.Sex;
+       s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Sex);
+   }).GetHtml()
+        </td><td>
+        @Html.DevExpress().ComboBox(s =>
+   {
+       s.Name = GlobalPropertyNames.Sex;
+       s.ReadOnly = !haveEdit;
+       if (!s.ReadOnly)
+       {
+           s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Sex);
+       }
+       s.ControlStyle.CssClass = "editor";
+       s.ShowModelErrors = true;
+       s.Properties.ValueType = typeof(bool);
+       s.Properties.Items.Add("Мужской", true);
+       s.Properties.Items.Add("Женский", false);
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+       s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+       s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+   }).Bind(Model.Sex).GetHtml()
+        </td><td class="table_label">
+        @Html.DevExpress().Label(s =>
+   {
+       s.ControlStyle.CssClass = "label";
+       s.Text = "Табельный номер:";
+       s.AssociatedControlName = GlobalPropertyNames.TabNo;
+       s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.TabNo);
+   }).GetHtml()
+        </td><td>
+        @Html.DevExpress().TextBox(s =>
+   {
+       s.Name = GlobalPropertyNames.TabNo;
+       s.ReadOnly = !haveEdit;
+       if (!s.ReadOnly)
+       {
+           s.Properties.NullText = "Введите табельный номер..";
+           s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.TabNo);
+       }
+       s.ControlStyle.CssClass = "editor";
+       s.ShowModelErrors = true;
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+       s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+       s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+   }).Bind(Model.TabNo).GetHtml()
+        </td></tr>
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+   {
+       s.ControlStyle.CssClass = "label";
+       s.Text = "Дата приема:";
+       s.AssociatedControlName = GlobalPropertyNames.DateStart;
+       s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.DateStart);
+   }).GetHtml()
+        </td><td>
+        @Html.DevExpress().DateEdit(s =>
+   {
+       s.Name = GlobalPropertyNames.DateStart;
+       s.ReadOnly = !haveEdit;
+       if (!s.ReadOnly)
+       {
+           s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.DateStart);
+       }
+       s.ControlStyle.CssClass = "editor";
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+       s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+       s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+   }).Bind(Model.DateStart).GetHtml()
+        </td><td class="table_label">
+        @Html.DevExpress().Label(s =>
+   {
+       s.ControlStyle.CssClass = "label";
+       s.Text = "Дата увольнения:";
+       s.AssociatedControlName = GlobalPropertyNames.DateEnd;
+       s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.DateEnd);
+   }).GetHtml()
+        </td><td>
+        @Html.DevExpress().DateEdit(s =>
+   {
+       s.Name = GlobalPropertyNames.DateEnd;
+       s.ReadOnly = !haveEdit;
+       if (!s.ReadOnly)
+       {
+           s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.DateEnd);
+       }
+       s.ControlStyle.CssClass = "editor";
+       s.ShowModelErrors = true;
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+       s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+       s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+   }).Bind(Model.DateEnd).GetHtml()
+        </td></tr>
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+   {
+       s.ControlStyle.CssClass = "label";
+       s.Text = "Фамилия:";
+       s.ToolTip = "Рекомендуется вводить полностью, без сокращения";
+       s.AssociatedControlName = GlobalPropertyNames.FirstName;
+   }).GetHtml()
+        </td><td colspan="3">
+        @Html.DevExpress().TextBox(s =>
+   {
+       s.Name = GlobalPropertyNames.FirstName;
+       s.ToolTip = "Рекомендуется вводить полностью, без сокращения";
+       s.ReadOnly = !haveEdit;
+       s.Properties.ConvertEmptyStringToNull = true;
+       if (!s.ReadOnly)
+       {
+           s.Properties.NullText = "Введите фамилию...";
+           s.Properties.NullTextStyle.ForeColor = System.Drawing.Color.Red;
+       }
+       s.ControlStyle.CssClass = "editor";
+       s.ShowModelErrors = true;
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+       s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+       s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+   }).Bind(Model.FirstName).GetHtml()
+        </td></tr>
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+   {
+       s.ControlStyle.CssClass = "label";
+       s.Text = "Имя:";
+       s.ToolTip = "Рекомендуется вводить полностью, без сокращения";
+       s.AssociatedControlName = GlobalPropertyNames.LastName;
+   }).GetHtml()
+        </td><td colspan="3">
+        @Html.DevExpress().TextBox(s =>
+   {
+       s.Name = GlobalPropertyNames.LastName;
+       s.ToolTip = "Рекомендуется вводить полностью, без сокращения";
+       s.ReadOnly = !haveEdit;
+       s.Properties.ConvertEmptyStringToNull = true;
+       if (!s.ReadOnly)
+       {
+           s.Properties.NullText = "Введите имя...";
+           s.Properties.NullTextStyle.ForeColor = System.Drawing.Color.Red;
+       }
+       s.ControlStyle.CssClass = "editor";
+       s.ShowModelErrors = true;
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+       s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+       s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+   }).Bind(Model.LastName).GetHtml()
+        </td></tr>
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+   {
+       s.ControlStyle.CssClass = "label";
+       s.ToolTip = "Рекомендуется вводить полностью, без сокращения";
+       s.Text = "Отчество:";
+       s.AssociatedControlName = GlobalPropertyNames.MidleName;
+   }).GetHtml()
+        </td><td colspan="3">
+        @Html.DevExpress().TextBox(s =>
+   {
+       s.Name = GlobalPropertyNames.MidleName;
+       s.ToolTip = "Рекомендуется вводить полностью, без сокращения";
+       s.ReadOnly = !haveEdit;
+       s.Properties.ConvertEmptyStringToNull = true;
+       if (!s.ReadOnly)
+       {
+           s.Properties.NullText = "Введите отчество...";
+           s.Properties.NullTextStyle.ForeColor = System.Drawing.Color.Red;
+       }
+
+       s.ControlStyle.CssClass = "editor";
+       s.ShowModelErrors = true;
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+       s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+       s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+   }).Bind(Model.MidleName).GetHtml()
+        </td></tr>
+
+        <tr><td class="table_label">
+        </td><td>
+        @Html.DevExpress().CheckBox(s =>
+   {
+       s.Name = GlobalPropertyNames.Mol;
+       s.ReadOnly = !haveEdit;
+       s.ControlStyle.CssClass = "editor";
+       s.ShowModelErrors = true;
+       s.Text = "Материально ответственный";
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+   }).Bind(Model.Mol).GetHtml()
+        </td><td colspan="2">
+        @Html.DevExpress().CheckBox(s =>
+   {
+       s.Name = GlobalPropertyNames.Invalidity;
+       s.ReadOnly = !haveEdit;
+       s.ControlStyle.CssClass = "editor";
+       s.ShowModelErrors = true;
+       s.Text = "Инвалидность";
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+   }).Bind(Model.Invalidity).GetHtml()
+        </td></tr>
+
+        <tr><td class="table_label">
+        </td><td>
+        @Html.DevExpress().CheckBox(s =>
+   {
+       s.Name = GlobalPropertyNames.Pension;
+       s.ReadOnly = !haveEdit;
+       s.ControlStyle.CssClass = "editor";
+       s.ShowModelErrors = true;
+       s.Text = "Пенсионность";
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+   }).Bind(Model.Pension).GetHtml()
+        </td><td colspan="2">
+        @Html.DevExpress().CheckBox(s =>
+   {
+       s.Name = GlobalPropertyNames.LegalWorker;
+       s.ReadOnly = !haveEdit;
+       s.ControlStyle.CssClass = "editor";
+       s.ShowModelErrors = true;
+       s.Text = "Официальный сотрудник";
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+   }).Bind(Model.LegalWorker).GetHtml()
+        </td></tr>
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+   {
+       s.ControlStyle.CssClass = "label";
+       s.Text = "Место хранения трудовой книжки:";
+       s.AssociatedControlName = GlobalPropertyNames.PlaceEmploymentBookId;
+   }).GetHtml()
+        </td><td colspan="3">
+        @Html.DevExpress().ComboBox(s =>
+   {
+       s.Name = GlobalPropertyNames.PlaceEmploymentBookId;
+       s.ReadOnly = !haveEdit;
+       s.ControlStyle.CssClass = "editor";
+       s.ShowModelErrors = true;
+       s.Properties.ValueField = GlobalPropertyNames.Id;
+       s.Properties.TextField = GlobalPropertyNames.Name;
+       s.Properties.ValueType = typeof(int);
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+       s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+       s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+   }).BindList(AnaliticModel.GetCollection(Hierarchy.SYSTEM_ANALITIC_EMPLOYMENTBOOK)).Bind(Model.PlaceEmploymentBookId == 0 ? null : Model.PlaceEmploymentBookId).GetHtml()
+        </td><tr></table>

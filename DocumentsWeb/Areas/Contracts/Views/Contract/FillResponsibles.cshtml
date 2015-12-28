@@ -1,0 +1,219 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    string modelId = (string)ViewData["ModelId"];
+    string docModelId = (string)ViewData["DocModelId"];
+}
+
+<script type="text/javascript">
+    function addAgent() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Content("~/Contracts/Contract/AddAgentToList")',
+            async: false,
+            data: {
+                modelId: '@modelId',
+                agentId: dxGridViewAgents.GetRowKey(dxGridViewAgents.GetFocusedRowIndex()),
+                dateTo: DateTo.GetText()
+            },
+            success: function (data) {
+                SelectorUpdate.PerformCallback();
+            }
+        });
+    }
+
+    function delAgents() {
+        var c = $('#RowsCount').val();
+        var i;
+        var ids = '';
+
+        for (i = 0; i < c; i++) {
+            var control = window['Row_' + i.toString()];
+            if (control.GetChecked()) {
+                ids += $('#RowId_' + i.toString()).val() + ',';
+            }
+        }
+        if (ids != '') {
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Content("~/Contracts/Contract/DeleteAgentsFromList")',
+                async: false,
+                data: {
+                    modelId: '@modelId',
+                    agents: ids
+                },
+                success: function (data) {
+                    SelectorUpdate.PerformCallback();
+                }
+            });
+        }
+    }
+
+    function updateAgent(rNo) {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Content("~/Contracts/Contract/UpdateAgentInList")',
+            async: false,
+            data: {
+                modelId: '@modelId',
+                rowNo: rNo,
+                orderNo: window['OrderNo_' + rNo.toString()].GetValue(),
+                agentId: window['AgentId_' + rNo.toString()].GetValue(),
+                agentSubId: window['AgentSubId_' + rNo.toString()].GetValue(),
+                dateTo: window['DateTo_' + rNo.toString()].GetText(),
+                needMessage: window['CreateMessage_' + rNo.toString()].GetChecked(),
+                needTask: window['CreateTask_' + rNo.toString()].GetChecked()
+            },
+            success: function (data) {
+            }
+        });
+    }
+</script>
+
+@using (Html.BeginForm("Fill", "Contract", FormMethod.Post, new { @class = "edit_form", @id = "editForm" }))
+{
+    <input id="modelId" name="modelId" type="hidden" value="@modelId" />
+    <input id="docModelId" name="docModelId" type="hidden" value="@docModelId" />
+}
+
+<table style="width: 100%;">
+    <tr>
+        <td colspan="3">
+            <table>
+                <tr>
+                    <td>
+                        @Html.DevExpress().Label(s => { s.Text = "Подписать до:"; }).GetHtml()
+                    </td>
+                    <td>
+                        @Html.DevExpress().DateEdit(s =>
+                        {
+                           s.Name = "DateTo";
+                           s.Width = System.Web.UI.WebControls.Unit.Pixel(150);
+                        }).Bind(DateTime.Now).GetHtml()
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="3">
+            <table>
+                <tr>
+                    <td>
+                        @Html.DevExpress().HyperLink(s => { s.Properties.Text = "Оповестить"; s.NavigateUrl = "javascript:void(0);"; }).GetHtml()
+                    </td>
+                    <td style="padding-left: 7px;">
+                        @Html.DevExpress().HyperLink(s => { s.Properties.Text = "Создать задачу"; s.NavigateUrl = "javascript:void(0);"; }).GetHtml()
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 40%">
+            @Html.Partial("FillAgentsListPartial")
+        </td>
+        <td style="width: 30px;">
+            @Html.DevExpress().HyperLink(
+                s =>
+                {
+                    s.Properties.Text = ">>";
+                    s.NavigateUrl = "javascript:addAgent();";
+                }
+            ).GetHtml()<br /><br />
+            @Html.DevExpress().HyperLink(
+                s =>
+                {
+                    s.Properties.Text = "<<";
+                    s.NavigateUrl = "javascript:delAgents();";
+                }
+            ).GetHtml()
+        </td>
+        <td style="width: 60%; vertical-align: top; border: solid 1px silver;">
+            @Html.Partial("SelectedAgentsPartial", new ViewDataDictionary
+            {
+                { "ModelId", modelId }
+            })
+        </td>
+    </tr>
+</table>
+
+
+
+@*<table style="width: 100%;">
+    <tr>
+        <td style="width: 120px;";>
+            @Html.DevExpress().Label(s => { s.Text = "Поиск сотрудника:"; }).GetHtml()    
+        </td>
+        <td>
+            @Html.Partial("WorkerPartial", new ViewDataDictionary
+            {
+                { "WorkerId", null },
+                { "GridName", "AgentId" }
+            })
+        </td>
+        <td style="width: 1px;">
+            @Html.DevExpress().HyperLink(s =>
+            {
+                s.Properties.ImageUrl = Url.Content("~/Images/add10x10.png");
+                s.NavigateUrl = "javascript:AddAgentToList();";
+                s.ToolTip = "Добавить сотрудника";
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td colspan="3">
+
+            <form method="post" action="@Url.Action("", new { Controller = "" })">
+            <input type="hidden" id="RowsCount" name="RowsCount" value="10" />
+            <table style="width: 100%;">
+                <tr>
+                    <th>Порядок</th>
+                    <th>Ответственный</th>
+                    <th>Заместитель</th>
+                    <th>Выполнить до</th>
+                </tr>
+                @for (int i = 0; i < 10; i++)
+                {
+                    <tr>
+                        <td>
+                            @Html.DevExpress().SpinEdit(edtSettings =>
+                            {
+                                edtSettings.Name = "OrderNo_" + i.ToString();
+                                edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                                edtSettings.Properties.MinValue = 0;
+                                edtSettings.Properties.MaxValue = 9999;
+                            }).GetHtml()
+                        </td>
+            
+                        <td>
+                            @Html.Partial("WorkerPartial", new ViewDataDictionary
+                            {
+                                { "WorkerId", null },
+                                { "GridName", "AgentId_" + i.ToString() }
+                            })
+                        </td>
+
+                        <td>
+                            @Html.Partial("WorkerPartial", new ViewDataDictionary
+                            {
+                                { "WorkerId", null },
+                                { "GridName", "AgentSubId_" + i.ToString() }
+                            })
+                        </td>
+
+                        <td>
+                            @Html.DevExpress().DateEdit(edtSettings =>
+                            {
+                                edtSettings.Name = "DateTo_" + i.ToString();
+                                edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                            }).GetHtml()
+                        </td>
+                    </tr>
+                }
+            </table>
+            </form>
+
+        </td>
+    </tr>
+</table>*@

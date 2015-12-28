@@ -1,0 +1,27 @@
+﻿@{
+    int? CountryId = null;
+    int? TerritoryId = null;
+
+    try { CountryId = int.Parse(ViewData["CountryId"].ToString()); CountryId = (CountryId == 0 ? null : CountryId); } catch { }
+    try { TerritoryId = int.Parse(ViewData["TerritoryId"].ToString()); TerritoryId = (TerritoryId == 0 ? null : TerritoryId); } catch { }
+}
+
+@Html.DevExpress().ComboBox(edtSettings =>
+{
+    edtSettings.Name = "TerritoryId";
+    edtSettings.CallbackRouteValues = new { Controller = "Supplyer", Action = "cmbTerritoryPartial" };
+    edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    edtSettings.Properties.ValueField = "Id";
+    edtSettings.Properties.TextField = "Name";
+    edtSettings.Properties.ValueType = typeof(int);
+    edtSettings.Properties.NullDisplayText = "Выберите регион...";
+    edtSettings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    edtSettings.Properties.FilterMinLength = 2;
+    edtSettings.ControlStyle.CssClass = "editor";
+    edtSettings.ShowModelErrors = true;
+    edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+    edtSettings.Properties.ClientSideEvents.BeginCallback = "function(s,e){ e.customArgs['CountryId'] = CountryId.GetValue(); }";
+    edtSettings.Properties.ClientSideEvents.EndCallback = "function(s,e){  RegionId.PerformCallback(); TownId.PerformCallback(); s.Validate(); }";
+    edtSettings.Properties.ClientSideEvents.SelectedIndexChanged = "function(s,e){  RegionId.PerformCallback(); TownId.PerformCallback(); }";
+}).BindList(DocumentsWeb.Models.WADataProvider.GetTerritories(CountryId)).Bind(TerritoryId).GetHtml()

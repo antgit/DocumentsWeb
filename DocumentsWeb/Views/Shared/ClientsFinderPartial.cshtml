@@ -1,0 +1,96 @@
+﻿@using BusinessObjects
+@using DocumentsWeb.Code;
+@using DocumentsWeb.Models
+
+@{
+    string Name = (string)ViewData["Name"];
+    string ComboboxName = (string)ViewData["ComboboxName"];
+    string ComboboxClientAcc = ViewData.ContainsKey("ComboboxClientAcc")? (string)ViewData["ComboboxClientAcc"]: string.Empty;
+    string ComboboxMyCompany = (string)ViewData["ComboboxMyCompany"];
+    int ComboboxButtonIndex = (int)ViewData["ComboboxButtonIndex"];
+
+    bool onlySupplyer = ViewData.ContainsKey("OnlySupplyer") ? (bool)ViewData["OnlySupplyer"] : false;
+
+    var dataModel = BusinessObjects.Web.Core.AgentWebView.GetView(WADataProvider.WA.Cashe.GetCasheData<Hierarchy>().ItemCode<Hierarchy>(onlySupplyer ? Hierarchy.SYSTEM_AGENT_SUPPLIERS : Hierarchy.SYSTEM_AGENT_BUYERS), true).Where(f => WADataProvider.IsCompanyIdAllowIdToCurrentUser(f.MyCompanyId) && f.StateId != State.STATEDENY && f.StateId != State.STATEDELETED).Select(DocumentsWeb.Areas.Agents.Models.ClientModel.ConvertToModel);
+
+    string currCompanies = "";
+    List<int> userScopeView = DocumentsWeb.Models.WADataProvider.CurrentUser.GetCompaniesList();
+    //DocumentsWeb.Models.WADataProvider.WA.Access.GetCompanyScopeView(HttpContext.Current.User.Identity.Name);
+    foreach(int id in userScopeView) {
+        if (currCompanies.Length > 0) {
+            currCompanies += " OR ";
+        }
+        
+        currCompanies += "[MyCompanyId] = " + id.ToString();
+    }
+    bool hasComboboxClientAcc = !string.IsNullOrEmpty(ComboboxClientAcc);
+}
+<script type="text/javascript">
+    var hasComboboxClientAcc = '@hasComboboxClientAcc';
+    function onSelectClick(s,e){
+        @Html.Raw("var id = gv" + Name + ".GetRowKey(gv" + Name + ".GetFocusedRowIndex());")
+        if (id != null) {
+            $.post('@DevExpressHelper.GetUrl(new { Area="Agents", Controller = "Byer", Action = "GetNameById" })',{id:id}).success(function (data) {
+                @Html.Raw(ComboboxName + ".AddItem(data, id);");
+                @Html.Raw(ComboboxName + ".SetValue(id);");
+                @if(hasComboboxClientAcc)
+                {
+                    @Html.Raw(ComboboxClientAcc + ".SetEnabled(true);");
+                }
+            });
+            @Html.Raw(Name + ".Hide();");
+
+        }
+    }
+</script>
+
+
+@Html.DevExpress().PopupControl(pc =>
+{
+    pc.Name = Name;
+    pc.PopupElementID = ComboboxName + "_B" + ComboboxButtonIndex.ToString() + "Img";
+    pc.Height = 250;
+    pc.Width = 520;
+
+    pc.ShowFooter = false;
+    pc.ShowHeader = false;
+    pc.PopupHorizontalAlign = PopupHorizontalAlign.LeftSides;
+    pc.PopupVerticalAlign = PopupVerticalAlign.Below;
+    pc.EnableAnimation = true;
+    pc.AllowDragging = false;
+    pc.CloseAction = CloseAction.MouseOut;
+
+    if (ComboboxMyCompany != null)
+    {
+        pc.ClientSideEvents.PopUp = "function (s, e) { gv" + Name + ".ApplyFilter('[MyCompanyId] = ' + " + ComboboxMyCompany + ".GetValue()); }";
+    }
+    else
+    {
+        pc.ClientSideEvents.PopUp = "function (s, e) { gv" + Name + ".ApplyFilter('" + currCompanies + "'); }";
+        //'MyCompanyId = ' + " + DocumentsWeb.Models.WADataProvider.CurrentUser.MyCompanyId.ToString() + "
+    }
+   
+    pc.SetContent(() =>
+    {
+        ViewContext.Writer.Write("<table style=\"width: 100%;\"><tr><td>");
+        Html.RenderPartial("ClientsFinderGridPartial", dataModel, new ViewDataDictionary { 
+            { "Name", Name },
+            { "onlyUsers", false },
+            {"OnlySupplyer", onlySupplyer}
+        });
+        ViewContext.Writer.Write("</td></tr><tr><td><table style=\"float:right;\"><tr><td>");
+        Html.DevExpress().Button(s=>{
+            s.Name = "gv" + Name + "_btnSelect";
+            s.Text = "Выбрать";
+            //s.ClientSideEvents.Click = "function (s, e) { var id = gv" + Name + ".GetRowKey(gv" + Name + ".GetFocusedRowIndex()); if (id != null) { " + ComboboxName + ".SetValue(id); gv" + Name + ".GetRowValues(gv" + Name + ".GetFocusedRowIndex(),'Name;', OnGetRowValues); } " + Name + ".Hide(); }";
+            s.ClientSideEvents.Click = "onSelectClick";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().Button(s=>{
+            s.Name = "gv" + Name + "_btnCancel";
+            s.Text = "Отмена";
+            s.ClientSideEvents.Click = "function (s, e) { " + Name + ".Hide(); }";
+        }).Render();
+        ViewContext.Writer.Write("</td></tr></table></td></tr></table>");
+    });    
+}).GetHtml()

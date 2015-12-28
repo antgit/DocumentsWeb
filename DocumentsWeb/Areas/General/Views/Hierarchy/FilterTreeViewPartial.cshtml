@@ -1,0 +1,91 @@
+﻿@using DevExpress.Web.Mvc.UI
+@using DevExpress.Web.ASPxTreeView
+@using DocumentsWeb.Areas.General.Models
+
+@{
+    string GridController = (string)ViewData["GridController"];
+    string GridAction = (string)ViewData["GridAction"];
+
+    string[] RootList = (string[])ViewContext.RequestContext.RouteData.Values["RootList"] == null ? (string[])ViewData["RootList"] : (string[])ViewContext.RequestContext.RouteData.Values["RootList"];
+    List<HierarchyModel> _RootList = new List<HierarchyModel>();
+
+    if (RootList != null)
+    {
+        foreach (string r in RootList)
+        {
+            _RootList.Add(HierarchyModel.GetObject(r));
+        }
+    }
+    
+    int[] roots = DocumentsWeb.Utils.GetHieRoots(GridController, GridAction);
+}
+
+@Html.DevExpress().TreeView(settings =>
+{
+    settings.Name = "tvHierarchiesFilter";
+    settings.AllowSelectNode = true;
+    settings.AllowCheckNodes = true;
+    settings.EnableAnimation = true;
+    settings.CallbackRouteValues = new { Area = "General", Controller = "Hierarchy", Action = "FilterTreeViewPartial" };
+    //settings.EnableHotTrack = true;
+    settings.SettingsLoadingPanel.Mode = TreeViewLoadingPanelMode.Disabled;
+    settings.EnableClientSideAPI = true;
+
+    settings.Style.Add("margin-left", "-10px");
+    settings.Style.Add("height", "auto");
+    
+    settings.Styles.Node.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(1);
+    settings.Styles.Node.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(1);
+    settings.Styles.NodeImage.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(1);
+    settings.Styles.NodeImage.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(1);
+    settings.Styles.NodeText.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(1);
+    settings.Styles.NodeText.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(1);
+    settings.Styles.NodeCheckBox.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(1);
+    settings.Styles.NodeCheckBox.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(1);
+    
+    settings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+
+    settings.ClientSideEvents.CheckedChanged = "HierarchyFilter_CheckedChanged";
+    settings.ClientSideEvents.BeginCallback = "function (s, e) { e.customArgs['GridController'] = '" + GridController + "'; e.customArgs['GridAction'] = '" + GridAction + "'; e.customArgs['RootList'] = '" + String.Join(",", RootList) + "'; }";
+    settings.ClientSideEvents.EndCallback = "function (s, e) { window.setTimeout(function() { $('#TreePartial').height(s.GetHeight() + 3); }, 400); }";
+    settings.ClientSideEvents.ExpandedChanged = "function (s, e) { $('#TreePartial').height(s.GetHeight() + 3); }";
+
+    settings.VirtualModeCreateChildren = (source, e) =>
+    {
+        ASPxTreeView tv = (ASPxTreeView)source;
+
+        List<TreeViewVirtualNode> children = new List<TreeViewVirtualNode>();
+
+        int id = e.NodeName != null ? int.Parse(e.NodeName) : 0;
+        
+        if (id == 0)
+        {
+            foreach (HierarchyModel model in _RootList)
+            {
+                TreeViewVirtualNode node = new TreeViewVirtualNode(model.Id.ToString(), model.Name, Url.Content("~/Images/root_folder_x16.png"));
+                node.IsLeaf = !model.HasChild;
+                node.Expanded = true;
+                if (roots.Contains(model.Id))
+                {
+                    node.Checked = true;
+                }
+                children.Add(node);
+            }
+        }
+        else
+        {
+            List<HierarchyModel> list = HierarchyModel.GetBranch(id);
+            foreach (HierarchyModel model in list)
+            {
+                TreeViewVirtualNode node = new TreeViewVirtualNode(model.Id.ToString(), model.Name, Url.Content("~/Images/folder_x16.png"));
+                node.IsLeaf = !model.HasChild;
+                if (roots.Contains(model.Id))
+                {
+                    node.Checked = true;
+                }
+                children.Add(node);
+            }
+        }
+        e.Children = children;
+    };
+}).GetHtml()

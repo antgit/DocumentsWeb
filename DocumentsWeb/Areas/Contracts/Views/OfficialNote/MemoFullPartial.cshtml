@@ -1,0 +1,8 @@
+﻿@model DocumentsWeb.Areas.Contracts.Models.DocumentContractModel
+@Html.DevExpress().HtmlEditor(settings =>
+{
+    settings.Name = "MemoAdv";
+    settings.CallbackRouteValues = new { Controller = "OfficialNote", Action = "MemoFullPartial", modelId = Model.ModelId };
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    //settings.Width = 800;
+}).Bind(Model.MemoAdv).GetHtml() 

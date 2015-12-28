@@ -1,0 +1,34 @@
+﻿@using BusinessObjects
+@using DocumentsWeb.Areas.Agents.Models
+@using DocumentsWeb.Areas.Sales.Models
+@model WebDepatmentModel
+           
+@{
+    bool showFindButton = ViewData["showFindButton"] == null ? true : (bool)ViewData["showFindButton"];
+}
+
+@Html.DevExpress().ComboBox(settings =>{
+    settings.Name = GlobalPropertyNames.DepatmentSubHeadId;
+    settings.CallbackRouteValues = new { Controller = "Depatment", Action = "DepatmentSubHeadPartial", modelId = Model.ModelId };
+    settings.Properties.EnableCallbackMode = true;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    settings.Properties.ValueField = "Id";
+    settings.Properties.TextField = "Name";
+    settings.Properties.ValueType = typeof(int);
+    settings.Properties.NullDisplayText = "Выберите заместителя...";
+    if (showFindButton)
+    {
+        EditButton b = settings.Properties.Buttons.Add();
+        b.Image.Url = "~/Images/search_x10.png";
+        b.ToolTip = "Поиск";
+    }
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.ClientEnabled = !Model.IsReadOnly;
+    settings.ShowModelErrors = true;
+    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+    settings.Properties.ClientSideEvents.BeginCallback = "function(s, e) { e.customArgs['MyCompanyId'] = MyCompanyId.GetValue(); e.customArgs['Id'] = " + @Model.Id + ";  e.customArgs['showFindButton'] = "+showFindButton.ToString().ToLower()+";}";
+    settings.Properties.ClientSideEvents.EndCallback = "function(s, e) { s.SetSelectedIndex(-1);}";
+    if(showFindButton)
+        settings.Properties.ClientSideEvents.ButtonClick = "function(s, e) { switch(e.buttonIndex) { case 0: PeopleFinderDepatmentSubHead.Show(); break; } }";
+}).BindList(ClientModel.GetChainWorker(Model.MyCompanyId)).BindList(ClientModel.GetAgentsLightByValue(Model.DepatmentSubHeadId)).Bind(Model.DepatmentSubHeadId == 0 ? null : (int?)Model.DepatmentSubHeadId).GetHtml()

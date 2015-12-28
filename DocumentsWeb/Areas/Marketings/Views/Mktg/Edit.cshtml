@@ -1,0 +1,591 @@
+﻿@model DocumentsWeb.Areas.Marketings.Models.DocumentMktgModel
+@using BusinessObjects;
+@using DocumentsWeb.Models;
+@using BusinessObjects.Security;
+@using BusinessObjects.Web.Core;
+
+@{  
+    bool haveEdit = WADataProvider.FolderElementRightView.IsAllow(Right.DOCEDIT, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_MKTG_MRAK).Id);
+}
+
+@{
+    ViewBag.Title = "Анкета клиента";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var repoTypeProp = WADataProvider.GetSysProperty("WEB_PRINTFORMFLASH");
+    var repoType = 1;
+    if (repoTypeProp != null)
+    {
+        repoType = (int)repoTypeProp.ValueInt;
+    }
+    string HelpDefaultLink = string.Empty;
+    if (ViewData.ContainsKey("HelpDefaultLink"))
+    {
+        HelpDefaultLink = ViewData["HelpDefaultLink"].ToString();
+    }
+    bool HasPopupHelp = false;
+    if (ViewData.ContainsKey("HelpHasPopup"))
+    {
+        HasPopupHelp = (bool)ViewData["HelpHasPopup"];
+    } 
+}
+
+<script type="text/javascript">
+    var hasCustomHelp = '@HasPopupHelp';
+    function OnMenuItemMouseOver(s, e) {
+            switch (e.item.name) {
+            case "mnuHelp":
+                if (hasCustomHelp) {
+                    $(function() {
+                        $.get('@Url.Action("DenamdHelp")', function(data) { $('#HelpPanel').replaceWith(data); });
+                    });
+                }
+                break;
+            }
+        }  
+    function OnMenuItemClick(s, e) {
+        switch (e.item.name) {
+        case "mnuSave":
+            document.getElementById('documentEditForm').submit();
+            break;
+        case "mnuClose":
+            window.open('', '_self', '');
+            window.close();
+            break;
+        case "mnuConduct":
+            document.getElementById('StateId').value=@State.STATEACTIVE;
+            alert("Документ будет проведен после сохранения");
+            break;
+        case "mnuIgnore":
+            document.getElementById('StateId').value=@State.STATENOTDONE;
+            alert("Изменения будут применены после сохранения");
+            break;
+        case "mnuBlock":
+            document.getElementById('IsReadOnly').value=true;
+            alert("Документ будет заблокирован после сохранения");
+            break;
+        case "mnuUnblock":
+            document.getElementById('IsReadOnly').value=false;
+            alert("Изменения будут применены после сохранения");
+            mEdit.GetItemByName("mnuSave").SetEnabled(true);
+            break;
+        case "mnuPrint":
+            window.open('http://172.16.11.6/PrintReports/WebViewer@(repoType == 1 ? "Fx" : "").aspx?repId=649&Id=@Model.Id', '_blank', 'width=900,height=700,resizable=1,scrollbars=1,location=0');
+            break;
+        case "mnuHelp":
+            break;
+        default:
+            alert(e.item.name);
+        }
+    }
+
+    function MainCompanyId_ButtonClick(s, e) {
+        switch(e.buttonIndex) {
+        /*case 0:
+                BrowseDialogAgentTo.SetWidth($(document).width() - 40);
+                BrowseDialogAgentTo.SetHeight($(document).height() - 40);
+                BrowseDialogAgentTo.ShowAtPos(20, 20);
+                break;*/
+        case 0:
+            if (MainClientDepatmentId.GetValue() != null && MainClientDepatmentId.GetValue() > 0) {
+                pcEdit.SetUpdateControl(s);
+                pcEdit.SetCaption('Клиент');
+                pcEdit.Load('@DevExpressHelper.GetUrl(new { Area = "Marketings", Controller = "Mktg", Action = "LightClient", id = 0 })?MyCompanyId=' + MainClientDepatmentId.GetValue(), 500, 370);
+            }
+            break;
+        case 1:
+            if (MainCompanyId.GetValue() != null && MainCompanyId.GetValue() > 0) {
+                pcEdit.SetUpdateControl(s);
+                pcEdit.SetCaption('Клиент');
+                pcEdit.Load('@DevExpressHelper.GetUrl(new { Area = "Agents", Controller = "Byer", Action = "Edit" })/' + MainCompanyId.GetValue().toString(), 700, 520);
+            }
+            break;
+        default:
+            alert(e.buttonIndex);
+            break;
+        }
+    }
+
+    function TimePeriodId_ButtonClick(s, e) {
+        switch (e.buttonIndex) {
+        case 0:
+            pcEdit.SetUpdateControl(s);
+            pcEdit.SetCaption('График работы');
+            pcEdit.Load('@DevExpressHelper.GetUrl(new { Area = "General", Controller = "TimePeriod", Action = "OpenTyped", id = 0, type = 0 })', 650, 530);
+            break;
+        case 1:
+            if (TimePeriodId.GetValue() != null) {
+                pcEdit.SetUpdateControl(s);
+                pcEdit.SetCaption('График работы');
+                pcEdit.Load('@DevExpressHelper.GetUrl(new { Area = "General", Controller = "TimePeriod", Action = "Edit" })/' + TimePeriodId.GetValue(), 650, 530);
+            }
+            break;
+        }
+    }
+
+    function BreakPeriodId_ButtonClick(s, e) {
+        switch (e.buttonIndex) {
+        case 0:
+            pcEdit.SetUpdateControl(s);
+            pcEdit.SetCaption('График перерыва');
+            pcEdit.Load('@DevExpressHelper.GetUrl(new { Area = "General", Controller = "TimePeriod", Action = "OpenTyped", id = 0, type = 1 })', 650, 530);
+            break;
+        case 1:
+            if (BreakPeriodId.GetValue() != null) {
+                pcEdit.SetUpdateControl(s);
+                pcEdit.SetCaption('График перерыва');
+                pcEdit.Load('@DevExpressHelper.GetUrl(new { Area = "General", Controller = "TimePeriod", Action = "Edit" })/' + BreakPeriodId.GetValue(), 650, 530);
+            }
+            break;
+        }
+    }
+
+    function Refrigerators_CreateGroup() {
+        pcEdit.SetCaption('Редактирование групп [Колбаса/молоко]');
+        pcEdit.SetUpdateControl(null);
+        pcEdit.Load('@DevExpressHelper.GetUrl(new { Area = "Marketings", Controller = "Mktg", Action = "EditGroupPartial", mId = Model.ModelId })', 600, 500);
+    }
+
+    function TM_SelectedIndexChanged (s, e) {
+        if (GroupId.GetValue() != 8 && GroupId.GetValue() != 9) {
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Content("~/Marketings/Mktg/GetSKU")',
+                async: false,
+                data: {
+                    mId: '@Model.ModelId',
+                    GpId: (GroupId.GetValue() == null ? 0 : GroupId.GetValue()),
+                    AnId: (AnaliticId.GetValue() == null ? 0 : AnaliticId.GetValue())
+                },
+                success: function(data) {
+                    SummValue3.SetValue(data);
+                }
+            });
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Content("~/Marketings/Mktg/GetPFGroups")',
+                async: false,
+                data: { 
+                    mId: '@Model.ModelId',
+                    GpId: (GroupId.GetValue() == null ? 0 : GroupId.GetValue()),
+                    AnId: (AnaliticId.GetValue() == null ? 0 : AnaliticId.GetValue())
+                },
+                success: function(data) {
+                    $("#StringValue1").val(data);
+                    StringValue1_Rebuild();
+                }
+            });
+        }
+    }
+
+    function TM_ButtonClick(s, e) {
+        switch(e.buttonIndex) {
+            case 0:
+                $.ajax({
+                    type: 'GET',
+                    url: '@Url.Content("~/Marketings/Mktg/UpdateTMs")',
+                    async: false,
+                    success: function( data ) {
+                        s.PerformCallback();
+                    }
+                });
+                break;
+            case 1:
+                pcEdit.SetUpdateControl(s);
+                pcEdit.SetCaption('Торговая марка');
+                pcEdit.Load('@DevExpressHelper.GetUrl(new { Area = "Marketings", Controller = "Mktg", Action = "LightTM", id = 0 })', 450, 100);
+                break;
+            case 2:
+                $.ajax({
+                    type: 'GET',
+                    url: '@Url.Content("~/Marketings/Mktg/GetLastInputTM")',
+                    async: false,
+                    data: { mId: $('#ModelId').val() },
+                    success: function( data ) {
+                        if (data != 0) {
+                            s.SetValue(data);
+                        } else {
+                            s.SetValue(null);
+                        }
+                        TM_SelectedIndexChanged(s, e);
+                    }
+                });
+                break;
+        }
+    }
+
+    function GT_SelectedIndexChanged (s, e) { 
+        $("#SummSKU").show();
+        $("tr[id^='Line']").hide();
+        SummValue3.SetEnabled(true); 
+        switch (s.GetValue()) {
+        case 4:
+            $('#Line2').show();
+            break;
+        case 5:
+            $("#SummSKU").hide();
+            break;
+        case 6:
+        case 7: 
+            $('#Line2').show();
+            $('#Line3').show();
+            break;
+        case 8:
+        case 9:
+            Analitic2Id.PerformCallback();
+            SummValue3.SetEnabled(false);
+            $('#Line1').show();
+            break;
+        }
+        if (GroupId.GetValue() != 8 && GroupId.GetValue() != 9) {
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Content("~/Marketings/Mktg/GetSKU")',
+                async: false,
+                data: {
+                    mId: '@Model.ModelId',
+                    GpId: (GroupId.GetValue() == null ? 0 : GroupId.GetValue()),
+                    AnId: (AnaliticId.GetValue() == null ? 0 : AnaliticId.GetValue())
+                },
+                success: function(data) { 
+                    SummValue3.SetValue(data); 
+                }
+            });
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Content("~/Marketings/Mktg/GetPFGroups")',
+                async: false,
+                data: {
+                    mId: '@Model.ModelId',
+                    GpId: (GroupId.GetValue() == null ? 0 : GroupId.GetValue()),
+                    AnId: (AnaliticId.GetValue() == null ? 0 : AnaliticId.GetValue())
+                },
+                success: function(data) { 
+                    $("#StringValue1").val(data); StringValue1_Rebuild();
+                } 
+            });
+        }
+    }
+
+    function GT_ButtonClick(s, e) {
+        switch(e.buttonIndex) {
+        case 0:
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Content("~/Marketings/Mktg/GetLastInputGT")',
+                async: false,
+                data: { mId: $('#ModelId').val() },
+                success: function( data ) {
+                    if (data != 0) {
+                        s.SetValue(data);
+                    } else {
+                        s.SetValue(null);
+                    }
+                    GT_SelectedIndexChanged(s, e);
+                }
+            });
+            break;
+        }
+    }
+
+    function Address_ButtonClick(s, e) {
+        switch(e.buttonIndex) {
+        case 0:
+            if (MainCompanyId.GetValue() != null && MainCompanyId.GetValue() > 0) {
+                pcEdit.SetUpdateControl(s);
+                pcEdit.SetCaption('Адрес клиента');
+                pcEdit.Load('@DevExpressHelper.GetUrl(new { Area = "Marketings", Controller = "Mktg", Action = "LightAddress" })/' + MainCompanyId.GetValue(), 500, 500);
+            }
+            break;
+        }
+    }
+
+    function pcEdit_OnClosing(s, e) {
+        var control = s.GetUpdateControl();
+        if (control != null) {
+            if (control.name == 'MainCompanyDepatmentId') {
+                Client_ValueChanged(null, null);
+            }
+        }
+    }
+
+    function pcEdit_OnSave(s) {
+        var control = s.GetUpdateControl();
+        if (control == null) {
+            gvDocRefrigerators.PerformCallback();
+        }
+    }
+
+    function Client_ValueChanged(s, e) {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Content("~/Marketings/Mktg/GetClientAddress")',
+            async: false,
+            data: { id: (MainCompanyId.GetValue() == null ? 0 : MainCompanyId.GetValue()) },
+            success: function( data ) {
+                Address.SetValue(data);
+            }
+        });
+        writeLog('CHANGECLIENT', s.GetValue().toString() + ' ' + s.GetText());
+    }
+
+    function isNumeric(sText,decimals,negatives) {
+        var isNumber=true;
+        var numDecimals = 0;
+        var validChars = "0123456789";
+        if (decimals)  validChars += ".";
+        if (negatives) validChars += "-";
+        var thisChar;
+        for (i = 0; i < sText.length && isNumber == true; i++) {  
+            thisChar = sText.charAt(i); 
+            if (negatives && thisChar == "-" && i > 0) isNumber = false;
+            if (decimals && thisChar == "."){
+                numDecimals = numDecimals + 1;
+                if (i==0 || i == sText.length-1) isNumber = false;
+                if (numDecimals > 1) isNumber = false;
+            }
+            if (validChars.indexOf(thisChar) == -1) isNumber = false;
+        }
+        return isNumber;
+    }
+
+    /*function AgentToId_ValueChanged(s, e) {
+        if (!isNumeric(MainCompanyDepatmentId.GetValue())) {
+            MainCompanyDepatmentId.SetValue(null);
+        }
+    }*/
+
+    function BrowseDialogAgentToCallbackFunction(values) {
+        if (MainCompanyDepatmentId.FindItemByValue(values[0]) == null) {
+            MainCompanyDepatmentId.InsertItem(0, values[1], values[0]);
+        }
+        MainCompanyDepatmentId.SetValue(values[0]);
+    }
+
+    function StringValue1_Rebuild() {
+        var value = $("#StringValue1").val();
+        CheckBoxList_StringValue1.UnselectAll();
+        if (value != null && value.length > 0) {
+            var ids = value.split(",");
+            var itms = new Array();
+            for(var i = 0; i < CheckBoxList_StringValue1.GetItemCount(); i++) {
+                for (var j = 0; j < ids.length; j++) {
+                    if (ids[j] == CheckBoxList_StringValue1.GetItem(i).value) {
+                        itms.push(CheckBoxList_StringValue1.GetItem(i));
+                        break;
+                    }
+                }
+            }
+            CheckBoxList_StringValue1.SelectItems(itms);
+        }
+    }
+
+    function OnEditorGotFocus(s, e) {
+        if (s.name == 'Telephone') {
+            var text = s.GetValue().replace(/(-)/g, "").replace(/(^\s+)|(\s+$)/g, "");
+            setTimeout(function() {
+                if (text.length >= 8) {
+                    s.SetCaretPosition(text.length + 3);
+                } else if (text.length >= 6 && text.length < 8) {
+                    s.SetCaretPosition(text.length + 2);
+                } else if (text.length >= 3 && text.length < 7) {
+                    s.SetCaretPosition(text.length + 1);
+                } else {
+                    s.SetCaretPosition(text.length);
+                }
+            }, 100);
+        }
+        SetHintVisible(s.name, true);
+    }
+    function OnEditorLostFocus(s, e) {
+        SetHintVisible(s.name, false);
+    }
+
+    function SetHintVisible(name, value) {
+        var hintWindow = pcHint.GetWindowByName(name);
+        if (value)
+            pcHint.ShowWindow(hintWindow);
+        else
+            pcHint.HideWindow(hintWindow);
+    }
+
+    function writeLog(name, memo) {
+        var id = $('#Id').val();
+        if (id != 0) {
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Content("~/Marketings/Mktg/WriteLog")',
+                async: true,
+                cache: false,
+                data: { 
+                    id: id,
+                    name: name,
+                    memo: memo
+                },
+                success: function( data ) {
+                    
+                }
+            });
+        }
+    }
+</script>
+
+@Html.DevExpress().Menu(settings =>
+{
+    settings.EnableHotTrack = true;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Name = "mEdit";
+    settings.ClientSideEvents.ItemClick = "OnMenuItemClick";
+    settings.ClientSideEvents.ItemMouseOver = "OnMenuItemMouseOver";
+
+    settings.Items.Add(item =>
+    {
+        item.Name = "mnuClose";
+        item.Text = "Закрыть";
+        item.Image.Url = @Url.Content("~/Images/cross.png"); 
+    });
+    settings.Items.Add(item =>
+    {
+        item.Name = "mnuSave";
+        item.Text = "Сохранить";
+        item.ClientEnabled = !Model.IsReadOnly & haveEdit;
+        item.Image.Url = @Url.Content("~/Images/SAVE_X16.png"); 
+    });
+    settings.Items.Add(item =>
+    {
+        item.Name = "mnuConduct";
+        item.Text = "Провести";
+        item.Enabled = Model.StateId != State.STATEACTIVE & haveEdit;
+        item.Image.Url = @Url.Content("~/Images/OK_X16.png");
+    });
+    if (User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+    {
+        settings.Items.Add(item =>
+        {
+            item.Name = "mnuIgnore";
+            item.Text = "Не учитывать";
+            item.Enabled = Model.StateId == State.STATEACTIVE & haveEdit;
+            item.Image.Url = @Url.Content("~/Images/ROLLBACKRED_X16.png");
+        });
+    }
+    settings.Items.Add(item =>
+    {
+        item.Name = "mnuBlock";
+        item.Text = "Заблокировать";
+        item.Enabled = !Model.IsReadOnly & haveEdit;
+        item.Image.Url = @Url.Content("~/Images/SECURITY_X16.png");
+    });
+    if (User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+    {
+        settings.Items.Add(item =>
+        {
+            item.Name = "mnuUnblock";
+            item.Text = "Разблокировать";
+            item.Enabled = Model.IsReadOnly & haveEdit;
+            item.Image.Url = @Url.Content("~/Images/UNLOCK16.png");
+        });
+    }
+    settings.Items.Add(item =>
+    {
+        item.Name = "mnuPrint";
+        item.Text = "Печать";
+        item.Image.Url = @Url.Content("~/Images/PRINT_X16.png");
+    });
+    if (HasPopupHelp || !string.IsNullOrEmpty(HelpDefaultLink))
+    {
+
+        settings.Items.Add(item =>
+        {
+            item.Name = "mnuHelp";
+            item.Text = "Помощь";
+            item.ToolTip = "Показать справочную документацию по работе с документом";
+            item.Image.Url = Url.Content("~/Images/HELP_X16.gif");
+            if (HasPopupHelp)
+            {
+                item.SetSubMenuTemplateContent(content =>
+                {
+                    ViewContext.Writer.Write("<div id=\"HelpPanel\"></div>");
+                });
+            }
+            else
+            {
+                if (HelpDefaultLink.StartsWith("~/"))
+                    item.NavigateUrl = Url.Content(HelpDefaultLink);
+                else
+                    item.NavigateUrl = HelpDefaultLink;
+            }
+            item.Target = "_blank";
+        });
+    }
+}).GetHtml()
+
+<div id="ContentDiv" style="overflow: auto; position: relative;">
+@using (Html.BeginForm("Edit", "Mktg", FormMethod.Post, new { @class = "edit_form", @id = "documentEditForm" }))
+{
+    @Html.Partial("EditPartial", Model)
+}
+<div style="width: 100%; height: 50px;"></div>
+</div>
+
+<script type="text/javascript" language="javascript">
+    $(document).ready(function () {
+        $('#ContentDiv').width($(window).width());
+        $('#ContentDiv').height($(window).height() - 28);
+    });
+
+    $(window).resize(function () {
+        $('#ContentDiv').width($(window).width());
+        $('#ContentDiv').height($(window).height() - 28);
+    });
+</script>
+
+@*Html.Partial("BrowseDialog", new BrowseDialogModel { Name = "BrowseDialogAgentTo", Caption = "Выбор клиента", RootHierarchy = "SYSTEM_AGENT_ROOT", CallbackFunction = "BrowseDialogAgentToCallbackFunction" })*@
+
+@Html.Partial("PopupWindowPartial", new ViewDataDictionary { 
+    { "Title", "" },
+    { "AutoUpdateControl", true },
+    { "OnClosing", "pcEdit_OnClosing" },
+    { "OnSave", "pcEdit_OnSave" }
+})
+
+@*Error popup*@
+@Html.DevExpress().PopupControl(
+    settings =>
+    {
+        settings.Name = "pcHint";
+        settings.SkinID = "none";
+        settings.Width = 250;
+        settings.EncodeHtml = false;
+        settings.EnableClientSideAPI = true;
+        settings.EnableHotTrack = false;
+        settings.PopupHorizontalAlign = PopupHorizontalAlign.OutsideRight;
+        settings.PopupVerticalAlign = PopupVerticalAlign.TopSides;
+        settings.ShowHeader = false;
+        settings.PopupHorizontalOffset = 1;
+        settings.PopupVerticalOffset = -10;
+        settings.PopupAction = PopupAction.None;
+        settings.CloseAction = CloseAction.None;
+
+        settings.Styles.Content.BackColor = System.Drawing.Color.FromArgb(0xFFFBBA);
+        settings.Styles.Content.ForeColor = System.Drawing.Color.FromArgb(0x916E04);
+        settings.Styles.Content.Paddings.Padding = 12;
+        settings.Styles.Content.Paddings.PaddingLeft = 14;
+        settings.Styles.Content.Paddings.PaddingRight = 14;
+        settings.ControlStyle.Border.BorderColor = System.Drawing.Color.FromArgb(0xFFC800);
+        settings.ControlStyle.Border.BorderStyle = System.Web.UI.WebControls.BorderStyle.Solid;
+        settings.ControlStyle.Border.BorderWidth = 1;
+        
+        settings.Windows.Add(WADataProvider.WA.Cashe.ResourceString("TOOLTIP_DOC_MKTG_AC_DATA", 1049), "date").PopupElementID = "date";
+        settings.Windows.Add(WADataProvider.WA.Cashe.ResourceString("TOOLTIP_DOC_MKTG_AC_TIME", 1049), "time").PopupElementID = "time";
+        settings.Windows.Add(WADataProvider.WA.Cashe.ResourceString("TOOLTIP_DOC_MKTG_AC_NUMBER", 1049), "DocNumber").PopupElementID = "DocNumber";
+        settings.Windows.Add(WADataProvider.WA.Cashe.ResourceString("TOOLTIP_DOC_MKTG_AC_FILIAL", 1049), "AgentDepartmentFromId").PopupElementID = "AgentDepartmentFromId";
+        settings.Windows.Add(WADataProvider.WA.Cashe.ResourceString("TOOLTIP_DOC_MKTG_AC_MANAGER", 1049), "ManagerId").PopupElementID = "ManagerId";
+        settings.Windows.Add(WADataProvider.WA.Cashe.ResourceString("TOOLTIP_DOC_MKTG_AC_CLIENT", 1049), GlobalPropertyNames.MainCompanyDepatmentId).PopupElementID = GlobalPropertyNames.MainCompanyDepatmentId;
+        settings.Windows.Add(WADataProvider.WA.Cashe.ResourceString("TOOLTIP_DOC_MKTG_AC_CONTACT", 1049), "ContactFace").PopupElementID = "ContactFace";
+        settings.Windows.Add(WADataProvider.WA.Cashe.ResourceString("TOOLTIP_DOC_MKTG_AC_WORKPOST", 1049), "WorkpostId").PopupElementID = "WorkpostId";
+        settings.Windows.Add(WADataProvider.WA.Cashe.ResourceString("TOOLTIP_DOC_MKTG_AC_CONTACTPHONE", 1049), "Telephone").PopupElementID = "Telephone";
+        settings.Windows.Add(WADataProvider.WA.Cashe.ResourceString("TOOLTIP_DOC_MKTG_AC_METRICAREA", 1049), "TPAreaId").PopupElementID = "TPAreaId";
+        settings.Windows.Add(WADataProvider.WA.Cashe.ResourceString("TOOLTIP_DOC_MKTG_AC_LOCATION", 1049), "TPPositionId").PopupElementID = "TPPositionId";
+        settings.Windows.Add(WADataProvider.WA.Cashe.ResourceString("TOOLTIP_DOC_MKTG_AC_WORKPERIOD", 1049), "TimePeriodId").PopupElementID = "TimePeriodId";
+        settings.Windows.Add(WADataProvider.WA.Cashe.ResourceString("TOOLTIP_DOC_MKTG_AC_BREAKPERIOD", 1049), "BreakPeriodId").PopupElementID = "BreakPeriodId";
+        settings.Windows.Add(WADataProvider.WA.Cashe.ResourceString("TOOLTIP_DOC_MKTG_AC_MEMO", 1049), "Memo").PopupElementID = "Memo";
+    }).GetHtml()

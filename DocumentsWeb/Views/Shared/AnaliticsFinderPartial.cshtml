@@ -1,0 +1,61 @@
+﻿@using DocumentsWeb.Code;
+
+@{
+    string Name = (string)ViewData["Name"];
+    string ComboboxName = (string)ViewData["ComboboxName"];
+    int ComboboxButtonIndex = (int)ViewData["ComboboxButtonIndex"];
+    string hierarchyCode = (string)ViewData["hierarchyCode"];
+}
+<script type="text/javascript">
+    function onSelectClick(s,e){
+        @Html.Raw("var id = gv" + Name + ".GetRowKey(gv" + Name + ".GetFocusedRowIndex());")
+        if (id != null) {
+            $.post('@DevExpressHelper.GetUrl(new { Area="Analitics", Controller = "Brand", Action = "GetNameById" })',{id:id}).success(function (data) {
+                @Html.Raw(ComboboxName + ".AddItem(data, id);");
+                @Html.Raw(ComboboxName + ".SetValue(id);");
+            });
+            @Html.Raw(Name + ".Hide();");
+
+        }
+    }
+</script>
+
+
+@Html.DevExpress().PopupControl(pc =>
+{
+    pc.Name = Name;
+    pc.PopupElementID = ComboboxName + "_B" + ComboboxButtonIndex.ToString() + "Img";
+    pc.Height = 250;
+    pc.Width = 520;
+
+    pc.ShowFooter = false;
+    pc.ShowHeader = false;
+    pc.PopupHorizontalAlign = PopupHorizontalAlign.LeftSides;
+    pc.PopupVerticalAlign = PopupVerticalAlign.Below;
+    pc.EnableAnimation = true;
+    pc.AllowDragging = false;
+    pc.CloseAction = CloseAction.MouseOut;
+
+    pc.SetContent(() =>
+    {
+        ViewContext.Writer.Write("<table style=\"width: 100%;\"><tr><td>");
+        Html.RenderPartial("AnaliticsFinderGridPartial", new ViewDataDictionary { 
+            { "Name", Name },
+            { "hierarchyCode", hierarchyCode }
+        });
+        ViewContext.Writer.Write("</td></tr><tr><td><table style=\"float:right;\"><tr><td>");
+        Html.DevExpress().Button(s=>{
+            s.Name = "gv" + Name + "_btnSelect";
+            s.Text = "Выбрать";
+            //s.ClientSideEvents.Click = "function (s, e) { var id = gv" + Name + ".GetRowKey(gv" + Name + ".GetFocusedRowIndex()); if (id != null) { " + ComboboxName + ".SetValue(id); gv" + Name + ".GetRowValues(gv" + Name + ".GetFocusedRowIndex(),'Name;', OnGetRowValues); } " + Name + ".Hide(); }";
+            s.ClientSideEvents.Click = "onSelectClick";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().Button(s=>{
+            s.Name = "gv" + Name + "_btnCancel";
+            s.Text = "Отмена";
+            s.ClientSideEvents.Click = "function (s, e) { " + Name + ".Hide(); }";
+        }).Render();
+        ViewContext.Writer.Write("</td></tr></table></td></tr></table>");
+    });    
+}).GetHtml()

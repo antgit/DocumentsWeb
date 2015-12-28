@@ -1,0 +1,155 @@
+﻿@using BusinessObjects
+@using DocumentsWeb.Areas.Admins.Models
+@using DocumentsWeb.Models
+@model DocumentConfigPricesModel
+           
+<input type="hidden" id="Name" name="Name" value="@Model.Name"/>
+<input type="hidden" id="StateId" name="StateId" value="@Model.StateId"/>
+<input type="hidden" id="IsReadOnly" name="IsReadOnly" value="@Model.IsReadOnly"/>
+<input type="hidden" id="ModelId" name="ModelId" value="@Model.ModelId"/>
+
+<table class="edit_form_table2">
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>
+            {
+                //s.ControlStyle.CssClass = "label";
+                s.Text = "Дата:";
+                s.AssociatedControlName = "date";
+                s.ToolTip = "Дата документа - фактическое отражение факта времени документа в учетной системе";
+            }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().DateEdit(s =>
+            {
+                s.Name = "date";
+                s.Properties.NullText = "Введите дату...";
+                s.ToolTip = "Дата документа - фактическое отражение факта времени документа в учетной системе";
+                //s.ControlStyle.CssClass = "editor";
+                s.Width = 100;
+                s.ClientEnabled = !Model.IsReadOnly;
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.Date).GetHtml()
+        </td>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>
+            {
+                //s.ControlStyle.CssClass = "label";
+                s.Text = "Номер:";
+                s.ToolTip = "Номер документа - присваивается автоматически, если оставить пустым или укажите вручную";
+                s.Style.Add("float", "left");
+                s.AssociatedControlName = GlobalPropertyNames.DocNumber;
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.Properties.Style.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+            }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = GlobalPropertyNames.DocNumber;
+                s.ToolTip = "Номер документа - присваивается автоматически, если оставить пустым или укажите вручную";
+                s.Properties.NullText = "Введите номер документа...";
+                //s.ControlStyle.CssClass = "editor";
+                s.ClientEnabled = !Model.IsReadOnly;
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.DocNumber).GetHtml()
+        </td>
+        
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>
+            {
+                //s.ControlStyle.CssClass = "label";
+                s.Text = "Предприятие:";
+                s.ToolTip = "Выберите из списка доступных компаний, данные являются обязательными при заполнении документа! Список компаний от лица которых регистрируется документ может отличатся от списка доступных для просмотра компаний";
+                s.AssociatedControlName = GlobalPropertyNames.MainCompanyDepatmentId;
+            }).GetHtml()
+        </td>
+        <td colspan="5">                       
+            @Html.DevExpress().ComboBox(s =>
+            {
+                s.Name = GlobalPropertyNames.MainCompanyDepatmentId;
+                s.ToolTip = "Выберите из списка доступных компаний, данные являются обязательными при заполнении документа! Список компаний от лица которых регистрируется документ может отличатся от списка доступных для просмотра компаний";
+                s.Properties.ValueField = GlobalPropertyNames.Id;
+                s.Properties.TextField = GlobalPropertyNames.Name;
+                s.Properties.ValueType = typeof(int);
+                s.Properties.NullDisplayText = "Выберите наше предприяте...";
+                //s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ClientEnabled = !Model.IsReadOnly;
+                s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                s.Properties.ClientSideEvents.SelectedIndexChanged = "AgentToId_Changed";
+                s.ReadOnly = Model.IsReadOnly;
+            }).BindList(DocumentModel.GetMyDepatmentsForDocumet(Model.MainCompanyDepatmentId)).Bind(Model.MainCompanyDepatmentId).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td colspan="4">
+            @Html.DevExpress().CheckBox(s =>
+                {
+                    s.Name = "Config.SalePriceOutByDocDate";
+                    s.ShowModelErrors = true;
+                    s.Text = "Ценообразование по дате документа или по текущей системной дате в документах торговли";
+                    s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), s.Name);
+                    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    s.ControlStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+                }).Bind(Model.Config.SalePriceOutByDocDate).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td colspan="4">
+            @Html.DevExpress().CheckBox(s =>
+                {
+                    s.Name = "Config.ServicePriceOutByDocDate";
+                    s.ShowModelErrors = true;
+                    s.Text = "Ценообразование по дате документа или по текущей системной дате в документах услуг";
+                    s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), s.Name);
+                    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                }).Bind(Model.Config.ServicePriceOutByDocDate).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td colspan="4">
+            @Html.DevExpress().CheckBox(s =>
+           {
+               s.Name = "Config.TaxPriceOutByDocDate";
+               s.ShowModelErrors = true;
+               s.Text = "Ценообразование по дате документа или по текущей системной дате в налоговых документах";
+               s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), s.Name);
+               s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+           }).Bind(Model.Config.TaxPriceOutByDocDate).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>
+            {
+                //s.ControlStyle.CssClass = "label";
+                s.Text = "Описание:";
+                s.AssociatedControlName = GlobalPropertyNames.Memo;
+            }).GetHtml()
+        </td>
+        <td colspan="5">                       
+            @Html.DevExpress().Memo(s =>
+            {
+                s.Name = GlobalPropertyNames.Memo;
+                s.Properties.NullText = "Введите примечание или описание документа...";
+                s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ClientEnabled = !Model.IsReadOnly;
+                s.ShowModelErrors = true;
+                s.Height = !string.IsNullOrEmpty(Model.Memo) && Model.Memo.Length > 255 ? 80 : 40;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.Memo).GetHtml()
+        </td>
+    </tr>
+</table>

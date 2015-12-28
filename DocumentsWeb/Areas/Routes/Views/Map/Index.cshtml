@@ -1,0 +1,189 @@
+﻿@using DevExpress.Web.Mvc.UI
+@using System.Web.UI.WebControls
+@using DevExpress.Utils;
+@{    
+    ViewBag.Title = "Мониторинг перемещения автотранспорта";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*
+http://www.sql.ru/forum/actualthread.aspx?tid=768243
+http://social.msdn.microsoft.com/Forums/en/sqlspatial/thread/98e19805-c31c-4b37-833e-af07079b1ad6
+http://stackoverflow.com/questions/11054149/sql-server-2008-spatial-find-a-point-in-polygon
+http://stackoverflow.com/questions/8384893/finding-a-geography-point-within-a-range-of-another-sql-server
+*@
+
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&libraries=geometry"></script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/jquery-rotate.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/gps/gps-zone-editor.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/gps/gps-label.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/gps/gps-track.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/gps/gps-search.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/gps/gps-member.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/gps/gps-zone-info.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/gps/gps-routes.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/gps/gps-routes-builder.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/gps/gps-routemembers.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/gps/gps-map.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/json/json2.js")"></script>
+<script type="text/javascript">
+    function CollapseActionsPane() {
+        splFullScreenMode.GetPaneByName('actionPane').Collapse(splFullScreenMode.GetPaneByName('MapPane'));
+    }
+
+    function CheckDevice(s, e) {
+        var code = s.name.toString();
+        code = code.slice(1);
+        if (s.GetChecked()) {
+            build_track(code);
+        } else {
+            remove_track(code);
+        }
+    }
+
+    function SelectZone(s, e) {
+        var key = s.GetRowKey(e.visibleIndex);
+        if (e.isSelected) {
+            show_zone(key);
+        } else {
+            hide_zone(key);
+        }
+    }
+
+    function SelectTrack(s, e) {
+        var key = s.GetRowKey(e.visibleIndex);
+        if (e.isSelected) {
+            buildTrack(key);
+        } else {
+            removeTrack(key);
+        }
+    }
+
+    function editAgent(id) {
+        pcEdit.SetCaption('Адрес клиента');
+        pcEdit.Load('@DevExpressHelper.GetUrl(new { Area = "Routes", Controller = "Map", Action = "LightAddress" })/' + id, 500, 480);
+    }
+
+    function editRoute(id) {
+        pcEdit.SetCaption('Шаблон маршрута');
+        pcEdit.Load('@DevExpressHelper.GetUrl(new { Area = "Routes", Controller = "Map", Action = "RouteEditor" })/' + id, 500, 500);
+    }
+
+    function deleteRoute(id) {
+        if (confirm("Удалить?")) {
+            var url = "Map/DeleteRoute?Id=" + id;
+            $.get(url, function (data) {
+            }).success(function () {
+                gvRoutesList.PerformCallback();
+            });
+        }
+    }
+
+    function editRouteMember(id) {
+        pcEdit.SetCaption('Участник маршрута');
+        pcEdit.Load('@DevExpressHelper.GetUrl(new { Area = "Routes", Controller = "RouteMember", Action = "Edit" })/' + id, 600, 400);
+    }
+
+    function deleteRouteMember(id) {
+        if (confirm("Удалить?")) {
+            var url = "RouteMember/Delete?Id=" + id;
+            $.get(url, function (data) {
+            }).success(function () {
+                gvRouteMemberList.PerformCallback();
+            });
+        }
+    }
+
+    function ChangePaneSize(s, e) {
+        google.maps.event.trigger(map, "resize");
+    }
+
+    function RouteSelect(s, e) {
+        if (gvRoutesList.GetSelectedKeysOnPage().length > 0) {
+            var id = gvRoutesList.GetSelectedKeysOnPage()[0];
+            showRoute(id);
+        }
+    }
+
+    function SelectRouteMember(s, e) {
+        var key = s.GetRowKey(e.visibleIndex);
+        if (e.isSelected) {
+            addRouteMember(key);
+        } else {
+            removeRouteMember(key);
+        }
+    }
+
+    function changeExpandActions(s, e) {
+        if (e.group.name != 'SearchBar') {
+            clearSearchMarker();
+            lbSearchResult.ClearItems();
+            tbSearch.SetValue(null);
+            $('#searchResult').hide();
+        }
+        if (e.group.name != 'RoutesBar') {
+            removeRoute();
+        }
+    }
+
+    function search() {
+        geo_search(tbSearch.GetValue());
+    }
+
+    function selectSearchRow(obj) {
+        moveToSearch(obj);
+    }
+</script>
+
+@Html.Partial("NavpanelPartial")
+@Html.DevExpress().Splitter(settings =>
+{
+    settings.Name = "splFullScreenMode";
+    settings.Orientation = Orientation.Vertical;
+    settings.Styles.Pane.Paddings.Padding = 0;
+    settings.FullscreenMode = true;
+
+    settings.Panes.Add(contentPane =>
+    {
+        contentPane.ScrollBars = ScrollBars.None;
+        contentPane.Panes.Add(actionsPane =>
+        {
+            actionsPane.Name = "actionPane";
+            actionsPane.AllowResize = DefaultBoolean.True;
+            actionsPane.Size = 270;
+            actionsPane.MinSize = 270;
+            actionsPane.ShowCollapseBackwardButton = DefaultBoolean.True;
+            actionsPane.ScrollBars = ScrollBars.None;
+            actionsPane.SetContent(() =>
+            {
+                Html.RenderPartial("ActionsPartial");
+            });
+        });
+        contentPane.Panes.Add(mapPane =>
+        {
+            mapPane.Name = "MapPane";
+            mapPane.SetContent(() =>
+            {
+                Html.RenderPartial("IndexPartial");
+            });
+        });
+    });
+
+    settings.Panes.Add(footerPane =>
+    {
+        footerPane.Size = 80;
+        footerPane.AllowResize = DefaultBoolean.False;
+        footerPane.ShowSeparatorImage = DefaultBoolean.False;
+        footerPane.SetContent(() =>
+        {
+            @Html.RenderPartial("FooterPartial");
+        });
+    });
+
+    settings.ClientSideEvents.PaneResized = "ChangePaneSize";
+}).GetHtml()
+
+@Html.Partial("PopupWindowPartial", new ViewDataDictionary { 
+    { "Title", "" },
+    { "AutoUpdateGrids", new string[] { "gvZonesList", "gvRoutesList", "gvRouteMemberList" } }
+})

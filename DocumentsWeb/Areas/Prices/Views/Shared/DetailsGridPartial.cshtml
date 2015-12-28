@@ -1,0 +1,168 @@
+﻿@model DocumentsWeb.Areas.Prices.Models.DocumentPriceListModel
+@using System.Globalization
+@using DocumentsWeb.Areas.Products.Models
+@using DocumentsWeb.Models
+@using BusinessObjects
+
+@Html.DevExpress().GridView(settings=>{
+    settings.Name = "gvDocDetails";
+    settings.KeyFieldName = "RowId";
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control; 
+    
+    settings.CallbackRouteValues = new { Controller = "PriceList", Action = "DetailsGridPartial", modelId = Model.ModelId };
+    settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "PriceList", Action = "DetailsGridAddNewPartial", ownewrModelId = Model.ModelId };
+    settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "PriceList", Action = "DetailsGridUpdatePartial", ownewrModelId = Model.ModelId };
+    settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "PriceList", Action = "DetailsGridDeletePartial", ownewrModelId = Model.ModelId };
+    settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+    settings.SettingsBehavior.AllowFocusedRow = true;
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+
+    settings.Settings.ShowFooter = true;
+    settings.SetFooterRowTemplateContent(c =>
+    {
+        ViewContext.Writer.Write("<div id=\"gridLnkCreate\" style=\"width: 100%; text-align: center; font-size: 10pt;\">");
+        Html.DevExpress().HyperLink(hl =>
+        {
+            hl.Name = "lnkAddNewDetailRow";
+            hl.Properties.Text = "Создать";
+            hl.ToolTip = "Создать";
+            hl.NavigateUrl = "javascript:gvDocDetails.AddNewRow();";
+            hl.Enabled = !Model.IsReadOnly;
+        }).Render();
+        ViewContext.Writer.Write("</div>");
+    });
+
+    settings.Columns.Add(cc =>
+    {
+        cc.Name = "colImageAction";
+        cc.Width = System.Web.UI.WebControls.Unit.Pixel(40);
+        cc.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+        cc.Settings.AllowDragDrop = DefaultBoolean.False;
+        cc.Settings.AllowSort = DefaultBoolean.False;
+        cc.SetDataItemTemplateContent(c =>
+        {
+            ViewContext.Writer.Write("<table><tr>");
+            ViewContext.Writer.Write("<td>");
+            Html.DevExpress().HyperLink(hl =>
+            {
+                hl.Properties.ImageUrl = Url.Content("~/Images/edit10x10.png");
+                hl.ToolTip = "Изменить";
+                hl.NavigateUrl = "javascript:gvDocDetails.StartEditRow(" + c.ItemIndex.ToString(CultureInfo.InvariantCulture) + ");";
+                hl.Enabled = !Model.IsReadOnly;
+            }).Render();
+            ViewContext.Writer.Write("</td><td>");
+            Html.DevExpress().HyperLink(hl =>
+            {
+                hl.Properties.ImageUrl = Url.Content("~/Images/DELETEDELEMENT_X16.png");
+                hl.ToolTip = "Удалить";
+                hl.NavigateUrl = "javascript:if (confirm(\"Удалить строку документа?\")) {gvDocDetails.DeleteRow(" + c.ItemIndex.ToString(CultureInfo.InvariantCulture) + ");}";
+                hl.Enabled = !Model.IsReadOnly;
+            }).Render();
+            ViewContext.Writer.Write("</td></tr></table>");
+        });
+    });
+    
+    settings.Columns.Add("ProductName","Товар");
+    settings.Columns.Add(column =>
+    {
+        column.FieldName = GlobalPropertyNames.Price;
+        column.Caption = "Цена";
+        column.PropertiesEdit.DisplayFormatString = "0.00";
+        column.Width = 70;
+    });
+    settings.Columns.Add("DetailMemo", "Примечание").Width = 200;
+
+    settings.SetEditFormTemplateContent(c =>
+    {
+        ViewContext.Writer.Write("<input type=\"hidden\" name=\"OwnerId\" id=\"OwnerId\" value=\"" + Model.Id + "\" />");
+        ViewContext.Writer.Write("<input type=\"hidden\" name=\"RowId\" id=\"RowId\" value=\"" + (c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "RowId"):"") + "\"/ >");
+
+        ViewContext.Writer.Write("<table class=\"edit_form_table2\" style=\"width: 650px;\">");
+        ViewContext.Writer.Write("<tr><td colspan=\"4\">");
+        Html.DevExpress().Button(btnSettings =>
+        {
+            btnSettings.Name = "btnUpdate";
+            btnSettings.ControlStyle.CssClass = "button";
+            btnSettings.Text = "Сохранить";
+            btnSettings.ClientSideEvents.Click = "function(s, e){ gvDocDetails.UpdateEdit(); }";
+        }).Render();
+        
+        Html.DevExpress().Button(btnSettings =>
+        {
+            btnSettings.Name = "btnCancel";
+            btnSettings.ControlStyle.CssClass = "button";
+            btnSettings.Text = "Отмена";
+            btnSettings.ClientSideEvents.Click = "function(s, e){ gvDocDetails.CancelEdit(); }";
+        }).Render();
+        ViewContext.Writer.Write("</td></tr>");
+        
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.Text = "Номенклатура:";
+            edtSettings.Properties.Style.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+            edtSettings.AssociatedControlName = GlobalPropertyNames.Price;
+        }
+        ).Render();
+        ViewContext.Writer.Write("</td><td class=\"table_label\">");
+
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.Text = "Товар:";
+            edtSettings.AssociatedControlName = GlobalPropertyNames.ProductId;
+        }).Render(); 
+        
+
+        ViewContext.Writer.Write("</td></tr><tr><td>");
+        Html.RenderPartial("ProductNomenclaturePartial", Model, new ViewDataDictionary {
+            { "ProductId", (c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "ProductId") : null) }
+        });
+        ViewContext.Writer.Write("</td><td>");
+        Html.RenderPartial("ProductPartial", Model, new ViewDataDictionary {
+            { "ProductId", (c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "ProductId") : null) }
+        });
+        
+        ViewContext.Writer.Write("</td></tr><tr><td class=\"table_label\" colspan=\"2\">");
+
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.Text = "Цена:";
+            edtSettings.Properties.Style.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+            edtSettings.AssociatedControlName = GlobalPropertyNames.Price;
+        }
+        ).Render();
+        ViewContext.Writer.Write("</td></tr><tr><td colspan=\"2\">");
+        Html.DevExpress().SpinEdit(edtSettings =>
+        {
+            edtSettings.Name = GlobalPropertyNames.Price;
+            edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            edtSettings.ShowModelErrors = true;
+            edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            edtSettings.Properties.DisplayFormatString = "0.00";
+        }).Bind(c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "Price") : 0).Render();
+        ViewContext.Writer.Write("</td></tr><tr><td class=\"table_label\" colspan=\"2\">");
+        
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.Text = "Примечание:";
+            edtSettings.AssociatedControlName = "DetailMemo";
+        }
+        ).Render();
+        ViewContext.Writer.Write("</td></tr><tr><td colspan=\"2\">");
+        Html.DevExpress().Memo(edtSettings =>
+        {
+            edtSettings.Name = "DetailMemo";
+            edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            edtSettings.ShowModelErrors = true;
+            edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }
+        ).Bind(c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "DetailMemo") : "").Render();
+        ViewContext.Writer.Write("</td></tr></table>");
+    });
+
+    settings.ClientSideEvents.ColumnResizing = "function (s, e) {if (e.column.name == 'colImageAction') {e.cancel = true;}}";
+}).Bind(Model.Details.Where(s => s.StateId != State.STATEDELETED)).GetHtml()

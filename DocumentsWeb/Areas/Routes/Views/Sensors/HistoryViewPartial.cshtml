@@ -1,0 +1,20 @@
+﻿<table style="width: 100%; height:100%;">
+    <tr style="height: 1px;">
+        <td style="width: 1px;">
+            @Html.DevExpress().Calendar(cl => {
+                cl.Name = "DateSet";
+                cl.Properties.ClientSideEvents.SelectionChanged = "DateChange";
+                //cl.Properties.EnableMultiSelect = true;
+            }).GetHtml()
+        </td>
+        <td style="text-align: left; ">
+            <div id="historyTable" style="width: 100%; height: 200px; overflow: auto;"></div>
+        </td>
+    </tr>
+
+    <tr style="height: 100%;">
+        <td style="height: 100%;" colspan="2">
+            <div id="historyChart" style="width: 100%; height: 100%"></div>
+        </td>
+    </tr>
+</table>

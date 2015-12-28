@@ -1,0 +1,40 @@
+﻿@Html.DevExpress().GridView(s => {
+    s.Name = "gvRoutesList";
+    s.CallbackRouteValues = new { Controller = "Map", Action = "RoutesListPartial" };
+    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    
+    s.Settings.ShowVerticalScrollBar = true;
+    s.Settings.VerticalScrollableHeight = 200;
+    s.Settings.ShowColumnHeaders = false;
+    s.Settings.ShowFilterRow = true;
+
+    //s.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+    s.SettingsPager.Visible = true;
+    s.SettingsPager.NumericButtonCount = 4;
+    s.SettingsPager.Summary.Visible = false;
+    s.SettingsPager.PageSize = 50;
+
+    s.SettingsBehavior.AllowSelectByRowClick = true;
+    s.SettingsBehavior.AllowSelectSingleRowOnly = true;
+    //s.SettingsBehavior.AllowFocusedRow = true;
+
+    s.KeyFieldName = "RouteId";
+    
+    s.Columns.Add(cs =>
+    {
+        cs.FieldName = "RouteMemberName";
+        cs.GroupIndex = 0;
+        cs.Caption = "Авто";
+        cs.CellStyle.Paddings.Padding = 2;
+    });
+    
+    s.Columns.Add(cs =>
+    {
+        cs.FieldName = "RouteName";
+        cs.CellStyle.Paddings.Padding = 2;
+        cs.Settings.AllowAutoFilter = DefaultBoolean.True;
+        cs.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+    });
+    s.ClientSideEvents.SelectionChanged = "RouteSelect";
+    s.GroupSummary.Add(DevExpress.Data.SummaryItemType.Count, "RouteId");
+}).Bind(DocumentsWeb.Areas.Routes.Models.RouteHeaderModel.GetRoutesHeaders()).GetHtml()

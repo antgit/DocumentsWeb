@@ -1,0 +1,59 @@
+﻿@using System.Web.UI.WebControls
+@{
+    ViewBag.Title = "Финансы - Входящие оплаты";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Html.Partial("NavpanelPartial")
+@Html.DevExpress().Splitter(settings =>
+{
+    settings.Name = "splFullScreenMode";
+    settings.Orientation = Orientation.Vertical;
+    settings.Styles.Pane.Paddings.Padding = 0;
+    settings.FullscreenMode = true;
+    //settings.ClientSideEvents.PaneResized = "function (s, e) { var height = splFullScreenMode.GetPane(0).GetClientHeight(); gvServicesDocuments.SetHeight(height);}";
+    settings.Panes.Add(contentPane =>
+    {
+        contentPane.SetContent(() =>
+        {
+        @Html.DevExpress().Splitter(dpane =>
+            {
+                dpane.Name = "splDocsActions";
+                dpane.Orientation = Orientation.Vertical;
+                dpane.Styles.Pane.Paddings.Padding = 0;
+                dpane.Width = Unit.Percentage(100);
+                dpane.Height = Unit.Percentage(100);
+                dpane.Orientation = Orientation.Horizontal;
+                dpane.AllowResize = false;
+                dpane.Panes.Add(actionsPane =>
+                {
+                    actionsPane.Name = "ActionPane";
+                    actionsPane.Size = 270;
+                    actionsPane.ShowCollapseBackwardButton = DefaultBoolean.True;
+                    actionsPane.SetContent(() => Html.RenderPartial("ActionsPartial"));
+                });
+                dpane.Panes.Add(cPane =>
+                {
+                    cPane.Name = "GridPane";
+                    cPane.SetContent(() => @Html.RenderPartial("IndexPartial"));
+                });
+                dpane.ClientSideEvents.PaneResized = "function (s, e) { window.setTimeout(adjustSize, 12); }";
+            }).Render();
+        });
+    });
+
+    settings.Panes.Add(footerPane =>
+    {
+        footerPane.Size = 80;
+        footerPane.AllowResize = DefaultBoolean.False;
+        footerPane.ShowSeparatorImage = DefaultBoolean.False;
+        footerPane.SetContent(() => @Html.RenderPartial("FooterPartial"));
+    });
+}).GetHtml()
+
+<script type="text/javascript">
+    function adjustSize() {
+        var height = splDocsActions.GetPaneByName('GridPane').GetClientHeight();
+        gvFinancesDocuments.SetHeight(height);
+    }
+</script>

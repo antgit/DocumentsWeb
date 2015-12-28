@@ -1,0 +1,275 @@
+﻿@using BusinessObjects.Security
+@using DocumentsWeb.Models
+<h1 style=" font-size:24px">Объекты учета - товары, услуги, основные средства и все что с ними связано...</h1>
+<hr />
+@if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_UNIT))
+{
+    @Html.DevExpress().HyperLink(s =>
+                                           {
+                                               s.Name = "lnkUnitImage";
+                                               s.Properties.ImageUrl = Url.Content("~/Images/UNIT_X16.png");
+                                               s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "General", Controller = "Unit", Action = "Index" });
+                                           }).GetHtml()
+    
+    @Html.DevExpress().HyperLink(s =>
+                                           {
+                                               s.Name = "lnkUnit";
+                                               s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Products", Controller = "Pack", Action = "Index" });
+                                               s.Properties.Text = "Единицы измерения";
+                                               s.ControlStyle.Font.Bold = true;
+                                           }).GetHtml()
+    ViewContext.Writer.Write(" - единицы измерения используемые для объектов учета. <br />");
+}
+
+@if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_PRODUCTS))
+{
+    @Html.DevExpress().HyperLink(s =>
+                                           {
+                                               s.Name = "lnkProductImage";
+                                               s.Properties.ImageUrl = Url.Content("~/Images/PRODUCT_X16.png");
+                                               s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Products", Controller = "Product", Action = "Index" });
+                                           }).GetHtml()
+    
+    @Html.DevExpress().HyperLink(s =>
+                                           {
+                                               s.Name = "lnkProduct";
+                                               s.NavigateUrl = DevExpressHelper.GetUrl(new {Area = "Products", Controller = "Product", Action = "Index"});
+                                               s.Properties.Text = "Товары";
+                                               s.ControlStyle.Font.Bold = true;
+                                           }).GetHtml()
+    ViewContext.Writer.Write(" - список наших товаров. В разделе Вы можете изменять свойства товаров и просматривать другие товары (разрешенные к просмотру). <br />");
+}
+
+@if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_SERVICES))
+{
+    @Html.DevExpress().HyperLink(s =>
+                                           {
+                                               s.Name = "lnkServiceImage";
+                                               s.Properties.ImageUrl = Url.Content("~/Images/SERVICE_X16.png");
+                                               s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Products", Controller = "Service", Action = "Index" });
+                                           }).GetHtml()
+    
+    @Html.DevExpress().HyperLink(s =>
+                                           {
+                                               s.Name = "lnkService";
+                                               s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Products", Controller = "Service", Action = "Index" });
+                                               s.Properties.Text = "Услуги";
+                                               s.ControlStyle.Font.Bold = true;
+                                           }).GetHtml()
+    ViewContext.Writer.Write(" - список наших услуг. В разделе Вы можете изменять свойства услуг и просматривать другие услуги (разрешенные к просмотру). <br />");
+}
+
+@if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_PRODUCTPACK))
+{
+    @Html.DevExpress().HyperLink(s =>
+                                           {
+                                               s.Name = "lnkPackImage";
+                                               s.Properties.ImageUrl = Url.Content("~/Images/PRODUCT_X16.png");
+                                               s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Products", Controller = "Pack", Action = "Index" });
+                                           }).GetHtml()
+    
+    @Html.DevExpress().HyperLink(s =>
+                                           {
+                                               s.Name = "lnkPack";
+                                               s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Products", Controller = "Pack", Action = "Index" });
+                                               s.Properties.Text = "Тара";
+                                               s.ControlStyle.Font.Bold = true;
+                                           }).GetHtml()
+    ViewContext.Writer.Write(" - тара используемая в документах и объектах учета. Основное назначение - учет возватной тары. <br />");
+}
+
+@if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_MONEY))
+{
+    @Html.DevExpress().HyperLink(s =>
+                                           {
+                                               s.Name = "lnkMoneyImage";
+                                               s.Properties.ImageUrl = Url.Content("~/Images/PRODUCT_X16.png");
+                                               s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Products", Controller = "Money", Action = "Index" });
+                                           }).GetHtml()
+    
+    @Html.DevExpress().HyperLink(s =>
+                                           {
+                                               s.Name = "lnkMoney";
+                                               s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Products", Controller = "Money", Action = "Index" });
+                                               s.Properties.Text = "Денежные объекты";
+                                               s.ControlStyle.Font.Bold = true;
+                                           }).GetHtml()
+    ViewContext.Writer.Write(" - денежные объекты используемые в документах. Основное назначение - учет МБП. <br />");
+}
+
+@if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_ASSETS))
+{
+    <hr />
+    @Html.DevExpress().HyperLink(s =>
+                                           {
+                                               s.Properties.ImageUrl = Url.Content("~/Images/PRODUCT_X16.png");
+                                               s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Products", Controller = "Assets", Action = "Index" });
+                                           }).GetHtml()
+    
+    @Html.DevExpress().HyperLink(s =>
+                                           {
+                                               s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Products", Controller = "Assets", Action = "Index" });
+                                               s.Properties.Text = "Основные средства";
+                                               s.ControlStyle.Font.Bold = true;
+                                           }).GetHtml()
+    ViewContext.Writer.Write(" - основыные средства предприятия. <br />");
+}
+
+@if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_RAWMATERIALS))
+{
+    @Html.DevExpress().HyperLink(s =>
+                                           {
+                                               s.Properties.ImageUrl = Url.Content("~/Images/PRODUCT_X16.png");
+                                               s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Products", Controller = "RawMaterial", Action = "Index" });
+                                           }).GetHtml()
+    
+    @Html.DevExpress().HyperLink(s =>
+                                           {
+                                               s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Products", Controller = "RawMaterial", Action = "Index" });
+                                               s.Properties.Text = "Сырье";
+                                               s.ControlStyle.Font.Bold = true;
+                                           }).GetHtml()
+    ViewContext.Writer.Write(" - сырье используемое в производстве. <br />");
+}
+
+@if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_RAWMATERIALS) )
+{
+    @Html.DevExpress().HyperLink(s =>
+                                           {
+                                               s.Properties.ImageUrl = Url.Content("~/Images/PRODUCT_X16.png");
+                                               s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Products", Controller = "FinishProduction", Action = "Index" });
+                                           }).GetHtml()
+    
+    @Html.DevExpress().HyperLink(s =>
+                                           {
+                                               s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Products", Controller = "FinishProduction", Action = "Index" });
+                                               s.Properties.Text = "Готовая продукция";
+                                               s.ControlStyle.Font.Bold = true;
+                                           }).GetHtml()
+    ViewContext.Writer.Write(" - продукция производства. <br />");
+}
+
+
+@if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_COMPUTER))
+{
+    <hr />
+    @Html.DevExpress().HyperLink(s =>
+                                           {
+                                               s.Properties.ImageUrl = Url.Content("~/Images/PRODUCT_X16.png");
+                                               s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Products", Controller = "Computer", Action = "Index" });
+                                           }).GetHtml()
+    
+    @Html.DevExpress().HyperLink(s =>
+                                           {
+                                               s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Products", Controller = "Computer", Action = "Index" });
+                                               s.Properties.Text = "Компьютеры";
+                                               s.ControlStyle.Font.Bold = true;
+                                           }).GetHtml()
+    ViewContext.Writer.Write(" - вычислительная техника. <br />");
+}
+
+@if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_COMPUTER))
+{
+    @Html.DevExpress().HyperLink(s =>
+                                           {
+                                               s.Properties.ImageUrl = Url.Content("~/Images/PRODUCT_X16.png");
+                                               s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Products", Controller = "Orgtex", Action = "Index" });
+                                           }).GetHtml()
+    
+    @Html.DevExpress().HyperLink(s =>
+                                           {
+                                               s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Products", Controller = "Orgtex", Action = "Index" });
+                                               s.Properties.Text = "Оргтехника";
+                                               s.ControlStyle.Font.Bold = true;
+                                           }).GetHtml()
+    ViewContext.Writer.Write(" - копировально-печатающая техника. <br />");
+}
+<hr />
+
+<h1 style=" font-size:24px">Аналитика наиболее часто используемая для объектов учета...</h1>
+<hr />
+@if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_PACK))
+{
+    @Html.DevExpress().HyperLink(s =>
+                                           {
+                                               s.Properties.ImageUrl = Url.Content("~/Images/MISCMAGENTA_X16.png");
+                                               s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Analitics", Controller = "ProductPackType", Action = "Index" });
+                                           }).GetHtml()
+    
+    @Html.DevExpress().HyperLink(s =>
+                                           {
+                                               s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Analitics", Controller = "ProductPackType", Action = "Index" });
+                                               s.Properties.Text = "Вид упаковки";
+                                               s.ControlStyle.Font.Bold = true;
+                                           }).GetHtml()
+    ViewContext.Writer.Write(" - аналитический справочник видов уаковки. <br />");
+}
+
+@if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_PRODUCTTYPE))
+{
+    @Html.DevExpress().HyperLink(s =>
+                                           {
+                                               s.Properties.ImageUrl = Url.Content("~/Images/MISCGREEN_X16.png");
+                                               s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Analitics", Controller = "ProductType", Action = "Index" });
+                                           }).GetHtml()
+    
+    @Html.DevExpress().HyperLink(s =>
+                                           {
+                                               s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Analitics", Controller = "ProductType", Action = "Index" });
+                                               s.Properties.Text = "Вид продукции";
+                                               s.ControlStyle.Font.Bold = true;
+                                           }).GetHtml()
+    ViewContext.Writer.Write(" - аналитический справочник видов продукции. <br />");
+}
+
+@if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_PRODUCTGROUP))
+{
+    @Html.DevExpress().HyperLink(s =>
+                                           {
+                                               s.Properties.ImageUrl = Url.Content("~/Images/MISCCUSTOM10_X16.png");
+                                               s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Analitics", Controller = "TradeGroup", Action = "Index" });
+                                           }).GetHtml()
+    
+    @Html.DevExpress().HyperLink(s =>
+                                           {
+                                               s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Analitics", Controller = "TradeGroup", Action = "Index" });
+                                               s.Properties.Text = "Товарная группа";
+                                               s.ControlStyle.Font.Bold = true;
+                                           }).GetHtml()
+    ViewContext.Writer.Write(" - аналитический справочник товарных групп. <br />");
+}
+
+@if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_BREND))
+{
+    @Html.DevExpress().HyperLink(s =>
+                                           {
+                                               s.Properties.ImageUrl = Url.Content("~/Images/MISCCUSTOM11_X16.png");
+                                               s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Analitics", Controller = "Brand", Action = "Index" });
+                                           }).GetHtml()
+    
+    @Html.DevExpress().HyperLink(s =>
+                                           {
+                                               s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Analitics", Controller = "Brand", Action = "Index" });
+                                               s.Properties.Text = "Бренды";
+                                               s.ControlStyle.Font.Bold = true;
+                                           }).GetHtml()
+    ViewContext.Writer.Write(" - аналитический справочник брендов. <br />");
+}
+
+@if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_RETURN))
+{
+    @Html.DevExpress().HyperLink(s =>
+                                           {
+                                               s.Properties.ImageUrl = Url.Content("~/Images/MISCBLUE_X16.png");
+                                               s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Analitics", Controller = "ReturnReason", Action = "Index" });
+                                           }).GetHtml()
+    
+    @Html.DevExpress().HyperLink(s =>
+                                           {
+                                               s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Analitics", Controller = "ReturnReason", Action = "Index" });
+                                               s.Properties.Text = "Причина возврата";
+                                               s.ControlStyle.Font.Bold = true;
+                                           }).GetHtml()
+    ViewContext.Writer.Write(" - аналитический справочник причин возврата товаров. <br />");
+}
+<hr />

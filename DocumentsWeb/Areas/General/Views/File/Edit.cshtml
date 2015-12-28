@@ -1,0 +1,93 @@
+﻿@using BusinessObjects
+@model DocumentsWeb.Areas.General.Models.FileDataModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*<script type="text/javascript">
+    function OnMenuItemClick(s, e) {
+        switch (e.item.name) {
+            case "mnuOk":
+                document.getElementById('editForm').submit();
+                break;
+            //            case "mnuCancel": 
+            //                parent.pcEdit.Hide(); 
+            //                break; 
+            default:
+                alert(e.item.name);
+        }
+    }
+</script>
+@Html.DevExpress().Menu(settings =>{
+    settings.EnableHotTrack = true;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Name = "mEditFile";
+    settings.ClientSideEvents.ItemClick = "OnMenuItemClick";
+
+    settings.Items.Add(item =>
+    {
+        item.Name = "mnuOk";
+        item.Text = "Сохранить";
+    });
+}).GetHtml()*@
+
+@using (Html.BeginForm("Edit", "File", FormMethod.Post, new { @class = "edit_form", @id = "editForm" }))
+{
+    ViewContext.Writer.Write("<input type=\"hidden\" id=\"RowId\" name=\"RowId\" value=\"" + @Model.RowId + "\"/>");
+    @Html.DevExpress().PageControl(settings =>
+{
+    settings.Name = "tsEditFile";
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Height = 450;
+    settings.TabPages.Add("Главная").SetContent(() =>
+    {
+        Html.RenderPartial("PageMainPartial", Model);
+    });
+
+    settings.TabPages.Add("Свойства").SetContent(() =>
+    {
+        ViewContext.Writer.Write("<table class=\"edit_form_table2\">" +
+"<tr>" +
+    "<td class=\"table_label\">");
+        @Html.DevExpress().Label(s =>
+        {
+            s.Text = "Идентификатор:";
+            s.AssociatedControlName = "txtId";
+        }).GetHtml();
+        ViewContext.Writer.Write("</td>" +
+        "<td>");
+        @Html.DevExpress().TextBox(s =>
+        {
+            s.Name = "txtId";
+            s.Enabled = false;
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.ShowModelErrors = true;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.Id).GetHtml();
+        ViewContext.Writer.Write("</td>" +
+    "</tr>" +
+    "<tr>" +
+        "<td class=\"table_label\">");
+        @Html.DevExpress().Label(s =>
+        {
+            s.Text = "Пользователь:";
+            s.AssociatedControlName = GlobalPropertyNames.UserName;
+        }).GetHtml();
+        ViewContext.Writer.Write("</td>" +
+        "<td>");
+        @Html.DevExpress().TextBox(s =>
+        {
+            s.Name = "txtUserName";
+            //s.ControlStyle.CssClass = "editor2";
+            s.Enabled = false;
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.ShowModelErrors = true;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.UserName).GetHtml();
+        ViewContext.Writer.Write("</td>" +
+    "</tr></table>");
+    });
+}).GetHtml()
+}

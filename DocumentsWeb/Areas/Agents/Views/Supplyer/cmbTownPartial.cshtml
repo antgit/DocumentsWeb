@@ -1,0 +1,29 @@
+﻿@{
+    int? TownId = null;
+    int? TerritoryId = null;
+    int? RegionId = null;
+
+    try { TownId = int.Parse(ViewData["TownId"].ToString()); TownId = (TownId == 0 ? null : TownId); }  catch { }
+    try { TerritoryId = int.Parse(ViewData["TerritoryId"].ToString()); TerritoryId = (TerritoryId == 0 ? null : TerritoryId); } catch { }
+    try { RegionId = int.Parse(ViewData["RegionId"].ToString()); RegionId = (RegionId == 0 ? null : RegionId); } catch { }
+}
+
+@Html.DevExpress().ComboBox(edtSettings =>
+{
+    edtSettings.Name = "TownId";
+    edtSettings.CallbackRouteValues = new { Controller = "Supplyer", Action = "cmbTownPartial" };
+    edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    edtSettings.Properties.ValueField = "Id";
+    edtSettings.Properties.TextField = "Name";
+    edtSettings.Properties.ValueType = typeof(int);
+    edtSettings.Properties.NullDisplayText = "Выберите город...";
+    edtSettings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    edtSettings.Properties.FilterMinLength = 2;
+    edtSettings.ControlStyle.CssClass = "editor";
+    edtSettings.ShowModelErrors = true;
+    edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+    edtSettings.Properties.ClientSideEvents.BeginCallback = "function(s,e){ e.customArgs['TerritoryId'] = TerritoryId.GetValue(); e.customArgs['RegionId'] = RegionId.GetValue(); }";
+    edtSettings.Properties.ClientSideEvents.EndCallback = "function(s,e){ s.Validate(); }";
+    edtSettings.Properties.ClientSideEvents.SelectedIndexChanged = "function(s,e){  StreetName.PerformCallback(); }";
+}).BindList(DocumentsWeb.Models.WADataProvider.GetTowns(TerritoryId, RegionId)).Bind(TownId).GetHtml()

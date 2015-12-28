@@ -1,0 +1,72 @@
+﻿@using (Html.BeginForm("MultiFileSelection", "Verification", FormMethod.Post, new { @class = "edit_form" }))
+{
+    <table border="0">
+    <tr>
+    <td>
+    @Html.DevExpress().UploadControl(
+        settings =>
+        {
+            /*settings.Name = "ucMultiSelection";
+            settings.CallbackRouteValues = new { Controller = "Document", Action = "MultiSelectionImageUpload", ownewrModelId = Model.ModelId };
+            settings.ControlStyle.CssClass = "editorArea";
+            settings.Width = System.Web.UI.WebControls.Unit.Pixel(380);
+            settings.AdvancedModeSettings.EnableMultiSelect = false;
+            settings.ValidationSettings.Assign(DocumentsWeb.Controllers.DocumentController.ValidationSettings);
+            settings.Style.Add("float","left");
+            settings.Style.Add("margin", "5px");
+            settings.Height = 20;
+            settings.ClientSideEvents.TextChanged = "function(s, e) { btnUpload.SetEnabled(ucMultiSelection.GetText(0) != \"\"); }";
+            settings.ClientSideEvents.FilesUploadComplete = "function(s,e) { gvFiles.PerformCallback(); }";
+            settings.ShowProgressPanel = true;*/
+
+            /* Ряполов Ю.А. Добавил 29.12.2011 9:59 */
+            settings.Name = "ucMultiSelection";
+            settings.CallbackRouteValues = new { Controller = "Verification", Action = "MultiSelectionImageUpload", ownewrModelId = Model.ModelId };
+            //settings.ControlStyle.CssClass = "editorArea";
+
+            settings.Width = System.Web.UI.WebControls.Unit.Pixel(380);
+            settings.AdvancedModeSettings.EnableMultiSelect = true;
+
+            settings.ValidationSettings.Assign(DocumentsWeb.Areas.Contracts.Controllers.VerificationController.ValidationSettings);
+
+            settings.ClientSideEvents.FileUploadStart = "function(s,e) { /*ClearFileContainer();*/ Uploader_OnFileUploadStart(); }";
+            //settings.ClientSideEvents.FileUploadComplete = "function(s,e) { if(e.callbackData != '') AddFileToContainer(e.callbackData); }";
+            settings.ClientSideEvents.FilesUploadComplete = "function(s,e) { Uploader_OnFilesUploadComplete(e);  gvFiles.PerformCallback(); }";
+            settings.ClientSideEvents.UploadingProgressChanged = "function(s, e) { Uploader_ProgressChanged(e); }";
+            settings.ClientSideEvents.TextChanged = "function(s, e) { UpdateUploadButton(); }";
+            /* ------------------------------------ */
+            
+            
+            //settings.CallbackRouteValues = new { Controller = "UploadControl", Action = "MultiSelectionImageUpload" };
+            //settings.ValidationSettings.Assign(UploadControlDemosHelper.ValidationSettings);
+
+            //settings.ClientSideEvents.FileUploadStart = "function(s,e) { ClearFileContainer(); Uploader_OnFileUploadStart(); }";
+            //settings.ClientSideEvents.FileUploadComplete = "function(s,e) { if(e.callbackData != '') AddFileToContainer(e.callbackData); }";
+            //settings.ClientSideEvents.FilesUploadComplete = "function(s,e) { Uploader_OnFilesUploadComplete(e); }";
+            //settings.ClientSideEvents.UploadingProgressChanged = "function(s, e) { Uploader_ProgressChanged(e); }";
+            //settings.ClientSideEvents.TextChanged = "function(s, e) { UpdateUploadButton(); }";
+        }).GetHtml()
+        </td>
+        <td>
+    @Html.DevExpress().Button(
+        settings=>{
+            settings.Name = "btnUpload";
+            settings.Text = "Загрузить";
+            settings.Style.Add("padding", "5px");
+            settings.Height = 15;
+            settings.ClientEnabled = false;
+            settings.ClientSideEvents.Click = "function(s,e) { ucMultiSelection.Upload(); }";
+        }).GetHtml()
+        </td>
+        </tr>
+        </table>
+}
+<table id="tableDetalsProduct" style="width:98%">
+    <tr>
+        <td>
+            @Html.Partial("FileGridPartial")
+        </td>
+    </tr>
+</table>
+
+<div style="width: 100%; height: 50px;"></div>

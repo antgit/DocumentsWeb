@@ -1,0 +1,42 @@
+using System;
+using System.Data;
+using System.Configuration;
+using System.Collections;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Web.UI.HtmlControls;
+using Stimulsoft.Report;
+using Stimulsoft.Report.WebFx;
+
+public partial class CustomizeWebViewerFx : System.Web.UI.Page
+{
+    protected override void OnPreInit(EventArgs e)
+    {
+        StiWebViewerFxOptions.Toolbar.ShowOpenButton = false;
+        StiWebViewerFxOptions.Toolbar.ShowFindButton = false;
+
+        base.OnPreInit(e);
+    }
+
+
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        string appDirectory = HttpContext.Current.Server.MapPath(string.Empty);
+
+        // Prepare data
+        DataSet dataSet = new DataSet();
+        dataSet.ReadXml(appDirectory + "\\Data\\Demo.xml");
+        dataSet.ReadXmlSchema(appDirectory + "\\Data\\Demo.xsd");
+
+        // Load report
+        StiReport report = new StiReport();
+        report.Load(appDirectory + "\\Reports\\SimpleList.mrt");
+        report.RegData(dataSet);
+
+        // View report
+        StiWebViewerFx1.Report = report;
+    }
+}

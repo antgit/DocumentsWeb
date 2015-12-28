@@ -1,0 +1,63 @@
+﻿@using BusinessObjects
+@using DocumentsWeb.Areas.UserPersonal.Models
+
+
+@Html.DevExpress().GridView(settings=>{
+    settings.Name = "gvLastMessageIncome";
+    settings.KeyFieldName = GlobalPropertyNames.Id;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+
+    settings.Settings.ShowVerticalScrollBar = true;
+    settings.Settings.VerticalScrollableHeight = 200;
+    settings.CallbackRouteValues = new { area="UserPersonal", Controller = "UserMessage", Action = "FastViewIncommingPartial" };
+    settings.SettingsBehavior.AllowFocusedRow = true;
+    settings.Styles.Cell.Font.Size = System.Web.UI.WebControls.FontUnit.Point(11);
+    settings.Styles.Cell.Paddings.Padding = System.Web.UI.WebControls.Unit.Pixel(2);
+    settings.Styles.Cell.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+
+    settings.Settings.ShowFilterRow = true;
+    settings.Settings.ShowHorizontalScrollBar = true;
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+    settings.Styles.AlternatingRow.Enabled = DefaultBoolean.True;
+
+    
+    MVCxGridViewColumn colDate = settings.Columns.Add("SendDate", "Дата");
+    colDate.Width = 70;
+    colDate.PropertiesEdit.DisplayFormatString = "d";
+    colDate.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+    colDate.ColumnType = MVCxGridViewColumnType.DateEdit;
+
+    MVCxGridViewColumn colTime = settings.Columns.Add("SendTimeString", "Время");
+    colTime.Width = 90;
+    colTime.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+
+    MVCxGridViewColumn colWorkerSenderName = settings.Columns.Add("WorkerSenderName", "Отправитель");
+                                                colWorkerSenderName.Width = 150;
+    colWorkerSenderName.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+    settings.Columns.Add(cc =>
+                                                    {
+                                                        cc.Name = "colName";
+                                                        cc.FieldName = "Name";
+                                                        cc.Caption = "Наименование";
+                                                        //cc.FixedStyle = GridViewColumnFixedStyle.Left;
+                                                        cc.Settings.AllowDragDrop = DefaultBoolean.False;
+                                                        cc.Settings.AllowSort = DefaultBoolean.False;
+                                                        cc.Width = 150;
+                                                        cc.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+                                                        cc.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+                                                        cc.SetDataItemTemplateContent(c =>
+                                                        {
+                                                            Html.DevExpress().HyperLink(linkSettings =>
+                                                            {
+                                                                linkSettings.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "UserPersonal", Controller = "UserMessage", Action = "Edit", Id = DataBinder.Eval(c.DataItem, "Id") });
+                                                                linkSettings.Properties.Target = "_blank";
+                                                                linkSettings.ToolTip = "Просмотреть сщщбщение";
+                                                                linkSettings.Properties.Text = (string)DataBinder.Eval(c.DataItem, "Name");
+                                                                
+                                                            }).Render();
+                                                            
+                                                        });
+                                                    });
+}).Bind(WebMessageModel.GetLastIncomingMessages()).GetHtml()

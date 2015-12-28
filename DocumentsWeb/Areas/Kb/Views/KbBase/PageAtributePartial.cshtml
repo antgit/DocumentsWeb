@@ -1,0 +1,114 @@
+﻿@using BusinessObjects
+@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentsWeb.Areas.General.Models
+@using DocumentsWeb.Models
+@using DocumentsWeb.Areas.Kb.Models
+@model KnowledgeModel
+@{
+    bool haveEdit = !Model.IsReadOnly && WADataProvider.LibrariesElementRightView.IsAllow(Right.UIEDIT, WebModuleNames.WEB_KNOWLEDGES) && !WADataProvider.CommonRightView.ReadOnly;
+}
+<table style="width: 600px;">
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>
+                {
+                    s.ControlStyle.CssClass = "label";
+                    s.Text = "Код:";
+                    s.AssociatedControlName = GlobalPropertyNames.Code;
+                    s.ToolTip = KnowledgeData.GetTooltip(GlobalPropertyNames.Code);
+                }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBox(s =>
+                {
+                    s.Name = GlobalPropertyNames.Code;
+                    s.ControlStyle.CssClass = "editor";
+                    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    s.ShowModelErrors = true;
+                    s.ReadOnly = !haveEdit;
+                    if (!s.ReadOnly)
+                    {
+                        s.Properties.NullText = KnowledgeData.GetNullText(GlobalPropertyNames.Code);
+                        s.ToolTip = KnowledgeData.GetTooltip(GlobalPropertyNames.Code);
+                    }
+                    s.Properties.ConvertEmptyStringToNull = true;
+                    s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                    s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                }).Bind(Model.Code).GetHtml()
+        </td>
+    </tr>
+    @if (Model.KindId == Knowledge.KINDID_ONLINE)
+    {
+        <tr>
+            <td class="table_label">
+                @Html.DevExpress().Label(s =>
+                    {
+                        s.ControlStyle.CssClass = "label";
+                        s.Text = "Url:";
+                        s.AssociatedControlName = GlobalPropertyNames.CodeFind;
+                        s.ToolTip = KnowledgeData.GetTooltip(GlobalPropertyNames.CodeFind);
+                    }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().TextBox(s =>
+                    {
+                        s.Name = GlobalPropertyNames.CodeFind;
+                        s.ControlStyle.CssClass = "editor";
+                        s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                        s.ShowModelErrors = true;
+                        s.ReadOnly = !haveEdit;
+                        if (!s.ReadOnly)
+                        {
+                            s.Properties.NullText = KnowledgeData.GetNullText(GlobalPropertyNames.CodeFind);
+                            s.ToolTip = KnowledgeData.GetTooltip(GlobalPropertyNames.CodeFind);
+                        }
+                        s.Properties.ConvertEmptyStringToNull = true;
+                        s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                        s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                    }).Bind(Model.CodeFind).GetHtml()
+            
+            </td>
+        </tr>
+    }
+    
+    @if (Model.KindId == Knowledge.KINDID_LOCAL)
+    {
+        <tr>
+            <td class="table_label">
+                @Html.DevExpress().Label(s =>
+                    {
+                        s.ControlStyle.CssClass = "label";
+                        s.Text = "Файл:";
+                        s.AssociatedControlName = GlobalPropertyNames.FileId;
+                        s.ToolTip = KnowledgeData.GetTooltip(GlobalPropertyNames.FileId);
+                    }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().ComboBox(s =>
+                {
+                    s.Name = GlobalPropertyNames.FileId;
+                    s.ControlStyle.CssClass = "editor";
+                    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    s.Properties.TextField = GlobalPropertyNames.Name;
+                    s.Properties.ValueField = GlobalPropertyNames.Id;
+                    s.Properties.ValueType = typeof(int);
+                    s.Properties.DropDownWidth = System.Web.UI.WebControls.Unit.Pixel(300);
+                    s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                    s.Properties.FilterMinLength = 3;
+                    s.ShowModelErrors = true;
+                    s.ReadOnly = !haveEdit;
+                    if (!s.ReadOnly)
+                    {
+                        s.ToolTip = KnowledgeData.GetTooltip(GlobalPropertyNames.FileId);
+                    }
+                    s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                    s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                }).BindList(FileDataModel.GetCollectionBind(Hierarchy.SYSTEM_FILEDATA_KNOWLEDGE, Model.FileId)).Bind(Model.FileId).GetHtml()
+
+                
+            
+            </td>
+        </tr>
+    }
+</table>

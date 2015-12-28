@@ -1,0 +1,16 @@
+﻿@using BusinessObjects
+@Html.DevExpress().GridView(settings=>{
+    settings.Name="gvReportsTree";
+    settings.CallbackRouteValues = new { Controller = "Report", Action = "IndexTreePartial" };
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control; 
+    settings.SettingsBehavior.AllowFocusedRow = true;
+    settings.KeyFieldName = GlobalPropertyNames.Id;
+    settings.Settings.ShowGroupPanel = false;
+    settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+    //settings.Settings.ShowColumnHeaders = false;
+    
+    settings.Columns.Add("Name", "Имя");
+    settings.ClientSideEvents.FocusedRowChanged = "function(s,e){gvReports.PerformCallback();}";
+}).Bind(Model).GetHtml()

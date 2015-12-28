@@ -1,0 +1,77 @@
+﻿@using DocumentsWeb.Areas.Analitics.Models
+@using BusinessObjects
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string mId = (string)Request.Params["mId"];
+}
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#divContent').width($(window).width());
+        $('#divContent').height($(window).height());
+    });
+
+    function TM_ButtonClick(s, e) {
+        switch (e.buttonIndex) {
+            case 0:
+                $.ajax({
+                    type: 'GET',
+                    url: '@Url.Content("~/Marketings/Mktg/UpdateTMs")',
+                    async: false,
+                    success: function (data) {
+                        s.PerformCallback();
+                    }
+                });
+                break;
+        }
+    }
+</script>
+
+@using (Html.BeginForm("SaveGroupPartial", "Mktg", FormMethod.Post, new { @class = "edit_form", @id = "editForm" }))
+{
+    ViewContext.Writer.Write("<input type=\"hidden\" id=\"mId\" name=\"mId\" value=\"" + mId + "\" />");
+    ViewContext.Writer.Write("<div id=\"divContent\" style=\"overflow: auto;\">");
+    ViewContext.Writer.Write("<table><tr><td colspan=\"2\">");
+    ViewContext.Writer.Write("</td></tr><tr><td>");
+
+    // Группа товаров
+    ViewContext.Writer.Write("<div>");
+    Html.DevExpress().Label(s =>
+    {
+        s.Text = "Группа товаров: ";
+        s.Style.Add("float", "left");
+    }).Render();
+    ViewContext.Writer.Write("<br />");
+    Html.DevExpress().ComboBox(s =>
+    {
+        s.ControlStyle.CssClass = "editor";
+        s.Name = "GroupId";
+        s.Properties.ValueField = GlobalPropertyNames.Id;
+        s.Properties.TextField = GlobalPropertyNames.Name;
+        s.Properties.ValueType = typeof(int);
+        s.Width = 250;
+        s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+        s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        s.Properties.ClientSideEvents.SelectedIndexChanged = "function (s, e) { SubGroupsCallback.PerformCallback(); }";
+    }).BindList(AnaliticGroupModel.GetGroups().Where(w => w.KindId == AnaliticGroupKind.MktgProductType && (w.Id == 8 || w.Id == 9))).Render();
+    ViewContext.Writer.Write("</div>");
+    ViewContext.Writer.Write("</td></tr><tr><td>");
+
+    // Торговая марка
+    ViewContext.Writer.Write("<div>");
+    Html.DevExpress().Label(s =>
+    {
+        s.Text = "Торговая марка: ";
+        s.Style.Add("float", "left");
+    }).Render();
+    ViewContext.Writer.Write("<br />");
+
+    Html.RenderPartial("EditGroupTMPartial");
+    
+    ViewContext.Writer.Write("</div>");
+
+    ViewContext.Writer.Write("</tr></table>");
+    Html.RenderPartial("EditGroupListPartial", new ViewDataDictionary { { "mId", mId } });
+    ViewContext.Writer.Write("</div>");
+}

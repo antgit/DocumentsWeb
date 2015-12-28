@@ -1,0 +1,51 @@
+﻿@using DevExpress.Web.Mvc.UI
+@using System.Web.UI.WebControls
+@using BusinessObjects
+@using DocumentsWeb.Models
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Учет договоров";
+    bool AllowVerification = WADataProvider.FolderElementRightView.IsAllow(BusinessObjects.Security.Right.DOCVIEW, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_CONTRACTS_VERIFICATION).Id);
+    bool AllowRevision = WADataProvider.FolderElementRightView.IsAllow(BusinessObjects.Security.Right.DOCVIEW, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_CONTRACTS_REVISION).Id);
+}
+
+@Html.Partial("NavpanelPartial")
+@Html.DevExpress().Splitter(settings =>
+{
+    settings.Name = "splFullScreenMode";
+    settings.Orientation = Orientation.Vertical;
+    settings.Styles.Pane.Paddings.Padding = 0;
+    settings.FullscreenMode = true;
+
+    settings.Panes.Add(contentPane =>
+    {
+        contentPane.ScrollBars = ScrollBars.Auto;
+        contentPane.SetContent(() => @Html.RenderPartial("IndexPartial"));
+    });
+
+    settings.Panes.Add(footerPane =>
+    {
+        footerPane.Size = 80;
+        footerPane.AllowResize = DefaultBoolean.False;
+        footerPane.ShowSeparatorImage = DefaultBoolean.False;
+        footerPane.SetContent(() => @Html.RenderPartial("FooterPartial"));
+    });
+}).GetHtml()
+
+<script type="text/javascript">
+    _aspxAttachEventToElement(window, "load", function () {
+        timeoutId = setTimeout(RefreshAllGridView, 500);
+    });
+    function RefreshAllGridView() {
+        gvServiceDocumentsContract.PerformCallback();
+        @if(AllowVerification)
+        {
+            @Html.Raw("gvContractDocumentsRevision.PerformCallback();");
+        }
+        @if (AllowRevision)
+        {
+            @Html.Raw("gvContractDocumentsVerification.PerformCallback();");
+        }
+    }
+</script>

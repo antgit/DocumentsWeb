@@ -1,0 +1,211 @@
+﻿@using BusinessObjects
+@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentsWeb.Models
+@using DocumentsWeb.Areas.Agents.Models
+@using DocumentsWeb.Areas.Analitics.Models
+@using DocumentsWeb.Controllers
+@using DocumentsWeb.Areas.General.Models
+@model ClientModel
+@{
+    bool haveEdit = !Model.IsReadOnly && WADataProvider.LibrariesElementRightView.IsAllow(Right.UIEDIT, WebModuleNames.WEB_CLIENTS) && !WADataProvider.CommonRightView.ReadOnly;
+}
+        <table style="width:600px;">
+        
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+   {
+       s.ControlStyle.CssClass = "label";
+       s.Text = "Признак:";
+       s.AssociatedControlName = GlobalPropertyNames.Code;
+       s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Code);
+   }).GetHtml()
+        </td><td>
+        @Html.DevExpress().TextBox(s =>
+   {
+       s.Name = GlobalPropertyNames.Code;
+       s.ReadOnly = !haveEdit;
+       if (!s.ReadOnly)
+       {
+           s.Properties.NullText = "Введите признак...";
+           s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Code);
+       }
+       s.ControlStyle.CssClass = "editor";
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+       s.ShowModelErrors = true;
+       s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+       s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+   }).Bind(Model.Code).GetHtml()
+        </td></tr>
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+   {
+       s.ControlStyle.CssClass = "label";
+       s.Text = "Код поиска:";
+       s.AssociatedControlName = GlobalPropertyNames.CodeFind;
+       s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.CodeFind);
+   }).GetHtml()
+        </td><td>
+        @Html.DevExpress().TextBox(s =>
+   {
+       s.Name = GlobalPropertyNames.CodeFind;
+       s.ReadOnly = !haveEdit;
+       if (!s.ReadOnly)
+       {
+           s.Properties.NullText = "Введите код поиска...";
+           s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.CodeFind);
+       }
+       s.ControlStyle.CssClass = "editor";
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+       s.ShowModelErrors = true;
+       s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+       s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+   }).Bind(Model.CodeFind).GetHtml()
+        </td></tr>
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+   {
+       s.ControlStyle.CssClass = "label";
+       s.Text = "Международное:";
+       s.AssociatedControlName = GlobalPropertyNames.InternationalName;
+       s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.InternationalName);
+   }).GetHtml()
+        </td><td>
+            @Html.DevExpress().TextBox(s =>
+       {
+           s.Name = GlobalPropertyNames.InternationalName;
+           s.ReadOnly = !haveEdit;
+           if (!s.ReadOnly)
+           {
+               s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.InternationalName);
+               s.Properties.NullText = "Введите международное наименование...";
+           }
+           s.ControlStyle.CssClass = "editor";
+           s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+           s.ShowModelErrors = true;
+           s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+           s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+       }).Bind(Model.InternationalName).GetHtml()
+             </td></tr> 
+             
+       <tr><td class="table_label">
+           @Html.DevExpress().Label(s =>
+      {
+          s.ControlStyle.CssClass = "label";
+          s.Text = "Тип собственности:";
+          s.AssociatedControlName = GlobalPropertyNames.OwnershipId;
+          s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.OwnershipId);
+      }).GetHtml()
+        </td><td>
+             @Html.DevExpress().ComboBox(s =>
+        {
+            s.Name = GlobalPropertyNames.OwnershipId;
+            s.ReadOnly = !haveEdit;
+            s.Properties.NullDisplayText = "Укажите тип собственности...";
+            s.Properties.TextField = GlobalPropertyNames.Name;
+            s.Properties.ValueField = GlobalPropertyNames.Id;
+            s.Properties.ValueType = typeof(int);
+            s.Properties.TextFormatString = "{1}";
+            //s.ControlStyle.CssClass = "editor";
+            s.ShowModelErrors = true;
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            s.Properties.Columns.Add("Code", "Кратко");
+            s.Properties.Columns.Add("Name", "Наименование");
+            if (WADataProvider.CurrentUserCompanyMultyCount())
+            {
+                s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.OwnershipId);
+                s.Properties.Columns.Add("MyCompanyName", "Компания-владелец", 150);
+            }
+        }).BindList(AnaliticModel.GetCollection(Hierarchy.SYSTEM_ANALITIC_AGENTOWNERSHIP)).Bind(Model.OwnerShipId).GetHtml()
+             </td></tr>  
+                          <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Тип торг. точки:";
+            s.AssociatedControlName = "TypeOutletId";
+        }).GetHtml()
+        </td><td>
+        @Html.DevExpress().ComboBox(s =>
+        {
+            s.Name = "TypeOutletId";
+            s.ReadOnly = !haveEdit;
+            s.Properties.NullDisplayText = "Укажите тип трговой точки...";
+            s.Properties.TextField = GlobalPropertyNames.Name;
+            s.Properties.ValueField = GlobalPropertyNames.Id;
+            s.Properties.ValueType = typeof(int);
+            s.ControlStyle.CssClass = "editor";
+            s.ShowModelErrors = true;
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            s.Properties.Columns.Add("Name", "Наименование");
+            if (WADataProvider.CurrentUserCompanyMultyCount())
+            {
+                s.Properties.Columns.Add("MyCompanyName", "Компания-владелец", 150);
+            }
+        }).BindList(AnaliticModel.GetCollection(Hierarchy.SYSTEM_ANALITIC_AGENTTYPEOUTLET)).Bind(Model.TypeOutletId).GetHtml()
+        </td></tr>
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Метраж:";
+            s.AssociatedControlName = GlobalPropertyNames.MetricAreaId;
+        }).GetHtml()
+        </td><td>
+        @Html.DevExpress().ComboBox(s =>
+        {
+            s.Name = GlobalPropertyNames.MetricAreaId;
+            s.ReadOnly = !haveEdit;
+            s.Properties.NullDisplayText = "Укажите метраж...";
+            s.Properties.TextField = GlobalPropertyNames.Name;
+            s.Properties.ValueField = GlobalPropertyNames.Id;
+            s.Properties.ValueType = typeof(int);
+            s.ControlStyle.CssClass = "editor";
+            s.ShowModelErrors = true;
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            s.Properties.Columns.Add("Name", "Наименование");
+            if (WADataProvider.CurrentUserCompanyMultyCount())
+            {
+                s.Properties.Columns.Add("MyCompanyName", "Компания-владелец", 150);
+            }
+        }).BindList(AnaliticModel.GetCollection(Hierarchy.SYSTEM_ANALITIC_AGENTMETRICAREA)).Bind(Model.MetricAreaId).GetHtml()
+        </td></tr>
+
+        <tr></tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Категория торг.точки:";
+            s.AssociatedControlName = GlobalPropertyNames.CategoryId;
+        }).GetHtml()
+        </td><td>
+        @Html.DevExpress().ComboBox(s =>
+        {
+            s.Name = GlobalPropertyNames.CategoryId;
+            s.ReadOnly = !haveEdit;
+            s.Properties.NullDisplayText = "Укажите категорию торговой точки...";
+            s.Properties.TextField = GlobalPropertyNames.Name;
+            s.Properties.ValueField = GlobalPropertyNames.Id;
+            s.Properties.ValueType = typeof(int);
+            s.ControlStyle.CssClass = "editor";
+            s.ShowModelErrors = true;
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            s.Properties.Columns.Add("Name", "Наименование");
+            if (WADataProvider.CurrentUserCompanyMultyCount())
+            {
+                s.Properties.Columns.Add("MyCompanyName", "Компания-владелец", 150);
+            }
+        }).BindList(AnaliticModel.GetCollection(Hierarchy.SYSTEM_ANALITIC_AGENTCATEGORY)).Bind(Model.CategoryId).GetHtml()
+        </td><tr>      
+        </table>

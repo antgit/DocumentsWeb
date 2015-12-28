@@ -1,0 +1,16 @@
+﻿@model DocumentsWeb.Models.TreeModel
+@Html.DevExpress().TreeView(
+settings => {
+    settings.Name = ViewData["ModelName"] + "Tree";
+    settings.NameField = "Id";
+    settings.TextField = "Name";
+    settings.ClientSideEvents.NodeClick = ViewData["ModelName"] + "TreeNodeClick";
+    settings.ClientSideEvents.Init = ViewData["ModelName"] + "TreeInit";
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.AllowSelectNode = true;
+    settings.PreRender = (s, e) =>
+    {
+        ASPxTreeView treeView = (ASPxTreeView)s;
+        treeView.ExpandAll();
+    };
+}).Bind(Model).GetHtml()

@@ -1,0 +1,77 @@
+﻿@using DevExpress.Web.Mvc.UI
+@using System.Web.UI.WebControls
+@inherits WebViewPage
+            
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Продукция, сырье";
+}
+
+@if(false){<script src="~/Scripts/ASPxScriptIntelliSense.js" type="text/javascript"></script>}
+                                                                                             
+<script type="text/javascript">
+    _aspxAttachEventToElement(window, "load", function () {
+        timeoutId = setTimeout(RefreshAllGridView, 20);
+    });
+    function RefreshAllGridView() {
+        var a = nbFeatures.GetItemByName('mnuFilterActive');
+        if (a != null) nbFeatures.SetSelectedItem(a);
+        ShowOnlyActive();
+        dxGridViewProducts.SetVisible(true);
+    }
+    function ShowPopupEdit(id) {
+        pcEdit.Load('@DevExpressHelper.GetUrl(new { Controller = "RawMaterial", Action = "Edit" })?Id=' + id, 550, 310);
+    }
+    function AdjustGridSize() {
+        var height = splFullScreenMode.GetPaneByName('GridPane').GetClientHeight(); dxGridViewProducts.SetHeight(height);
+    }
+    function ControlRawMaterial() {
+        if (dxGridViewProducts.GetFocusedRowIndex() != -1) {
+            var id = dxGridViewProducts.GetRowKey(dxGridViewProducts.GetFocusedRowIndex());
+            window.open('@DevExpressHelper.GetUrl(new { Controller = "RawMaterial", Action = "ControlView"})/' + id.toString(), '_blank');
+        }
+    }
+</script>
+
+@Html.Partial("NavpanelPartial")
+@Html.DevExpress().Splitter(settings =>
+{
+    settings.Name = "splFullScreenMode";
+    settings.Orientation = Orientation.Vertical;
+    settings.Styles.Pane.Paddings.Padding = 0;
+    settings.FullscreenMode = true;
+    settings.ClientSideEvents.PaneResized = "function (s, e) { AdjustGridSize(); }";
+    settings.Panes.Add(contentPane =>
+    {
+        contentPane.Panes.Add(actionsPane =>
+        {
+            actionsPane.Name = "actionPane";
+            actionsPane.Size = 270;
+            actionsPane.MinSize = 270;
+            actionsPane.MaxSize = 400;
+            actionsPane.AllowResize = DefaultBoolean.True;
+            actionsPane.ShowCollapseBackwardButton = DefaultBoolean.True;
+            actionsPane.SetContent(() => Html.RenderPartial("ActionsPartial"));
+        });
+        contentPane.Panes.Add(gridPane =>
+        {
+            gridPane.Name = "GridPane";
+            gridPane.SetContent(() => Html.RenderPartial("IndexPartial"));
+        });
+    });
+
+    settings.Panes.Add(footerPane =>
+    {
+        footerPane.Size = 80;
+        footerPane.AllowResize = DefaultBoolean.False;
+        footerPane.ShowSeparatorImage = DefaultBoolean.False;
+        footerPane.SetContent(() => @Html.RenderPartial("FooterPartial"));
+    });
+}).GetHtml()
+            
+@Html.Partial("PopupWindowPartial", new ViewDataDictionary { 
+    { "Title", "Сырье" },
+    { "AutoUpdateGrids", new[] { "dxGridViewProducts" } },
+    { "ShowFooter", true}
+})
+

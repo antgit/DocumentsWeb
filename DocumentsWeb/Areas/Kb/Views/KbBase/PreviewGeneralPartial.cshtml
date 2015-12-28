@@ -1,0 +1,104 @@
+﻿@using BusinessObjects
+@model DocumentsWeb.Areas.Kb.Models.KnowledgeModel
+<table class="edit_form_table2">
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Наименование:";
+                    settings.AssociatedControlName = GlobalPropertyNames.Name;
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = GlobalPropertyNames.Name;
+                    settings.Properties.Style.Font.Bold = true;
+                }).Bind(Model.Name).GetHtml() 
+        </td>
+    </tr>
+        <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                                   {
+                                       settings.Text = "Печать:";
+                                       settings.AssociatedControlName = GlobalPropertyNames.NameFull;
+                                   }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                                   {
+                                       settings.Name = GlobalPropertyNames.NameFull;
+                                       settings.Properties.Style.Font.Bold = true;
+                                   }).Bind(Model.NameFull).GetHtml() 
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Код:";
+                    settings.AssociatedControlName = GlobalPropertyNames.Code;
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = GlobalPropertyNames.Code;
+                    settings.Properties.Style.Font.Bold = true;
+                }).Bind(Model.Code).GetHtml() 
+        </td>
+    </tr>
+    
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Url:";
+                    settings.AssociatedControlName = GlobalPropertyNames.CodeFind;
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().HyperLink(settings =>
+                {
+                    settings.Name = GlobalPropertyNames.CodeFind;
+                    settings.Properties.Style.Font.Bold = true;
+                    settings.Properties.Text = Model.CodeFind;
+                    settings.NavigateUrl = Model.CodeFind;
+                }).GetHtml() 
+        </td>
+    </tr>
+    
+    @if(Model.FileId!=0)
+    {
+            <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings =>
+       {
+           settings.Text = "Файл:";
+       }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().HyperLink(settings =>
+       {
+           settings.Properties.Style.Font.Bold = true;
+           settings.Properties.Text = Model.FileName;
+           settings.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "KbBase", Action = "NavigateTo", Area = "Kb" }) + "?id=" + Model.Id;
+       }).GetHtml() 
+        </td>
+    </tr>
+    }
+
+    <tr>
+        
+        <td colspan="2">
+            <hr /> <b>Описание:</b> <br />                      
+            @Html.DevExpress().Label(settings =>
+                                   {
+                                       settings.Name = GlobalPropertyNames.Memo;
+                                       settings.EncodeHtml = false;
+                                   }).Bind(string.IsNullOrEmpty(Model.Memo)? "<К сожалению описание данной статьи отсутствует!>": Model.Memo).GetHtml() 
+            <hr />
+        </td>
+    </tr>
+</table>

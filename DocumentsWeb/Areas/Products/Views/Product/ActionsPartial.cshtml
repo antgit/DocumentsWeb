@@ -1,0 +1,188 @@
+﻿@using BusinessObjects
+@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentsWeb.Models
+@using DocumentsWeb.Controllers;
+@using DocumentsWeb.Areas.General.Models;
+@{   
+    bool haveCreate = WADataProvider.LibrariesElementRightView.IsAllow(Right.UICREATE, WebModuleNames.WEB_PRODUCTS) && !WADataProvider.CommonRightView.ReadOnly;
+    bool haveEdit = WADataProvider.LibrariesElementRightView.IsAllow(Right.UIEDIT, WebModuleNames.WEB_PRODUCTS) && !WADataProvider.CommonRightView.ReadOnly;
+    bool haveDelete = WADataProvider.LibrariesElementRightView.IsAllow(Right.UITRASH, WebModuleNames.WEB_PRODUCTS) && !WADataProvider.CommonRightView.ReadOnly;
+    bool haveView = WADataProvider.LibrariesElementRightView.IsAllow(Right.UIVIEW, WebModuleNames.WEB_PRODUCTS);
+
+    string helpDefaultLink = string.Empty;
+    if (ViewData.ContainsKey("HelpDefaultLink"))
+    {
+        helpDefaultLink = ViewData["HelpDefaultLink"].ToString();
+    }
+    
+}
+<script src="@Url.Content("~/Scripts/jProductActions.js")" type="text/javascript"></script>
+<div id="divActions" style="width: 100%; height: 100%; overflow: auto;">
+@Html.DevExpress().NavBar(
+nbsettings =>
+{
+    nbsettings.Name = "nbFeatures";
+    nbsettings.AllowExpanding = true;
+    nbsettings.AllowSelectItem = true;
+    nbsettings.AutoCollapse = false;
+    nbsettings.EnableHotTrack = true;
+    nbsettings.EnableAnimation = true;
+    nbsettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    nbsettings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+    nbsettings.EncodeHtml = false;
+    nbsettings.SaveStateToCookies = true;
+    nbsettings.SaveStateToCookiesID = Url.RequestContext.RouteData.Values["controller"] + "Nav";
+
+    nbsettings.Groups.Add(group => {
+        group.Text = "Товары";
+        group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+        group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.CssClass = "navpanellink";
+        group.HeaderImage.Url = Url.Content("~/Images/okey_x16.png");
+        group.HeaderStyle.Font.Bold = true;
+
+        MVCxNavBarItem item = group.Items.Add("Помощь", "mnuActionHelp", "~/Images/INFO_X16.png");
+        item.ToolTip = "Показать справочную информацию";
+        item.Image.Url = "~/Images/INFO_X16.png";
+        if (string.IsNullOrEmpty(helpDefaultLink))
+            item.NavigateUrl = "javascript:alert('Справочная информация отсутствует!');";
+        else
+        {
+            item.Target = "_blank";
+            item.NavigateUrl = helpDefaultLink.StartsWith("~/") ? Url.Content(helpDefaultLink) : helpDefaultLink;
+        }
+        if (haveCreate)
+        {
+            item = group.Items.Add("Создать", "mnuAdd", "~/Images/new_x16.png");
+            item.NavigateUrl = "javascript:ShowPopupEdit(0);";
+            item.ToolTip = "Создать новый товар";
+            
+            
+            item = group.Items.Add("Создать копию", "mnuAddCopy", "~/Images/copy_x16.png");
+            item.NavigateUrl = "javascript:ProductCreateCopy('Product');";
+            item.ToolTip = "Создание копии текущего выделенного в списке товара";
+        }
+        if (haveView)
+        {
+            item = group.Items.Add("Изменить", "mnuPreview", "~/Images/editdoc_x16.png");
+            item.NavigateUrl = "javascript:openProduct('Product');";
+            item.ToolTip = "Просмотр данных о товаре";
+        }
+        if (haveDelete)
+        {
+            item = group.Items.Add("Удалить", "mnuDelete", "~/Images/delete_x16.png");
+            item.NavigateUrl = "javascript:deleteProduct('Product');";
+            item.ToolTip = "Удалить данные о текущем товаре";
+        }
+         
+        item = group.Items.Add("Обновить", "mnuRefresh", "~/Images/refresh_x16.png");
+        item.ToolTip = "Обновить данные в списке товаров. Рекомендуемое действие вместо обновления страницы.";
+        item.NavigateUrl = "javascript:dxGridViewProducts.PerformCallback('refresh=true');";
+
+        if (haveEdit)
+        {
+            item = group.Items.Add();
+            item.SetTemplateContent(s => ViewContext.Writer.Write("<hr>"));
+
+            item = group.Items.Add("Установить состояние \"Активен\"", "mnuStateActive", "~/Images/state_active_x16.png");
+            item.ToolTip = "Установка данного состояния возможная только при текущем состоянии не соответствующего \"Активному\" - например данное действие имеет смысл для требующих корректировки, запрещенных или удаленных товаров";
+            item.NavigateUrl = "javascript:ProductChangeState(1, 'Product');";
+
+            item = group.Items.Add("Требовать корректировки", "mnuStateNeedCorrect", "~/Images/state_needcorrect_x16.png");
+            item.ToolTip = "Установка данного состояния возможная только при текущем состоянии не соответствующего \"Требовующего корректировки\" - например данное действие имеет смысл для ативных товаров, чтобы в дальшейшем откорректировать товар";
+            item.NavigateUrl = "javascript:ProductChangeState(2, 'Product');";
+
+            item = group.Items.Add("\"Запрещен\"", "mnuStateBan", "~/Images/state_ban_x16.png");
+            item.ToolTip = "Установка данного состояния возможная только при текущем состоянии не соответствующего \"Запрещеному\" - например данное действие имеет смысл для для блокировки товара по каким-либо причинам";
+            item.NavigateUrl = "javascript:ProductChangeState(4, 'Product');";
+        }
+    });
+
+    nbsettings.Groups.Add(group =>
+    {
+        group.Text = "Иерархия";
+        group.Expanded = false;
+        group.HeaderImage.Url = Url.Content("~/Images/filter_nodes_x16.png");
+        group.SetContentTemplateContent(content =>
+        {
+            CoreController<Product> controller = (CoreController<Product>)ViewContext.Controller;
+            Html.RenderAction("GridFilterPartial", new
+            {
+                Area = "General",
+                Controller = "Hierarchy",
+                RootList = HierarchyModel.GetLinkedHierarchies(controller.RootHierachy, HierarchyModel.FILTER_HIERARCHY_CHAIN).Select(s => s.Code).ToArray(),
+                GridName = "dxGridViewProducts",
+                GridController = "Product",
+                GridAction = "IndexPartial",
+                Model = Model
+            });
+        });
+    });
+
+    nbsettings.Groups.Add(group => {
+        group.Text = "Фильтр";
+        group.Expanded = false;
+        group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.HoverStyle.Font.Bold = true;
+        group.ItemStyle.HoverStyle.Font.Underline = true;
+        group.ItemStyle.SelectedStyle.Font.Bold = true;
+        group.HeaderImage.Url = Url.Content("~/Images/filter_x16.png");
+
+        MVCxNavBarItem item = group.Items.Add("Только активные", "mnuFilterActive", "~/Images/filter_state_active_x16.png");
+        item.ToolTip = "Отображать в списке только активные данные";
+        item.NavigateUrl = "javascript:ShowOnlyActive();";
+        
+        item = group.Items.Add("Требующие корректировки", "mnuFilterCorrect", "~/Images/filter_state_needcorrect_x16.png");
+        item.ToolTip = "Отображать в списке только требующие корректировки данные";
+        item.NavigateUrl = "javascript:ShowOnlyNotDone();";
+        
+        item = group.Items.Add("Только запрещенные", "mnuFilterBan", "~/Images/filter_state_ban_x16.png");
+        item.ToolTip = "Отображать в списке только требующие запрещенные данные";
+        item.NavigateUrl = "javascript:ShowOnlyDenyed();";
+        
+        item = group.Items.Add("Корзина", "mnuFilterDeleted", "~/Images/filter_state_deleted_x16.png");
+        item.ToolTip = "Отображать в списке только удаленные данные";
+        item.NavigateUrl = "javascript:ShowOnlyDeleted();";
+    });
+    nbsettings.Groups.Add(group =>
+    {
+        group.Text = "Отчеты";
+        group.Expanded = false;
+        group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+        group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.CssClass = "navpanellink";
+        group.HeaderImage.Url = Url.Content("~/Images/REPORT_X16.png");
+
+        MVCxNavBarItem item = group.Items.Add("Microsoft Excel", "mnuExportToXLSX", "~/Images/FILEEXCEL_X16.png");
+        item.ToolTip = "Экспорт списка товаров в Microsoft Excel";
+        item.NavigateUrl = DevExpressHelper.GetUrl(new {Controller = "Product", Action = "ExportTo", type = "XLSX", subtype = Url.RequestContext.RouteData.Values["action"]});
+        
+        item = group.Items.Add("Adobe PDF", "mnuExportToPDF", "~/Images/FILEPDF_X16.png");
+        item.ToolTip = "Экспорт списка товаров в Adobe PDF";
+        item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "Product", Action = "ExportTo", type = "PDF", subtype = Url.RequestContext.RouteData.Values["action"] });
+
+        if (WADataProvider.HiearchyElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_REPORTS))
+        {
+            item = group.Items.Add("Перейти в отчеты...", "mnuReportNavToReportsMain", "~/Images/arrowgreen.png");
+            item.ToolTip = "Перейти в раздел отчетов...";
+            item.NavigateUrl = Url.Action("Index", new { area = "Reports", Controller = "Report" });
+        }
+    });
+    nbsettings.Groups.Add(group =>
+    {
+        group.Text = "Сервис";
+        group.Name = "grpSettings";
+        group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+        group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.Expanded = false;
+        group.HeaderImage.Url = Url.Content("~/Images/settings_x16.png");
+
+        group.SetContentTemplateContent(c => Html.RenderPartial("SettingsPartial", new ViewDataDictionary { { "GridName", "dxGridViewProducts" } }));
+    });
+}).GetHtml()
+</div>

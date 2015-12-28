@@ -1,0 +1,188 @@
+﻿@using BusinessObjects
+@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentsWeb.Models
+@using DocumentsWeb.Areas.Agents.Models
+@using DocumentsWeb.Areas.Analitics.Models
+@using DocumentsWeb.Controllers
+@using DocumentsWeb.Areas.General.Models
+@model ClientModel
+
+@{
+    bool haveEdit = !Model.IsReadOnly && WADataProvider.LibrariesElementRightView.IsAllow(Right.UIEDIT, WebModuleNames.WEB_BANKS) && !WADataProvider.CommonRightView.ReadOnly;
+}
+
+<table style="width:600px;">
+        
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+       {
+           s.ControlStyle.CssClass = "label";
+           s.Text = "Мфо:";
+           s.AssociatedControlName = GlobalPropertyNames.Mfo;
+       }).GetHtml()
+        </td><td colspan="3">
+         @Html.DevExpress().TextBox(s =>
+        {
+            s.Name = GlobalPropertyNames.Mfo;
+            s.ReadOnly = !haveEdit;
+            if (!s.ReadOnly)
+            {
+                s.Properties.NullText = "Мфо банка...";
+                s.Properties.NullTextStyle.ForeColor = System.Drawing.Color.Red;
+            }
+            s.ControlStyle.CssClass = "editor";
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.ShowModelErrors = true;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.Mfo).GetHtml()
+        </td></tr>
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+       {
+           s.ControlStyle.CssClass = "label";
+           s.Text = "Номер лицензии:";
+           s.ToolTip = "Номер банковской лицензии:";
+           s.AssociatedControlName = GlobalPropertyNames.LicenseNo;
+       }).GetHtml()
+            </td><td>
+                     @Html.DevExpress().TextBox(s =>
+                         {
+                             s.Name = GlobalPropertyNames.LicenseNo;
+                             s.ReadOnly = !haveEdit;
+                             if (!s.ReadOnly)
+                             {
+                                 s.Properties.NullText = "Номер банковской лицензии...";
+                             }
+                             s.ControlStyle.CssClass = "editor";
+                             s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                             s.ShowModelErrors = true;
+                             s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                             s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                         }).Bind(Model.LicenseNo).GetHtml()
+                 </td>
+        <td class="table_label">
+        @Html.DevExpress().Label(s =>
+       {
+           s.ControlStyle.CssClass = "label";
+           s.Text = "Дата банковской лицензии:";
+           s.AssociatedControlName = GlobalPropertyNames.LicenseDate;
+       }).GetHtml()
+        </td><td>
+        @Html.DevExpress().DateEdit(s =>
+   {
+       s.Name = GlobalPropertyNames.LicenseDate;
+       s.ReadOnly = !haveEdit;
+       if (!s.ReadOnly)
+       {
+           s.Properties.NullText = "Дата банковской лицензии...";
+       }
+       s.ControlStyle.CssClass = "editor";
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+       s.ShowModelErrors = true;
+       s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+       s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+   }).Bind(Model.LicenseDate).GetHtml()
+        </td>
+        </tr>
+
+            
+       <tr><td class="table_label">
+            @Html.DevExpress().Label(s =>
+       {
+           s.ControlStyle.CssClass = "label";
+           s.Text = "№ свидетельства регистрации НБУ:";
+           s.ToolTip = "Номер свидетельства регистрации НБУ";
+           s.AssociatedControlName = GlobalPropertyNames.SertificateNo;
+       }).GetHtml()
+           </td><td>
+                    @Html.DevExpress().TextBox(s =>
+                        {
+                            s.Name = GlobalPropertyNames.SertificateNo;
+                            s.ReadOnly = !haveEdit;
+                            if (!s.ReadOnly)
+                            {
+                                s.Properties.NullText = "Номер свидетельства регистрации НБУ...";
+                            }
+                            s.ControlStyle.CssClass = "editor";
+                            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                            s.ShowModelErrors = true;
+                            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                        }).Bind(Model.SertificateNo).GetHtml()
+                </td>
+                
+                <td class="table_label">
+             @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Дата свидетельства регистрации НБУ:";
+            s.AssociatedControlName = GlobalPropertyNames.SertificateDate;
+        }).GetHtml()
+           </td><td>
+                     @Html.DevExpress().DateEdit(s =>
+                {
+                    s.Name = GlobalPropertyNames.SertificateDate;
+                    s.ReadOnly = !haveEdit;
+                    if (!s.ReadOnly)
+                    {
+                        s.Properties.NullText = "Дата свидетельства регистрации НБУ...";
+                    }
+                    s.ControlStyle.CssClass = "editor";
+                    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    s.ShowModelErrors = true;
+                    s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                    s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                }).Bind(Model.SertificateDate).GetHtml()
+                </td>
+       </tr>    
+       
+               <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+   {
+       s.ControlStyle.CssClass = "label";
+       s.Text = "Корреспондентский счет:";
+       s.AssociatedControlName = GlobalPropertyNames.CorrBankAccount;
+   }).GetHtml()
+        </td><td colspan="3">
+            @Html.DevExpress().TextBox(s =>
+       {
+           s.Name = GlobalPropertyNames.CorrBankAccount;
+           s.ReadOnly = !haveEdit;
+           if (!s.ReadOnly)
+           {
+               s.Properties.NullText = "Корреспондентский счет...";
+           }
+           s.ControlStyle.CssClass = "editor";
+           s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+           s.ShowModelErrors = true;
+           s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+           s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+       }).Bind(Model.CorrBankAccount).GetHtml()
+             </td></tr> 
+             <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+   {
+       s.ControlStyle.CssClass = "label";
+       s.Text = "S.W.I.F.T.:";
+       s.AssociatedControlName = GlobalPropertyNames.Swift;
+   }).GetHtml()
+        </td><td colspan="3">
+            @Html.DevExpress().TextBox(s =>
+        {
+            s.Name = GlobalPropertyNames.Swift;
+            s.ReadOnly = !haveEdit;
+            if (!s.ReadOnly)
+            {
+                s.Properties.NullText = "SWIFT...";
+            }
+            s.ControlStyle.CssClass = "editor";
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.ShowModelErrors = true;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.Swift).GetHtml()
+             </td></tr>     
+        </table>

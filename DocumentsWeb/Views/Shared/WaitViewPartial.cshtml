@@ -1,0 +1,14 @@
+﻿@{
+    string elementAt = ViewData["elementAt"]==null? string.Empty: (string)ViewData["elementAt"];
+    
+}
+
+@Html.DevExpress().LoadingPanel(
+        settings => {
+            settings.Name = "LoadingPanel";
+            settings.Modal = true;
+            settings.ContainerElementID = string.IsNullOrEmpty(elementAt) ? string.Empty: elementAt ;//IsDisplayedOverPanel ? "Panel" : "";
+            
+        }
+    ).GetHtml()
+

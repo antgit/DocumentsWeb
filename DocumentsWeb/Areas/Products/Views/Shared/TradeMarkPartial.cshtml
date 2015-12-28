@@ -1,0 +1,40 @@
+﻿@using BusinessObjects;
+@using DocumentsWeb.Areas.Analitics.Models;
+@using DocumentsWeb.Areas.Products.Models
+@using DocumentsWeb.Models
+@model ProductModel
+
+@Html.DevExpress().ComboBox(s =>
+{
+    s.Name = GlobalPropertyNames.TradeMarkId;
+    s.CallbackRouteValues = new { Controller = Url.RequestContext.RouteData.Values["controller"], Action = "TradeMarkPartial", modelId = Model.ModelId };
+    s.Properties.EnableCallbackMode = true;
+    s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+    if(!s.ReadOnly)
+    {
+        s.ToolTip = ProductData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.TradeMarkId);
+    }
+    s.ControlStyle.CssClass = "editor";
+    s.ShowModelErrors = true;
+    s.Properties.ValueField = GlobalPropertyNames.Id;
+    s.Properties.TextField = GlobalPropertyNames.Name;
+    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    s.Properties.ValueType = typeof(int);
+    s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+    s.Properties.FilterMinLength = 2;
+    s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+
+    EditButton b = s.Properties.Buttons.Add();
+    b.Image.Url = "~/Images/search_x10.png";
+    b.ToolTip = "Поиск";
+
+    s.Properties.TextFormatString = "{0}";
+    s.Properties.DropDownWidth = 400;
+    s.Properties.Columns.Add("Name", "Имя");
+    if (WADataProvider.CurrentUserCompanyMultyCount())
+    {
+        s.Properties.Columns.Add("MyCompanyName", "Компания-владелец", 150);
+    }
+    s.Properties.ClientSideEvents.ButtonClick = "function(s, e) { switch(e.buttonIndex) { case 0: AnaliticsFinderTradeMark.Show(); break; } }";
+}).BindList(AnaliticModel.GetTradeMarkByRange, AnaliticModel.GetAnaliticById).Bind(Model.TradeMarkId == 0 ? null : (int?)Model.TradeMarkId).GetHtml()

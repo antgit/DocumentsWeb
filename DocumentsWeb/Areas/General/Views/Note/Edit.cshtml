@@ -1,0 +1,122 @@
+﻿@using DevExpress.Web.Mvc.UI
+@using DevExpress.Web.ASPxEditors
+@using DevExpress.Web.ASPxClasses
+@model DocumentsWeb.Areas.General.Models.NoteModel
+           
+<table class="edit_form_table2">
+    <tr>
+        <td colspan="4">
+            @Html.DevExpress().Button(btnSettings =>
+            {
+                btnSettings.Name = "btnUpdate";
+                btnSettings.ControlStyle.CssClass = "button";
+                btnSettings.Text = "Сохранить";
+                btnSettings.ClientSideEvents.Click = "function(s, e){ gvNotes.UpdateEdit(); }";
+            }).GetHtml()
+        
+            @Html.DevExpress().Button(btnSettings =>
+            {
+                btnSettings.Name = "btnCancelEdit";
+                btnSettings.ControlStyle.CssClass = "button";
+                btnSettings.Text = "Отмена";
+                btnSettings.ClientSideEvents.Click = "function(s, e){ gvNotes.CancelEdit(); }";
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Тема:";
+                settings.AssociatedControlName = "NoteName";
+            }).GetHtml()
+        </td>
+        <td colspan="3">
+            @Html.DevExpress().TextBox(settings =>
+            {
+                settings.Name = "NoteName";
+                settings.ShowModelErrors = true;
+                settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.NoteName).GetHtml()
+        </td>
+    </tr>
+    @*<tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Признак:";
+                settings.AssociatedControlName = "NoteCode";
+            }).GetHtml()
+        </td>
+        <td colspan="3">
+            @Html.DevExpress().TextBox(settings =>
+            {
+                settings.Name = "NoteCode";
+                settings.ShowModelErrors = true;
+                settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.NoteName).GetHtml()
+        </td>
+    </tr>*@
+    @*<tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Дата:";
+                settings.AssociatedControlName = "NoteDate";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().DateEdit(settings =>
+            {
+                settings.Name = "NoteDate";
+                settings.Properties.NullText = "Введите дату...";
+                settings.Width = 100;
+                settings.ShowModelErrors = true;
+                //settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.NoteDate).GetHtml()
+        </td>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Номер:";
+                settings.AssociatedControlName = "NoteOrderNo";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().SpinEdit(settings =>
+            {
+                settings.Name = "NoteOrderNo";
+                settings.ShowModelErrors = true;
+                //settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.NoteOrderNo).GetHtml()
+        </td>
+    </tr>*@
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Text = "Примечание:";
+                settings.AssociatedControlName = "NoteMemo";
+            }).GetHtml()
+        </td>
+        <td colspan="3">
+            @Html.DevExpress().Memo(settings =>
+            {
+                settings.Name = "NoteMemo";
+                settings.ShowModelErrors = true;
+                settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                settings.Height = 50;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.NoteMemo).GetHtml()
+        </td>
+    </tr>
+</table>

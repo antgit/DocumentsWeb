@@ -1,0 +1,411 @@
+﻿@using System.Web.UI.WebControls
+@using DocumentsWeb.Areas.Kb.Models
+@using DocumentsWeb.Areas.UserPersonal.Models
+<table>
+    <tr>
+        <td style="width:200px">
+            @if (Model.GetWorker() != null)
+            {
+                if (Model.HasPhoto)
+                {
+                    Html.DevExpress().BinaryImage(
+                        imageSettings =>
+                            {
+                                imageSettings.Name = "Photo" + DataBinder.Eval(Model, "Id");
+                                imageSettings.Width = 48;
+                                imageSettings.Height = 48;
+                            }).Bind(Model.Photo).GetHtml();
+                }
+            else
+                 {
+                    <img src = "@Url.Content("~/Images/" + Model.Avatar)" alt="Photo"/><br />     
+                 }
+                
+                <table>
+                    <tr><td><b>Фамилия:</b></td><td>@Model.GetWorker().FirstName</td></tr>
+                    <tr><td><b>Имя:</b></td><td>@Model.GetWorker().LastName</td></tr>
+                    <tr><td style="vertical-align:top"><b>Отчество:</b></td><td>@Model.GetWorker().MidleName</td></tr>
+                    <tr><td>Пользователь:</td><td>@Model.Name</td></tr>
+                    <tr><td style="vertical-align:top">Компания:</td><td>@Model.CompanyDefaultName</td></tr>
+                    <tr><td>E-mail:</td><td><a href="mailto:@Model.Email">@Model.Email</a></td></tr>
+                    @if (!Model.IsReadOnly)
+                    {
+                        <tr><td colspan="2">
+                                @Html.DevExpress().HyperLink(s =>
+                                    {
+                                        s.NavigateUrl = string.Format("javascript:ShowPopupEdit({0});", Model.Id);
+                                        s.Properties.Text = "Редактировать личные данные";
+                                    }).GetHtml()
+                            
+                            </td></tr>
+                    }
+                </table> 
+            }
+            else
+            {
+                <p>Персональная информация отсутствует</p>
+            }
+            <hr />
+        </td>
+        <td style="vertical-align:top">
+            <div style=" float: left">
+                <b>Быстрый переход:</b><br />
+                @Html.DevExpress().TreeView(tvsettings =>
+                    {
+                        tvsettings.Name = "tvFeautures";
+                        //tvsettings.AllowCheckNodes = true;                            
+                        //tvsettings.AllowSelectNode = true;
+                        tvsettings.CheckNodesRecursive = true;
+                        tvsettings.EnableAnimation = true;
+                        tvsettings.EnableHotTrack = true;
+                        tvsettings.ShowTreeLines = true;
+                        tvsettings.ShowExpandButtons = true;
+                        tvsettings.Width = 140;
+
+                        tvsettings.Nodes.Add(node =>
+                            {
+                                node.Name = "Messages";
+                                node.Text = "Сообщения";
+                                node.ToolTip = "Переход в модуль работы с сообщениями";
+                                node.Image.Url = "~/Images/balloon.png";
+                                node.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "ViewListUserMessage", Action = "Index" });
+
+                            });
+                        tvsettings.Nodes.Add(node =>
+                            {
+                                node.Name = "Contacts";
+                                node.Text = "Контакты";
+                                node.ToolTip = "Управление моими учетными записями";
+                                node.Image.Url = "~/Images/address-book.png";
+                                node.NavigateUrl = "javascript:alert('Данный функционал находится в разработке')";
+                                //node.NavigateUrl = "~/UserPersonal/Home/UserPage/" + node.Name;                              
+                            });
+                        tvsettings.Nodes.Add(node =>
+                            {
+                                node.Name = "Tasks";
+                                node.Text = "Задачи";
+                                node.ToolTip = "Управление, создание и контроль задач";
+                                node.Image.Url = "~/Images/TASK_X16.png";
+                                node.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Kb", Controller = "ViewListTask", Action = "Index" });
+                            });
+                        tvsettings.Nodes.Add(node =>
+                            {
+                                node.Name = "Files";
+                                node.Text = "Файлы";
+                                node.ToolTip = "Мои личные файлы";
+                                node.Image.Url = "~/Images/folder-open-document-text.png";
+                                node.NavigateUrl = "javascript:alert('Данный функционал находится в разработке')";
+                                //node.NavigateUrl = "~/UserPersonal/Home/UserPage/" + node.Name;
+                            });
+                        tvsettings.Nodes.Add(node =>
+                            {
+                                node.Name = "Events";
+                                node.Text = "Мероприятия";
+                                node.ToolTip = "Календари, управление рабочим временем";
+                                node.Image.Url = "~/Images/calendar.png";
+                                node.NavigateUrl = "javascript:alert('Данный функционал находится в разработке')";
+                                //node.NavigateUrl = "~/UserPersonal/Home/UserPage/" + node.Name;                               
+                            });
+
+                        tvsettings.ClientSideEvents.NodeClick = "function(){}";
+
+                        tvsettings.PreRender = (source, e) =>
+                            {
+                                ASPxTreeView treeView = (ASPxTreeView)source;
+                                treeView.ExpandToDepth(1);
+                                //TreeViewNode selNode = treeView.Nodes.FindByName(ViewData["SelectedNodeName"].ToString());
+                                //treeView.SelectedNode = selNode;
+                            };
+                    }).GetHtml()
+                </div>
+            <!-- Список разделов документов доступных поользователю -->
+            <div style=" float:left; width:250px; vertical-align:top; margin-left:25px;">
+                <b>Мои разделы:</b><br />
+                @foreach (var mySection in DocumentsWeb.Areas.UserPersonal.Controllers.HomeController.GetMySections())
+                                                    {
+                                                        Html.DevExpress().HyperLink(linkSettings =>
+                                                        {
+                                                            linkSettings.NavigateUrl = DevExpressHelper.GetUrl(new { Area = DataBinder.Eval(mySection, "NavigateUrl"), Controller = "Home", Action = "Index" });
+                                                            linkSettings.ToolTip = "Перейти в раздел";
+                                                            linkSettings.Properties.Text = (string)DataBinder.Eval(mySection, "Name");
+
+                                                        }).Render();
+                                                        ViewContext.Writer.Write("<br/>");
+                                                    }
+                @*@Html.Partial("ViewMySectionsPanel")*@
+            </div>
+        </td>
+        <td rowspan="2" style="width:500px; vertical-align:top">
+            <!-- Список примечаний поользователю -->
+            @Html.Partial("~/Areas/UserPersonal/Views/UserNote/ViewMyNotes.cshtml", new { area = "UserPersonal", controller = "UserNote" })
+        </td>
+
+    </tr>
+    <tr>
+        <td colspan="2" >
+        <div id="LastNewsValues"></div>
+
+        @Html.Partial("~/Areas/Kb/Views/ViewListNews/LastFiveNews.cshtml", new { area = "Kb", controller = "ViewListNews", Action = "LastFiveNews" })
+        
+        @Html.DevExpress().GridView(gs =>
+                                        {
+                                            gs.Name = "gvLastMessageIncome2";
+                                            gs.KeyFieldName = "Id";
+                                            gs.Width = Unit.Percentage(100);
+                                            gs.Height = Unit.Percentage(100);
+                                            gs.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+                                            gs.Settings.ShowVerticalScrollBar = true;
+                                            gs.Settings.VerticalScrollableHeight = WebMessageModel.GetIncomingMessagesCount() > 0 ? 150 : 100;
+                                            gs.CallbackRouteValues = new { area = "UserPersonal", Controller = "UserMessage", Action = "FastViewIncommingPartial" };
+                                            gs.SettingsBehavior.AllowFocusedRow = true;
+                                            gs.Styles.Cell.Font.Size = FontUnit.Point(11);
+                                            gs.Styles.Cell.Paddings.Padding = Unit.Pixel(2);
+                                            gs.Styles.Cell.VerticalAlign = VerticalAlign.Top;
+
+                                            gs.Settings.ShowFilterRow = false;
+                                            gs.Settings.ShowHorizontalScrollBar = true;
+                                            gs.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+                                            gs.Styles.AlternatingRow.Enabled = DefaultBoolean.True;
+                                            gs.Settings.ShowColumnHeaders = WebMessageModel.GetIncomingMessagesCount() > 0;
+                                            gs.Settings.ShowTitlePanel = true;
+                                            gs.SetTitlePanelTemplateContent(s =>
+                                            {
+                                                ViewContext.Writer.Write("<div style=\"width: 100%; text-align: center; font-size: 10pt;\">");
+                                                @Html.DevExpress().HyperLink(hl =>
+                                                {
+                                                    hl.Properties.ImageUrl = Url.Content("~/Images/balloon.png");
+                                                    hl.ToolTip = "Последнии сообщения в моем ящике, которые требуют обязательного прочтения но еще не прочитанные";
+                                                    hl.Style.Add("float", "left");
+                                                    hl.NavigateUrl = Url.Action("Index", new { area = "Kb", controller = "ViewListUserMessage", action = "Index" });
+                                                }).Render();
+
+                                                Html.DevExpress().HyperLink(set =>
+                                                {
+                                                    set.Style.Add("float", "left");
+                                                    set.Style.Add("margin-left", "5px");
+
+                                                    set.NavigateUrl = Url.Action("Index", new { area = "UserPersonal", controller = "ViewListUserMessage", action = "Index" });
+                                                    set.Properties.Text = "Последнии сообщения...";
+                                                    set.ToolTip = "Последнии сообщения в моем ящике, которые требуют обязательного прочтения но еще не прочитанные";
+
+                                                }).Render();
+
+                                                ViewContext.Writer.Write("</div>");
+                                            });
+                                            gs.SetEmptyDataRowTemplateContent(s => @Html.DevExpress().HyperLink(set =>
+                                            {
+                                                set.NavigateUrl = Url.Action("Index", new { area = "UserPersonal", controller = "ViewListUserMessage", action = "Index" });
+                                                set.Properties.Text = "У вас нет новых, непрочтенных сообщений";
+                                            }).GetHtml());
+
+                                            MVCxGridViewColumn colDate = gs.Columns.Add("SendDate", "Дата");
+                                            colDate.Width = 70;
+                                            colDate.PropertiesEdit.DisplayFormatString = "d";
+                                            colDate.CellStyle.VerticalAlign = VerticalAlign.Top;
+                                            colDate.ColumnType = MVCxGridViewColumnType.DateEdit;
+
+                                            MVCxGridViewColumn colTime = gs.Columns.Add("SendTimeString", "Время");
+                                            colTime.Width = 90;
+                                            colTime.CellStyle.VerticalAlign = VerticalAlign.Top;
+
+                                            MVCxGridViewColumn colWorkerSenderName = gs.Columns.Add("WorkerSenderName", "Отправитель");
+                                            colWorkerSenderName.Width = 150;
+                                            colWorkerSenderName.CellStyle.VerticalAlign = VerticalAlign.Top;
+                                            gs.Columns.Add(cc =>
+                                                {
+                                                    cc.Name = "colName";
+                                                    cc.FieldName = "Name";
+                                                    cc.Caption = "Наименование";
+                                                    //cc.FixedStyle = GridViewColumnFixedStyle.Left;
+                                                    cc.Settings.AllowDragDrop = DefaultBoolean.False;
+                                                    cc.Settings.AllowSort = DefaultBoolean.False;
+                                                    cc.Width = 150;
+                                                    cc.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+                                                    cc.CellStyle.VerticalAlign = VerticalAlign.Top;
+                                                    cc.SetDataItemTemplateContent(c => Html.DevExpress().HyperLink(linkSettings =>
+                                                        {
+                                                            linkSettings.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "UserPersonal", Controller = "UserMessage", Action = "Edit", Id = DataBinder.Eval(c.DataItem, "Id") });
+                                                            linkSettings.Properties.Target = "_blank";
+                                                            linkSettings.ToolTip = "Просмотреть сообщение";
+                                                            linkSettings.Properties.Text = (string)DataBinder.Eval(c.DataItem, "Name");
+
+                                                        }).Render());
+                                                });
+                                        }).Bind(WebMessageModel.GetLastIncomingMessages()).GetHtml()
+            @*            @Html.DevExpress().RoundPanel(
+                settings =>
+                    {
+                        settings.Name = "rpLastMessages";
+                        settings.HeaderText = "Последнии сообщения";
+                        settings.ToolTip = "Последнии сообщения в моем ящике, которые требуют обязательного прочтения но еще не прочитанные";
+                        settings.HeaderNavigateUrl = DevExpressHelper.GetUrl(new { Controller = "ViewListUserMessage", Action = "Index" });
+                        settings.HeaderImage.Url = "~/Images/balloon.png";
+                        settings.ShowHeader = true;
+                        settings.ControlStyle.CssClass = "navigator_item";
+                        settings.Width = Unit.Percentage(100);
+                        settings.ContentHeight = MessageModel.GetIncomingMessagesCount() > 0 ? 115 : 25;
+                        settings.PreRender = (sender, e) =>
+                            {
+                                MVCxRoundPanel panel = (MVCxRoundPanel)sender;
+                                panel.ContentPaddings.PaddingLeft = 0;
+                                panel.ContentPaddings.PaddingTop = 0;
+                                panel.ContentPaddings.PaddingRight = 0;
+                                panel.ContentPaddings.PaddingBottom = 0;
+                            };
+                        settings.SetContent(() =>
+                            {
+                                if (MessageModel.GetIncomingMessagesCount() > 0)
+                                {
+                                    @Html.DevExpress().GridView(gs =>
+                                        {
+                                            gs.Name = "gvLastMessageIncome2";
+                                            gs.KeyFieldName = "Id";
+                                            gs.Width = Unit.Percentage(100);
+                                            gs.Height = Unit.Percentage(100);
+                                            gs.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+                                            gs.Settings.ShowVerticalScrollBar = true;
+                                            gs.Settings.VerticalScrollableHeight = 200;
+                                            gs.CallbackRouteValues = new { area = "UserPersonal", Controller = "UserMessage", Action = "FastViewIncommingPartial" };
+                                            gs.SettingsBehavior.AllowFocusedRow = true;
+                                            gs.Styles.Cell.Font.Size = FontUnit.Point(11);
+                                            gs.Styles.Cell.Paddings.Padding = Unit.Pixel(2);
+                                            gs.Styles.Cell.VerticalAlign = VerticalAlign.Top;
+
+                                            gs.Settings.ShowFilterRow = true;
+                                            gs.Settings.ShowHorizontalScrollBar = true;
+                                            gs.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+                                            gs.Styles.AlternatingRow.Enabled = DefaultBoolean.True;
+
+
+                                            MVCxGridViewColumn colDate = gs.Columns.Add("SendDate", "Дата");
+                                            colDate.Width = 70;
+                                            colDate.PropertiesEdit.DisplayFormatString = "d";
+                                            colDate.CellStyle.VerticalAlign = VerticalAlign.Top;
+                                            colDate.ColumnType = MVCxGridViewColumnType.DateEdit;
+
+                                            MVCxGridViewColumn colTime = gs.Columns.Add("SendTimeString", "Время");
+                                            colTime.Width = 90;
+                                            colTime.CellStyle.VerticalAlign = VerticalAlign.Top;
+
+                                            MVCxGridViewColumn colWorkerSenderName = gs.Columns.Add("WorkerSenderName", "Отправитель");
+                                            colWorkerSenderName.Width = 150;
+                                            colWorkerSenderName.CellStyle.VerticalAlign = VerticalAlign.Top;
+                                            gs.Columns.Add(cc =>
+                                                {
+                                                    cc.Name = "colName";
+                                                    cc.FieldName = "Name";
+                                                    cc.Caption = "Наименование";
+                                                    //cc.FixedStyle = GridViewColumnFixedStyle.Left;
+                                                    cc.Settings.AllowDragDrop = DefaultBoolean.False;
+                                                    cc.Settings.AllowSort = DefaultBoolean.False;
+                                                    cc.Width = 150;
+                                                    cc.CellStyle.HorizontalAlign = HorizontalAlign.Left;
+                                                    cc.CellStyle.VerticalAlign = VerticalAlign.Top;
+                                                    cc.SetDataItemTemplateContent(c => Html.DevExpress().HyperLink(linkSettings =>
+                                                        {
+                                                            linkSettings.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "UserPersonal", Controller = "UserMessage", Action = "Edit", Id = DataBinder.Eval(c.DataItem, "Id") });
+                                                            linkSettings.Properties.Target = "_blank";
+                                                            linkSettings.ToolTip = "Просмотреть сообщение";
+                                                            linkSettings.Properties.Text = (string)DataBinder.Eval(c.DataItem, "Name");
+
+                                                        }).Render());
+                                                });
+                                        }).Bind(MessageModel.GetLastIncomingMessages()).GetHtml();
+                                }
+                                else
+                                {
+                                    @Html.DevExpress().HyperLink(s =>
+                                        {
+                                            s.Name = "hyperLinkGotoShowNewMessage2";
+                                            s.NavigateUrl = "~/UserPersonal/ViewListUserMessage";
+                                            s.Properties.Text = "У вас нет новых, непрочтенных сообщений";
+                                        }).GetHtml();
+                                }
+                            }
+                            );
+                    }).GetHtml()*@
+            
+            @Html.Partial("~/Areas/Kb/Views/ViewListTask/FastViewIncomeTask.cshtml", new { area = "Kb", controller = "ViewListTask" })
+            @*           @Html.DevExpress().RoundPanel(
+                settings =>
+                    {
+                        settings.Name = "rpLastTask";
+                        settings.HeaderText = "Незавершенные задачи";
+                        settings.ToolTip = "Задачи назначенные мне для выполнения";
+                        settings.HeaderNavigateUrl = DevExpressHelper.GetUrl(new { Controller = "ViewListTask", Action = "Index" });
+                        settings.HeaderImage.Url = "~/Images/TASK_X16.png";
+                        settings.ShowHeader = true;
+                        settings.ControlStyle.CssClass = "navigator_item";
+                        settings.Width = Unit.Percentage(100);
+                        settings.ContentHeight = TaskModel.GetIncomingTaskCount() > 0 ? 115 : 25;
+                        settings.PreRender = (sender, e) =>
+                            {
+                                MVCxRoundPanel panel = (MVCxRoundPanel)sender;
+                                panel.ContentPaddings.PaddingLeft = 0;
+                                panel.ContentPaddings.PaddingTop = 0;
+                                panel.ContentPaddings.PaddingRight = 0;
+                                panel.ContentPaddings.PaddingBottom = 0;
+                            };
+                        settings.SetContent(() =>
+                            {
+                                if (TaskModel.GetIncomingTaskCount() > 0)
+                                {
+                                    Html.RenderPartial("~/Areas/Kb/Views/ViewListTask/FastViewIncomeTask.cshtml", new { area = "Kb", controller = "ViewListTask" });
+                                }
+                                else
+                                {
+                                    @Html.DevExpress().HyperLink(s =>
+                                        {
+                                            s.Name = "hyperLinkGotoNewTask2";
+                                            s.NavigateUrl = "~/Kb/ViewListTask";
+                                            s.Properties.Text = "У вас нет новых, незавершенных задач";
+                                        }).GetHtml();
+                                }
+                            }
+                            );
+                    }).GetHtml()*@
+                    @Html.Partial("~/Areas/Kb/Views/ViewListTask/FastViewOutcomeTask.cshtml", new { area = "Kb", controller = "ViewListTask" })
+@*            @Html.DevExpress().RoundPanel(
+                settings =>
+                    {
+                        settings.Name = "rpLastOutcomeTask";
+                        settings.HeaderText = "Задачи на контроле";
+                        settings.ToolTip = "Задачи поставленные мною для исполнения";
+                        settings.HeaderNavigateUrl = DevExpressHelper.GetUrl(new { Controller = "ViewListTask", Action = "Index" });
+                        settings.HeaderImage.Url = "~/Images/TASK_X16.png";
+                        settings.ShowHeader = true;
+                        settings.ControlStyle.CssClass = "navigator_item";
+                        settings.Width = Unit.Percentage(100);
+                        settings.ContentHeight = TaskModel.GetOutcommingTaskCount() > 0 ? 115 : 25;
+                        settings.PreRender = (sender, e) =>
+                            {
+                                MVCxRoundPanel panel = (MVCxRoundPanel)sender;
+                                panel.ContentPaddings.PaddingLeft = 0;
+                                panel.ContentPaddings.PaddingTop = 0;
+                                panel.ContentPaddings.PaddingRight = 0;
+                                panel.ContentPaddings.PaddingBottom = 0;
+                            };
+                        settings.SetContent(() =>
+                            {
+                                if (TaskModel.GetOutcommingTaskCount() > 0)
+                                {
+                                    Html.RenderPartial("~/Areas/Kb/Views/ViewListTask/FastViewOutcomeTask.cshtml", new { area = "Kb", controller = "ViewListTask" });
+                                }
+                                else
+                                {
+                                    @Html.DevExpress().HyperLink(s =>
+                                        {
+                                            s.Name = "hyperLinkGotoOutcomeTask2";
+                                            s.NavigateUrl = "~/Kb/ViewListTask";
+                                            s.Properties.Text = "У вас нет задач на контроле";
+                                        }).GetHtml();
+                                }
+                            }
+                            );
+                    }).GetHtml()*@
+        </td>
+        <td style="vertical-align:top">
+            
+        </td>
+    </tr>
+</table>

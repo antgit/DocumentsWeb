@@ -1,0 +1,29 @@
+﻿@using BusinessObjects
+@using DocumentsWeb.Areas.Admins.Models
+@model DocumentsWeb.Models.UserModel
+
+
+@Html.DevExpress().ComboBox(s =>
+{
+    s.Name = GlobalPropertyNames.EmployerId;
+    s.ControlStyle.CssClass = "editor";
+    s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.EmployerId);
+    s.CallbackRouteValues = new { Controller = "User", Action = "WorkerPartial", Id = Model.Id };
+    s.Properties.EnableCallbackMode = true;
+    s.Properties.CallbackPageSize = 15;
+    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    s.Properties.ValueField = GlobalPropertyNames.Id;
+    s.Properties.TextField = GlobalPropertyNames.Name;
+    s.Properties.ValueType = typeof(int);
+    s.Properties.IncrementalFilteringDelay = 250;
+    s.Properties.FilterMinLength = 4;
+    s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    s.Properties.TextFormatString = "{0}";
+    s.Properties.Columns.Add(GlobalPropertyNames.Name, "Наименование", 150);
+    s.Properties.Columns.Add(GlobalPropertyNames.LastName, "Фамилия", 50);
+    s.Properties.Columns.Add(GlobalPropertyNames.FirstName, "Имя", 50);
+    s.ShowModelErrors = true;
+    s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+    s.Properties.ClientSideEvents.BeginCallback = "function(s,e){ e.customArgs['MyCompanyId'] = MyCompanyId.GetValue(); }";
+}).BindList(DocumentsWeb.Areas.Agents.Models.ClientModel.GetChainWorker(Model.MyCompanyId, Model.EmployerId)).Bind(Model.EmployerId==0? (int?)null: Model.EmployerId).GetHtml()

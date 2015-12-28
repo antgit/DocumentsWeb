@@ -1,0 +1,119 @@
+﻿@using DocumentsWeb.Models
+@using BusinessObjects
+
+@{
+    string Name = (string)ViewData["Name"];
+    bool onlyUsers = (bool)ViewData["onlyUsers"];
+    string ComboboxMyCompany = (string)ViewData["ComboboxMyCompany"];
+    bool showAgentsInChains = ViewData["showAgentsInChains"] != null && (bool)ViewData["showAgentsInChains"];
+    System.Collections.IEnumerable list;
+    if(showAgentsInChains)
+    {
+        int myCompanyId=(int?)ViewData["myCompanyId"] ?? 0;
+        list = DocumentsWeb.Areas.Agents.Models.ClientModel.GetChainSourceList(myCompanyId);
+    }
+    else
+    {
+        list = BusinessObjects.Web.Core.PeopleWebSearchView.GetView(WADataProvider.WA.Cashe.GetCasheData<Hierarchy>().ItemCode<Hierarchy>(Hierarchy.SYSTEM_AGENT_MYWORKERS), true, 0, onlyUsers);
+    }
+}
+
+@Html.DevExpress().GridView(settings=>{
+    settings.Name = "gv" + Name;
+    settings.KeyFieldName = onlyUsers? "UidId": GlobalPropertyNames.Id;
+    settings.Width = System.Web.UI.WebControls.Unit.Pixel(600);
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+
+    settings.Settings.ShowVerticalScrollBar = true;
+    settings.Settings.VerticalScrollableHeight = 200;
+    settings.CallbackRouteValues = new { Area = "Agents", Controller = "Home", Action = "PeoplesFinderGridPartial" };
+    settings.SettingsBehavior.AllowFocusedRow = true;
+
+    settings.Settings.ShowFilterRow = true;
+    settings.Settings.ShowFilterRowMenu = true;
+    settings.Settings.ShowHorizontalScrollBar = true;
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+    settings.Styles.AlternatingRow.Enabled = DefaultBoolean.True;
+
+    settings.Columns.Add(column =>
+    {
+        column.FieldName = "Name";
+        column.Caption = "Наименование";
+        column.Width = 150;
+        column.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+    });
+
+    settings.Columns.Add(column =>
+    {
+        column.FieldName = "FirstName";
+        column.Caption = "Фамилия";
+        column.Width = 150;
+        column.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+    });
+
+    settings.Columns.Add(column =>
+    {
+        column.FieldName = "LastName";
+        column.Caption = "Имя";
+        column.Width = 150;
+        column.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+    });
+    
+    settings.Columns.Add(column =>
+    {
+        column.FieldName = "MidleName";
+        column.Caption = "Отчество";
+        column.Width = 150;
+        column.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+    });
+
+    settings.Columns.Add(column =>
+    {
+        column.FieldName = "TaxNumber";
+        column.Caption = "Инн";
+        column.Width = 75;
+        column.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+    });
+
+    settings.Columns.Add(column =>
+    {
+        column.FieldName = "Phone";
+        column.Caption = "Телефон";
+        column.Width = 75;
+        column.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+    });
+
+    settings.Columns.Add(column =>
+    {
+        column.FieldName = "MyCompanyName";
+        column.Caption = "Компания";
+        column.Width = 150;
+        column.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+    });
+
+    if (!showAgentsInChains)
+    {
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "DepatmentName";
+            column.Caption = "Отдел";
+            column.Width = 150;
+            column.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+        });
+    }
+    
+    //settings.Columns.Add("Name", "Наименование").Width = 150;
+    //settings.Columns.Add("LastName", "Фамилия").Width = 150;
+    //settings.Columns.Add("FirstName", "Имя").Width = 150;
+    //settings.Columns.Add("MidleName", "Отчество").Width = 150;
+    //settings.Columns.Add("TaxNumber", "Инн").Width = 75;
+    //settings.Columns.Add("Phone", "Телефон").Width = 75;
+    //settings.Columns.Add("MyCompanyName", "Компания").Width = 150;
+    //settings.Columns.Add("DepatmentName", "Отдел").Width = 150;
+    //settings.Columns.Add("MyCompanyId", "").Visible = false;
+
+    settings.ClientSideEvents.BeginCallback = "function (s, e) { e.customArgs['Name'] = '" + Name + "'; e.customArgs['onlyUsers'] = '" + onlyUsers.ToString() + "'; " + 
+        (string.IsNullOrEmpty(ComboboxMyCompany) ? string.Empty : ("e.customArgs['MyCompanyId'] = " + ComboboxMyCompany + ".GetValue();")) + 
+        "e.customArgs['showAgentsInChains'] = '"+showAgentsInChains+"';" + 
+        "}";
+}).Bind(list).GetHtml()

@@ -1,0 +1,75 @@
+﻿@using DevExpress.Web.Mvc.UI
+@using System.Web.UI.WebControls
+
+@inherits WebViewPage
+@{
+    ViewBag.Title = "Канал сбыта - аналитический справочник ...";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script type="text/javascript">
+    _aspxAttachEventToElement(window, "load", function () {
+        ShowOnlyActive();
+        setTimeout(function () {
+            dxGridViewAnalitic.SetVisible(true);
+        }, 100);
+    });
+    function ShowPopupEdit(id) {
+        pcEdit.Load('@DevExpressHelper.GetUrl(new { Area = "Analitics", Controller = "AgentCategory", Action = "Edit" })/' + id, 550, 320);
+    }
+    function AdjustGridSize() {
+        var height = splFullScreenMode.GetPaneByName('GridPane').GetClientHeight();
+        dxGridViewAnalitic.SetHeight(height);
+        $('#divActions').height(height - $('#divHeader').height());
+    }
+    function ControlAnalitic() {
+        if (dxGridViewAnalitic.GetFocusedRowIndex() != -1) {
+            var id = dxGridViewAnalitic.GetRowKey(dxGridViewAnalitic.GetFocusedRowIndex());
+            window.open('@DevExpressHelper.GetUrl(new { Controller = Url.RequestContext.RouteData.Values["controller"].ToString(), Action = "ControlView"})/' + id.toString(), '_blank');
+        }
+    }
+</script>
+
+@Html.Partial("NavpanelPartial")
+@Html.DevExpress().Splitter(settings =>
+{
+    settings.Name = "splFullScreenMode";
+    settings.Orientation = Orientation.Vertical;
+    settings.Styles.Pane.Paddings.Padding = 0;
+    settings.FullscreenMode = true;
+    settings.ClientSideEvents.PaneResized = "function (s, e) { AdjustGridSize(); }";
+    
+    settings.Panes.Add(contentPane =>
+    {
+        contentPane.ScrollBars = ScrollBars.Auto;
+        contentPane.Panes.Add(actionsPane =>
+        {
+            actionsPane.Name = "actionPane";
+            actionsPane.Size = 270;
+            actionsPane.MinSize = 270;
+            actionsPane.MaxSize = 400;
+            actionsPane.AllowResize = DefaultBoolean.True;
+            actionsPane.ShowCollapseBackwardButton = DefaultBoolean.True;
+            actionsPane.SetContent(() => Html.RenderPartial("ActionsPartial"));
+        });
+        
+        contentPane.Panes.Add(gridPane =>
+        {
+            gridPane.Name = "GridPane";
+            gridPane.SetContent(() => Html.RenderPartial("IndexPartial"));
+        });
+    });
+
+    settings.Panes.Add(footerPane =>{
+        footerPane.Size = 80;
+        footerPane.AllowResize = DefaultBoolean.False;
+        footerPane.ShowSeparatorImage = DefaultBoolean.False;
+        footerPane.SetContent(() => @Html.RenderPartial("FooterPartial"));
+    });
+}).GetHtml()
+
+@Html.Partial("PopupWindowPartial", new ViewDataDictionary { 
+    { "Title", "Категория торговой точки" },
+    { "AutoUpdateGrids", new[] { "dxGridViewAnalitic" } },
+    { "ShowFooter", true}
+})

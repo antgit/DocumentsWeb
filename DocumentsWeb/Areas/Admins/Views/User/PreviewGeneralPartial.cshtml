@@ -1,0 +1,111 @@
+﻿@using BusinessObjects
+@using BusinessObjects.Security
+@using DocumentsWeb.Models
+@model DocumentsWeb.Models.UserModel
+@{
+    Uid uid = Model.ToObject(WADataProvider.WA);
+    
+}
+<table class="edit_form_table">
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Наименование:";
+                    settings.AssociatedControlName = GlobalPropertyNames.Name;
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = GlobalPropertyNames.Name;
+                    settings.Properties.Style.Font.Bold = true;
+                }).Bind(Model.Name).GetHtml() 
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Печать:";
+                    settings.AssociatedControlName = GlobalPropertyNames.NameFull;
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = GlobalPropertyNames.NameFull;
+                    settings.Properties.Style.Font.Bold = true;
+                }).Bind(Model.NameFull).GetHtml() 
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2"><hr /></td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Сотрудник:";
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Properties.Style.Font.Bold = true;
+                }).Bind(Model.WorkerName).GetHtml() 
+            @if (Model.GetWorker() != null)
+            {
+                @Html.DevExpress().Label(settings =>
+                    {
+                        settings.Properties.Style.Font.Bold = true;
+                    }).Bind(string.Format("({0} {1} {2})", Model.GetWorker().FirstName, Model.GetWorker().LastName, Model.GetWorker().MidleName)).GetHtml()     
+                
+            }
+            
+        </td>
+    </tr>
+    <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Активен:";
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Properties.Style.Font.Bold = true;
+                }).Bind(Model.IsActive? "Да":"Нет").GetHtml() 
+        </td>
+    
+    <tr>
+        <td colspan="2">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Группы в которые входит пользователь:";
+                    settings.Properties.Style.Font.Bold = true;
+                    
+                }).GetHtml()
+            <ul>
+                @foreach (Uid grp in uid.Groups)
+                {
+                    <li>
+                        @grp.Name
+                    </li>
+                }
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        
+        <td colspan="2">
+            <hr /> <b>Описание:</b> <br />                      
+            @Html.DevExpress().Label(settings =>
+                                   {
+                                       settings.Name = GlobalPropertyNames.Memo;
+                                       settings.EncodeHtml = false;
+                                   }).Bind(string.IsNullOrEmpty(Model.Memo)? "<К сожалению описание пользователя отсутствует!>": Model.Memo).GetHtml() 
+            <hr />
+        </td>
+    </tr>
+</table>

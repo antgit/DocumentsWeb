@@ -1,0 +1,35 @@
+﻿@model DocumentsWeb.Areas.Contracts.Models.DocumentContractModel
+@using BusinessObjects
+@using DocumentsWeb.Areas.Agents.Models
+
+@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = GlobalPropertyNames.MainClientDepatmentId;
+    settings.ControlStyle.CssClass = "editor";
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    //settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control; 
+    settings.ClientEnabled = !Model.IsReadOnly;
+    settings.CallbackRouteValues = new { Controller = "Revision", Action = "AgentFromPartial" };
+
+    settings.Properties.EnableCallbackMode = true;
+    settings.Properties.CallbackPageSize = 20;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    settings.Properties.FilterMinLength = 2;
+    settings.Properties.TextField = "Name";
+    settings.Properties.ValueField = "Id";
+    settings.Properties.ValueType = typeof(int);
+    settings.Properties.DropDownStyle = DropDownStyle.DropDown;
+    settings.EncodeHtml = false;
+    //settings.Properties.EncodeHtml = true;
+
+    EditButton btnSearch = settings.Properties.Buttons.Add();
+    btnSearch.Image.Url = "~/Images/search_x10.png";
+    btnSearch.ToolTip = "Поиск";
+
+    settings.ShowModelErrors = true;
+    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+
+    settings.Properties.ClientSideEvents.ButtonClick = "AgentFromId_ButtonClick";
+    settings.Properties.ClientSideEvents.BeginCallback = "function(s,e){ e.customArgs['MainCompanyDepatmentId'] = MainCompanyDepatmentId.GetValue(); e.customArgs['Id'] = " + @Model.Id + ";}";
+}).BindList(ClientModel.GetAgentsRangeFromView, ClientModel.GetAgentByID).BindList(ClientModel.GetAgentsByValue(Model.MainClientDepatmentId)).Bind(Model.MainClientDepatmentId).GetHtml()

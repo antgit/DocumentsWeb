@@ -1,0 +1,66 @@
+﻿@using System.Web.UI.WebControls
+@using Stimulsoft.Report.Mvc
+@{
+    ViewBag.Title = "Печать документа";
+    Layout = "~/Views/Shared/_LayoutPrintForms.cshtml";
+    string CurrentPrm = @HttpUtility.HtmlEncode("GetReportSnapshot?id=" + @Request["Id"] + "&repid=" + @Request["repid"] + "&docprint=" + @Request["docprint"]);
+}
+    <script type="text/javascript">
+
+        function resizeTable() {
+            if (typeof (window.innerWidth) == "number") {
+                intWidth = window.innerWidth;
+                intHeight = window.innerHeight;
+
+            } else if (document.documentElement && (document.documentElement.clientWidth || document.documentElement.clientHeight)) {
+                intWidth = document.documentElement.clientWidth;
+                intHeight = document.documentElement.clientHeight;
+            } else if (document.body && (document.body.clientWidth || document.body.clientHeight)) {
+                intWidth = document.body.clientWidth;
+                intHeight = document.body.clientHeight;
+            }
+            document.getElementById('contentTable').style.height = (intHeight - 20) + "px";
+            document.getElementById('ViewerFx_Mvc').style.height = (intHeight - 30) + "px";
+
+        }
+        window.onresize = resizeTable;
+        window.onload = resizeTable;  
+    </script>
+<table id="contentTable" style="width: 100%; height:100%;">
+    <tr>
+        
+        <td class="reports" valign="top" style="width: 100%;">
+            @Html.StiMvcViewerFx(new StiMvcViewerFxOptions() {
+           ActionGetReportSnapshot = "GetReportSnapshot",
+                                                           ActionGetLocalization = "GetLocalization",
+                         
+                                                           ActionExportReport = "ExportReport",
+                                                           Width = Unit.Percentage(100),
+                                                           Height = Unit.Pixel(800),
+                                                           Zoom = 100, 
+                                                           ShowExportToBmp = false,
+                                                           ShowExportToCsv = false,
+                                                           ShowExportToDbf = false,
+                                                           ShowExportToExcel = false,
+                                                           ShowExportToExcelXml = false,
+                                                           ShowExportToGif = false,
+                                                           ShowExportToMetafile = false,
+                                                           ShowExportToOpenDocumentCalc = false,
+                                                           ShowExportToOpenDocumentWriter = false,
+                                                           ShowExportToPcx = false,
+                                                           ShowExportToPpt = false,
+                                                           ShowExportToRtf = false,
+                                                           ShowExportToSvg = false,
+                                                           ShowExportToSylk = false,
+                                                           ShowExportToText = false,
+                                                           ShowExportToDocument = false,
+                                                           ShowExportToDif = false,
+                                                           ShowExportToSvgz = false,
+                                                           ShowExportToXml = false,
+                                                           ShowExportToTiff = false,
+                                                           ShowButtonAbout = false,
+                                                           ShowButtonOpen = false
+                                                       })
+        </td>
+    </tr>
+</table>

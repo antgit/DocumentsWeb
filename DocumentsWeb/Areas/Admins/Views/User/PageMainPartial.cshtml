@@ -1,0 +1,316 @@
+﻿@using BusinessObjects
+@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentsWeb.Areas.Admins.Models
+@using DocumentsWeb.Areas.General.Models
+@using DocumentsWeb.Models
+@using DocumentsWeb.Areas.Agents.Models
+@model UserModel
+@{
+    bool haveEdit = (!Model.IsReadOnly && WADataProvider.LibrariesElementRightView.IsAllow(Right.UIEDIT, WebModuleNames.WEB_ADMINUSERS) && !WADataProvider.CommonRightView.ReadOnly) || WADataProvider.CommonRightView.AdminEnterprize;
+}
+
+<input type="hidden" id="StateId" name="StateId" value="@Model.StateId"/>
+<input type="hidden" id="KindId" name="KindId" value="@Model.KindId"/>
+<input type="hidden" id="ModelId" name="ModelId" value="@Model.ModelId"/>
+
+<table style="width:600px;">
+    <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+   {
+       s.ControlStyle.CssClass = "label";
+       s.Text = "Логин:";
+       s.AssociatedControlName = GlobalPropertyNames.Name;
+       s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Name);
+   }).GetHtml()
+</td><td colspan="3">
+        @Html.DevExpress().TextBox(s =>
+   {
+       s.Name = GlobalPropertyNames.Name;
+       s.ReadOnly = Model.Id != 0 |!haveEdit;
+       s.Properties.ConvertEmptyStringToNull = true;
+       if (!s.ReadOnly)
+       {
+           s.Properties.NullText = "Введите наименование...";
+           s.Properties.NullTextStyle.ForeColor = System.Drawing.Color.Red;
+           s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Name);
+       }
+       s.ControlStyle.CssClass = "editor";
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+       s.ShowModelErrors = true;
+       s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+       s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+   }).Bind(Model.Name).GetHtml()
+</td></tr>
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+   {
+       s.ControlStyle.CssClass = "label";
+       s.Text = "E-mail:";
+       if (string.IsNullOrEmpty(Model.Email))
+           s.ControlStyle.ForeColor = System.Drawing.Color.Red;
+       s.AssociatedControlName = GlobalPropertyNames.Email;
+       s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Email);
+   }).GetHtml()
+        </td><td>
+        @Html.DevExpress().TextBox(s =>
+   {
+       s.Name = GlobalPropertyNames.Email;
+       s.ReadOnly = !haveEdit;
+       s.ControlStyle.CssClass = "editor";
+       s.ShowModelErrors = true;
+       if (!s.ReadOnly)
+       {
+           s.Properties.NullText = "Введите e-mail...";
+           s.Properties.NullTextStyle.ForeColor = System.Drawing.Color.FromArgb(249, 97, 97);
+       }
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+       s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+       s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+       s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Email);
+   }).Bind(Model.Email).GetHtml()
+        </td></tr>
+
+<tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+   {
+       s.ControlStyle.CssClass = "label";
+       s.Text = "Пароль:";
+       if (string.IsNullOrEmpty(Model.Password))
+           s.ControlStyle.ForeColor = System.Drawing.Color.Red;
+       s.AssociatedControlName = GlobalPropertyNames.Password;
+       s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Password);
+   }).GetHtml()
+        </td><td>
+        @Html.DevExpress().HyperLink(s =>
+   {
+       
+       s.Name = "passwordLabel";
+       s.ControlStyle.CssClass = "label";
+       if (haveEdit)
+       {
+           s.Properties.ClientSideEvents.Click = "onShowPassClick";
+           s.Properties.EnableClientSideAPI = true;
+       }
+       s.Properties.Text = "************";
+       s.ControlStyle.Font.Bold = true;
+       s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Password);
+   }).GetHtml()
+        @Html.DevExpress().TextBox(s =>
+   {
+       s.Name = GlobalPropertyNames.Password;
+       s.ClientVisible = false;
+       s.ControlStyle.CssClass = "editor";
+       if (!s.ReadOnly)
+       {
+           s.Properties.NullText = "Введите пароль...";
+           s.Properties.NullTextStyle.ForeColor = System.Drawing.Color.FromArgb(249, 97, 97);
+       }
+       s.ShowModelErrors = true;
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+       s.Properties.Password = false;
+       s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+       s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+       s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Password);
+       s.Properties.ClientSideEvents.LostFocus = "OnPassLostFocus";
+       s.Properties.EnableClientSideAPI = true;
+   }).Bind(Model.Password).GetHtml()
+        </td></tr>
+        
+       <tr><td colspan="2">
+        @Html.DevExpress().CheckBox(s =>
+   {
+       s.Name = GlobalPropertyNames.AllowChangePassword;
+       s.Text = "Разрешить смену пароля пользователем";
+       s.ControlStyle.CssClass = "editor";
+       s.ShowModelErrors = true;
+       s.ReadOnly = !haveEdit;
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+       s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+       s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+       s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.AllowChangePassword);
+   }).Bind(Model.AllowChangePassword).GetHtml()
+        </td></tr>
+
+       <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+   {
+       s.ControlStyle.CssClass = "label";
+       s.Text = "Рекомендуемая дата смены пароля:";
+       s.AssociatedControlName = GlobalPropertyNames.RecommendedDateChangePassword;
+       s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.RecommendedDateChangePassword);
+   }).GetHtml()
+        </td><td>
+        @Html.DevExpress().DateEdit(s =>
+   {
+       s.Name = GlobalPropertyNames.RecommendedDateChangePassword;
+       s.ControlStyle.CssClass = "editor";
+       s.ReadOnly = !haveEdit;
+       s.Width = System.Web.UI.WebControls.Unit.Pixel(100);
+       s.ShowModelErrors = true;
+       s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+       s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+       s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.RecommendedDateChangePassword);
+   }).Bind(Model.RecommendedDateChangePassword).GetHtml()
+        </td></tr>
+
+    <tr><td colspan="2">
+        @Html.DevExpress().CheckBox(s =>
+   {
+       s.Name = GlobalPropertyNames.AutogenerateNextPassword;
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+       s.Text = "Автоматически генерировать следующий пароль";
+       s.ControlStyle.CssClass = "editor";
+       s.ShowModelErrors = true;
+       s.ReadOnly = !haveEdit;
+       s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+       s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+       s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.AutogenerateNextPassword);
+   }).Bind(Model.AllowChangePassword).GetHtml()
+        </td></tr>
+    <tr><td >
+            @Html.DevExpress().CheckBox(s =>
+       {
+           s.Name = "IsActive";
+           s.Text = "Разрешен";
+           //s.ControlStyle.CssClass = "editor";
+           s.ShowModelErrors = true;
+           s.ReadOnly = !haveEdit;
+           s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+           s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+           s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), "IsActive");
+       }).Bind(Model.IsActive).GetHtml()
+                
+        
+        </td>
+        <td>
+                    @Html.DevExpress().CheckBox(s =>
+               {
+                   s.Name = "IsAdmin";
+                   s.Text = "Администратор";
+                   s.ReadOnly = !haveEdit;
+                   //s.ControlStyle.CssClass = "editor";
+                   s.ShowModelErrors = true;
+                   s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                   s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                   s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), "IsAdmin");
+               }).Bind(Model.IsAdmin).GetHtml()
+        </td>
+        </tr>
+
+    <tr><td colspan="2" >
+            @Html.DevExpress().CheckBox(s =>
+       {
+           s.Name = "IsReadOnly";
+           s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+           s.Text = "Запрещено менять собственые данные";
+           s.ControlStyle.CssClass = "editor";
+           s.ShowModelErrors = true;
+           s.ReadOnly = !haveEdit;
+           s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+           s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+           s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), "IsReadOnly");
+       }).Bind(Model.IsReadOnly).GetHtml()
+                
+        
+        </td>
+        </tr>
+
+    <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+   {
+       s.ControlStyle.CssClass = "label";
+       s.Text = "Вход разрешен:";
+       s.AssociatedControlName = GlobalPropertyNames.TimePeriodId;
+       s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.TimePeriodId);
+   }).GetHtml()
+        </td><td>
+        @Html.DevExpress().ComboBox(s =>
+   {
+       s.Name = GlobalPropertyNames.TimePeriodId;
+       s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.TimePeriodId);
+       s.ControlStyle.CssClass = "editor";
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+       s.Properties.ValueField = GlobalPropertyNames.Id;
+       s.Properties.TextField = GlobalPropertyNames.Name;
+       s.Properties.ValueType = typeof(int);
+       s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+       s.ReadOnly = !haveEdit;
+       s.ShowModelErrors = true;
+       s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+       s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+   }).BindList(TimePeriodModel.GetAccountTimePeriod()).Bind(Model.TimePeriodId).GetHtml()
+        </td></tr>
+
+    <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+   {
+       s.ControlStyle.CssClass = "label";
+       s.Text = "Компания:";
+       if (Model.MyCompanyId == 0)
+           s.ControlStyle.ForeColor = System.Drawing.Color.Red;
+       s.AssociatedControlName = GlobalPropertyNames.MyCompanyId;
+       s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.MyCompanyId);
+   }).GetHtml()
+        </td><td>
+        @Html.DevExpress().ComboBox(s =>
+   {
+       s.Name = GlobalPropertyNames.MyCompanyId;
+       s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.MyCompanyId);
+       s.ControlStyle.CssClass = "editor";
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+       s.Properties.ValueField = GlobalPropertyNames.Id;
+       s.Properties.TextField = GlobalPropertyNames.Name;
+       s.Properties.ValueType = typeof(int);
+       s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+       s.ReadOnly = !haveEdit;
+       s.ShowModelErrors = true;
+       s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+       s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+       s.Properties.ClientSideEvents.SelectedIndexChanged = "function(s,e) {WorkerId.PerformCallback();}";
+   }).BindList(ClientModel.GetMyDepatmentsWithHolding()).Bind(Model.MyCompanyId == 0 ? (int?)null : Model.MyCompanyId).GetHtml()
+        </td></tr>
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+   {
+       s.ControlStyle.CssClass = "label";
+       s.Text = "Сотрудник:";
+       if (Model.EmployerId == 0)
+           s.ControlStyle.ForeColor = System.Drawing.Color.Red;
+       s.AssociatedControlName = GlobalPropertyNames.EmployerId;
+       s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.EmployerId);
+   }).GetHtml()
+            </td><td>
+                     @Html.Partial("WorkerPartial", Model)
+                 </td></tr>
+    
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+   {
+       s.ControlStyle.CssClass = "label";
+       s.Text = "Примечание:";
+       s.AssociatedControlName = GlobalPropertyNames.Memo;
+       s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Memo);
+   }).GetHtml()
+        </td><td colspan="3">
+        @Html.DevExpress().Memo(s =>
+        {
+            s.Name = GlobalPropertyNames.Memo;
+            s.ReadOnly = !haveEdit;
+            if (!s.ReadOnly)
+            {
+                s.Properties.NullText = "Введите примечание или описание сотрудника...";
+                s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Memo);
+            }
+            s.ControlStyle.CssClass = "editor";
+            s.Height = 40;
+            s.ShowModelErrors = true;
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.Memo).GetHtml()
+             </td><tr>
+             </table>

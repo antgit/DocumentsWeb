@@ -1,0 +1,259 @@
+﻿@using System.Globalization
+@using BusinessObjects
+@using DocumentsWeb.Areas.Agents.Models
+@model ClientModel
+           
+@Html.DevExpress().GridView(settings=>{
+    settings.Name = "gvAddress";
+    settings.CallbackRouteValues = new { Controller = Url.RequestContext.RouteData.Values["controller"], Action = "AddressGridPartial", agId = Model.Id };
+    settings.SettingsEditing.AddNewRowRouteValues = new { Controller = Url.RequestContext.RouteData.Values["controller"], Action = "AddNewAddressPartial" };
+    settings.SettingsEditing.UpdateRowRouteValues = new { Controller = Url.RequestContext.RouteData.Values["controller"], Action = "UpdateAddressPartial" };
+    settings.SettingsEditing.DeleteRowRouteValues = new { Controller = Url.RequestContext.RouteData.Values["controller"], Action = "DeleteAddressPartial" };
+    settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+    settings.Styles.Cell.Paddings.Padding = System.Web.UI.WebControls.Unit.Pixel(2);
+    settings.KeyFieldName = GlobalPropertyNames.Id;
+    settings.SettingsBehavior.AllowFocusedRow = true;
+
+    settings.Columns.Add(cc =>
+    {
+        cc.Name = "colImageAction";
+        cc.Width = System.Web.UI.WebControls.Unit.Pixel(35);
+        cc.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+        cc.Settings.AllowDragDrop = DefaultBoolean.False;
+        cc.Settings.AllowSort = DefaultBoolean.False;
+        cc.SetDataItemTemplateContent(c =>
+        {
+            ViewContext.Writer.Write("<table><tr>");
+            ViewContext.Writer.Write("<td>");
+            Html.DevExpress().HyperLink(hl =>
+            {
+                hl.Properties.ImageUrl = Url.Content("~/Images/edit10x10.png");
+                hl.ToolTip = "Изменить";
+                hl.NavigateUrl = "javascript:gvAddress.StartEditRow(" + c.ItemIndex.ToString(CultureInfo.InvariantCulture) + ");";
+            }).Render();
+            ViewContext.Writer.Write("</td><td>");
+            Html.DevExpress().HyperLink(hl =>
+            {
+                hl.Properties.ImageUrl = Url.Content("~/Images/DELETEDELEMENT_X16.png");
+                hl.ToolTip = "Удалить";
+                hl.NavigateUrl = "javascript:if (confirm(\"Удалить строку документа?\")) {gvAddress.DeleteRow(" + c.ItemIndex.ToString(CultureInfo.InvariantCulture) + ");}";
+            }).Render();
+            ViewContext.Writer.Write("</td></tr></table>");
+        });
+    });
+    settings.Columns.Add("CountryName", "Страна");
+    settings.Columns.Add("TerritoryName", "Район");
+    settings.Columns.Add("TownName", "Город");
+    settings.Columns.Add("AddressKindName", "Тип");
+        
+    settings.Settings.ShowFooter = true;
+    
+    settings.SetFooterRowTemplateContent(c =>
+    {
+        ViewContext.Writer.Write("<div style=\"width: 100%; text-align: center; font-size: 10pt;\"><a href=\"javascript:gvAddress.AddNewRow();\">Создать</a></div>");
+    });
+    
+    settings.SetEditFormTemplateContent(c =>
+    {
+        ViewContext.Writer.Write("<input type=\"hidden\" id=\"OwnId\" name=\"OwnId\" value=\"" + Model.Id + "\">");
+        
+        ViewContext.Writer.Write("<table style=\"width: 450px;\">");
+        ViewContext.Writer.Write("<tr><td colspan=\"2\">");
+        ViewContext.Writer.Write("<table><tr><td>");
+        Html.DevExpress().Button(btnSettings =>
+        {
+            btnSettings.Name = "btnUpdate";
+            btnSettings.ControlStyle.CssClass = "button";
+            btnSettings.Text = "Сохранить";
+            btnSettings.ClientSideEvents.Click = "function(s, e){ gvAddress.UpdateEdit(); }";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().Button(btnSettings =>
+        {
+            btnSettings.Name = "btnCancel";
+            btnSettings.ControlStyle.CssClass = "button";
+            btnSettings.Text = "Отмена";
+            btnSettings.ClientSideEvents.Click = "function(s, e){ gvAddress.CancelEdit(); }";
+        }).Render();
+        ViewContext.Writer.Write("</td></tr></table>");
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Тип адреса:";
+            edtSettings.AssociatedControlName = "AddressKindId";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().ComboBox(edtSettings =>
+        {
+            edtSettings.Name = "AddressKindId";
+            edtSettings.Properties.ValueField = "Id";
+            edtSettings.Properties.TextField = "Name";
+            edtSettings.Properties.ValueType = typeof(int);
+            edtSettings.Properties.NullDisplayText = "Выберите тип адреса...";
+            edtSettings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+            edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            //edtSettings.Properties.FilterMinLength = 2;
+            edtSettings.ControlStyle.CssClass = "editor";
+            edtSettings.ShowModelErrors = true;
+            edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            //edtSettings.Properties.ClientSideEvents.SelectedIndexChanged = "function(s,e){TerritoryId.PerformCallback();TownId.SetSelectedIndex(-1);}";
+        }).BindList(DocumentsWeb.Models.WADataProvider.GetAddressTypes()).Bind(DataBinder.Eval(c.DataItem, "AddressKindId")).GetHtml();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Страна:";
+            edtSettings.AssociatedControlName = "CountryId";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().ComboBox(edtSettings =>
+        {
+            edtSettings.Name = "CountryId";
+            edtSettings.Properties.ValueField = "Id";
+            edtSettings.Properties.TextField = "Name";
+            edtSettings.Properties.ValueType = typeof(int);
+            edtSettings.Properties.NullDisplayText = "Выберите страну...";
+            edtSettings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+            edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            //edtSettings.Properties.FilterMinLength = 2;
+            edtSettings.ControlStyle.CssClass = "editor";
+            edtSettings.ShowModelErrors = true;
+            edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            edtSettings.Properties.ClientSideEvents.SelectedIndexChanged = "function(s,e){TerritoryId.PerformCallback();TownId.SetSelectedIndex(-1);}";
+        }).BindList(DocumentsWeb.Models.WADataProvider.GetCountries()).Bind(DataBinder.Eval(c.DataItem, "CountryId")).GetHtml();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Территория:";
+            edtSettings.AssociatedControlName = "TerritoryId";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.RenderPartial("cmbTerritoryPartial", new ViewDataDictionary { { "CountryId", DataBinder.Eval(c.DataItem, "CountryId") }, { "TerritoryId", DataBinder.Eval(c.DataItem, "TerritoryId") } });
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Регион:";
+            edtSettings.AssociatedControlName = "RegionId";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.RenderPartial("cmbRegionPartial", new ViewDataDictionary { { "TerritoryId", DataBinder.Eval(c.DataItem, "TerritoryId") }, { "RegionId", DataBinder.Eval(c.DataItem, "RegionId") } });
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Город:";
+            edtSettings.AssociatedControlName = "TownId";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.RenderPartial("cmbTownPartial", new ViewDataDictionary { { "TerritoryId", DataBinder.Eval(c.DataItem, "TerritoryId") }, { "RegionId", DataBinder.Eval(c.DataItem, "RegionId") }, { "TownId", DataBinder.Eval(c.DataItem, "TownId") } });
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Улица:";
+            edtSettings.AssociatedControlName = "StreetName";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.RenderPartial("cmbStreetPartial", new ViewDataDictionary { { "StreetName", DataBinder.Eval(c.DataItem, "StreetName") }, { "TownId", DataBinder.Eval(c.DataItem, "TownId") } });
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Дом:";
+            edtSettings.AssociatedControlName = "HouseNumber";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TextBox(edtSettings =>
+        {
+            edtSettings.Name = "HouseNumber";
+            edtSettings.Properties.NullDisplayText = "Выберите номер дома";
+            edtSettings.ControlStyle.CssClass = "editor";
+            edtSettings.ShowModelErrors = true;
+            edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(DataBinder.Eval(c.DataItem, "HouseNumber")).GetHtml();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Индекс:";
+            edtSettings.AssociatedControlName = "PostIndex";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TextBox(edtSettings =>
+        {
+            edtSettings.Name = "PostIndex";
+            edtSettings.Properties.NullDisplayText = "Выберите почтовый индекс";
+            edtSettings.ControlStyle.CssClass = "editor";
+            edtSettings.ShowModelErrors = true;
+            edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        }).Bind(DataBinder.Eval(c.DataItem, "PostIndex")).GetHtml();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Широта:";
+            edtSettings.AssociatedControlName = "X";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().SpinEdit(edtSettings =>
+        {
+            edtSettings.Name = "X";
+            edtSettings.Properties.NullDisplayText = "Выберите координату X...";
+            edtSettings.ControlStyle.CssClass = "editor";
+            edtSettings.ShowModelErrors = true;
+            edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(DataBinder.Eval(c.DataItem, "X")).GetHtml();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Долгота:";
+            edtSettings.AssociatedControlName = "Y";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().SpinEdit(edtSettings =>
+        {
+            edtSettings.Name = "Y";
+            edtSettings.Properties.NullDisplayText = "Выберите координату Y...";
+            edtSettings.ControlStyle.CssClass = "editor";
+            edtSettings.ShowModelErrors = true;
+            edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(DataBinder.Eval(c.DataItem, "Y")).GetHtml();
+        ViewContext.Writer.Write("</td></tr></table>");
+    });
+}).Bind(Model.AddressCollection).GetHtml()

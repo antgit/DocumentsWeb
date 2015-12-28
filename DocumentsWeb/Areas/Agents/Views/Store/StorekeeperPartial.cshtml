@@ -1,0 +1,37 @@
+﻿@using BusinessObjects
+@using DocumentsWeb.Areas.Agents.Models
+
+@{
+    int? StorekeeperId = null;
+    int? MyCompanyId = null;
+    bool IsReadonly = false;
+
+    try { StorekeeperId = int.Parse(ViewData["StorekeeperId"].ToString()); }
+    catch { }
+
+    try { MyCompanyId = int.Parse(ViewData["MyCompanyId"].ToString()); }
+    catch { }        
+
+    try { IsReadonly = bool.Parse(ViewData["ReadOnly"].ToString()); }
+    catch { }
+    
+    if (MyCompanyId != null && MyCompanyId == 0) { MyCompanyId = null; }
+    if (StorekeeperId != null && StorekeeperId == 0) { StorekeeperId = null; }
+}
+         
+@Html.DevExpress().ComboBox(settings =>{
+    settings.Name = GlobalPropertyNames.StorekeeperId;
+    settings.ReadOnly = IsReadonly;
+    settings.CallbackRouteValues = new { Area = "Agents", Controller = "Store", Action = "StorekeeperPartial" };
+    settings.Properties.EnableCallbackMode = true;
+    settings.Properties.ValueField = GlobalPropertyNames.Id;
+    settings.Properties.TextField = GlobalPropertyNames.Name;
+    settings.Properties.ValueType = typeof(int);
+    settings.Properties.NullDisplayText = "Выберите зав. складом...";
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.ShowModelErrors = true;
+    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+    settings.Properties.ClientSideEvents.BeginCallback = "function(s, e) { e.customArgs['StorekeeperId'] = StorekeeperId.GetValue(); e.customArgs['MyCompanyId'] = MyCompanyId.GetValue(); e.customArgs['ReadOnly'] = '" + IsReadonly.ToString() + "'; }";
+}).BindList(ClientModel.GetChainSourceList(MyCompanyId)).Bind(StorekeeperId).GetHtml()

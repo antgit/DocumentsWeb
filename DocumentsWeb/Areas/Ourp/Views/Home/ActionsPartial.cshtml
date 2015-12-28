@@ -1,0 +1,246 @@
+﻿@using BusinessObjects
+@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentWeb.Extentions
+@using DocumentsWeb.Models
+@using DocumentsWeb.Controllers;
+@using DocumentsWeb.Areas.General.Models;
+@using DevExpress.Web.Mvc.UI
+@using System.Web.UI.WebControls
+@using DevExpress.Utils;
+@using DevExpress.Web.ASPxNavBar;
+@using DevExpress.Web.Mvc;
+
+@{   
+	bool haveCreate = true; // WADataProvider.LibrariesElementRightView.IsAllow(Right.UICREATE, WebModuleNames.WEB_EMPLOERS) && !WADataProvider.CommonRightView.ReadOnly;
+	bool haveEdit = true; // WADataProvider.LibrariesElementRightView.IsAllow(Right.UIEDIT, WebModuleNames.WEB_EMPLOERS) && !WADataProvider.CommonRightView.ReadOnly;
+	bool haveDelete = true; // WADataProvider.LibrariesElementRightView.IsAllow(Right.UITRASH, WebModuleNames.WEB_EMPLOERS) && !WADataProvider.CommonRightView.ReadOnly;
+	bool haveView = true; // WADataProvider.LibrariesElementRightView.IsAllow(Right.UIVIEW, WebModuleNames.WEB_EMPLOERS);
+}
+
+<div id="divHeader" style="width: 100%;">
+@Html.DevExpress().NavBar(settings =>
+{
+	settings.Name = "nbFeaturesHeader";
+	settings.AllowExpanding = false;
+	settings.AllowSelectItem = false;
+	settings.AutoCollapse = false;
+	settings.EnableHotTrack = false;
+	settings.EnableAnimation = false;
+	settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+	settings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+	settings.EncodeHtml = false;
+	settings.SaveStateToCookies = true;
+	settings.SaveStateToCookiesID = Url.RequestContext.RouteData.Values["controller"] + "Nav";
+	settings.Groups.Add(group =>
+	{
+		group.ShowExpandButton = DefaultBoolean.False;
+		group.SetHeaderTemplateContent(head =>
+		{
+			ViewContext.Writer.Write("<table width=\"100%\"><tr><td>");
+			ViewContext.Writer.Write("<div style=\"width: 100%; text-align: center;\">");
+			Html.DevExpress().Label(lb =>
+			{
+				lb.ControlStyle.Font.Bold = true;
+				lb.ControlStyle.Font.Size = System.Web.UI.WebControls.FontUnit.Point(10);
+				lb.Text = "Образ оборудования";
+			}).Render();
+			ViewContext.Writer.Write("</div>");
+
+			//ViewContext.Writer.Write("</td><td style=\"width:16px\">");
+			//Html.DevExpress().HyperLink(s =>
+			//{
+			//    s.ToolTip = "Показать справочную информацию";
+			//    s.Properties.ImageUrl = "~/Images/INFO_X16.png";
+			//    if (string.IsNullOrEmpty(HelpDefaultLink))
+			//        s.NavigateUrl = "javascript:alert('Справочная информация отсутствует!');";
+			//    else
+			//    {
+			//        s.Properties.Target = "_blank";
+			//        s.NavigateUrl = HelpDefaultLink.StartsWith("~/") ? Url.Content(HelpDefaultLink) : HelpDefaultLink;
+			//    }
+			//}).Render();
+
+			ViewContext.Writer.Write("</td><td style=\"width:16px\">");
+			Html.DevExpress().HyperLink(s =>
+			{
+				s.Properties.Style.Font.Bold = true;
+				s.Properties.Text = "<<";
+				s.ToolTip = "Скрыть панель управления";
+				//s.Properties.ImageUrl = "~/Images/collapse_arrow_x16.png";
+				//s.NavigateUrl = "javascript:CollapseActionsPane()";
+			}).Render();
+			ViewContext.Writer.Write("</tr></td></table>");
+		});
+	});
+}).GetHtml()
+</div>
+
+<div id="divActions" style="width: 100%; height: 100%; overflow: auto;">
+@Html.DevExpress().NavBar(
+nbsettings =>
+{
+    nbsettings.Name = "nbFeatures";
+    nbsettings.AllowExpanding = true;
+    nbsettings.AllowSelectItem = true;
+    nbsettings.AutoCollapse = false;
+    nbsettings.EnableHotTrack = true;
+    nbsettings.EnableAnimation = true;
+    nbsettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    //nbsettings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+    nbsettings.EncodeHtml = false;
+    nbsettings.SaveStateToCookies = true;
+    nbsettings.SaveStateToCookiesID = Url.RequestContext.RouteData.Values["controller"] + "Nav";
+
+    nbsettings.Groups.Add(group => {
+        group.Text = "Действия";
+        group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+        group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.CssClass = "navpanellink";
+        MVCxNavBarItem item = null;
+
+        if (haveCreate)
+        {
+            item = group.Items.Add("Создать", "mnuAdd", "~/Images/new_x16.png");
+            item.ClientEnabled = haveCreate;
+            item.NavigateUrl = "javascript:ShowPopupEdit(0);";
+            item.ToolTip = "Создать новый элемент";
+
+            item = group.Items.Add("Создать копию", "mnuAddCopy", "~/Images/copy_x16.png");
+            item.ClientEnabled = haveCreate;
+            //item.NavigateUrl = "javascript:createCopy('Worker');";
+            item.ToolTip = "Создание копии текущего выделенного в списке элемента";
+        }
+
+        if (haveEdit)
+        {
+            item = group.Items.Add("Изменить", "mnuEdit", "~/Images/editdoc_x16.png");
+            item.ClientEnabled = haveEdit;
+            //item.NavigateUrl = "javascript:editAgent();";
+            item.ToolTip = "Изменить данные о текущем элементе";
+        }
+
+        if (haveDelete)
+        {
+            item = group.Items.Add("Удалить", "mnuDelete", "~/Images/delete_x16.png");
+            item.ClientEnabled = haveDelete;
+            //item.NavigateUrl = "javascript:deleteAgent('Worker');";
+            item.ToolTip = "Удалить данные о текущем элементе";
+        }
+        
+        item = group.Items.Add("Обновить", "mnuRefresh", "~/Images/refresh_x16.png");
+        item.ToolTip = "Обновить данные в списке элементов. Рекомендуемое действие вместо обновления страницы.";
+		item.NavigateUrl = "javascript:MyGrid.PerformCallback('refresh=true');";
+
+		//if (haveEdit)
+		//{
+		//    item = group.Items.Add();
+		//    item.SetTemplateContent(s =>
+		//                                {
+		//                                    ViewContext.Writer.Write("<hr>");
+		//                                });
+
+		//    item = group.Items.Add("Установить состояние \"Активен\"", "mnuStateActive", "~/Images/state_active_x16.png");
+		//    item.ToolTip = "Установка данного состояния возможная только при текущем состоянии не соответствующего \"Активному\" - например данное действие имеет смысл для требующих корректировки, запрещенных или удаленных сотрудников";
+		//    item.ClientEnabled = haveEdit;
+		//    item.NavigateUrl = "javascript:changeState(1, 'Worker');";
+
+		//    item = group.Items.Add("Требовать корректировки", "mnuStateNeedCorrect", "~/Images/state_needcorrect_x16.png");
+		//    item.ToolTip = "Установка данного состояния возможная только при текущем состоянии не соответствующего \"Требовующего корректировки\" - например данное действие имеет смысл для ативных корреспондентов, чтобы в дальшейшем откорректировать сотрудника";
+		//    item.ClientEnabled = haveEdit;
+		//    item.NavigateUrl = "javascript:changeState(2, 'Worker');";
+
+		//    item = group.Items.Add("\"Запрещен\"", "mnuStateBan", "~/Images/state_ban_x16.png");
+		//    item.ToolTip = "Установка данного состояния возможная только при текущем состоянии не соответствующего \"Запрещеному\" - например данное действие имеет смысл для для блокировки сотрудника по каким-либо причинам";
+		//    item.ClientEnabled = haveEdit;
+		//    item.NavigateUrl = "javascript:changeState(4, 'Worker');";
+		//}
+    });
+
+    nbsettings.Groups.Add(group =>
+    {
+        group.Text = "Иерархия";
+        group.Expanded = false;
+
+		//group.SetContentTemplateContent(content =>
+		//{
+		//    CoreController<Agent> controller = (CoreController<Agent>)ViewContext.Controller;
+		//    Html.RenderAction("GridFilterPartial", new
+		//    {
+		//        Area = "General",
+		//        Controller = "Hierarchy",
+        //        RootList = HierarchyModel.GetLinkedHierarchies(controller.RootHierachy, HierarchyModel.FILTER_HIERARCHY_CHAIN).Select(s => s.Code).ToArray(),
+		//        GridName = "dxGridViewAgent",
+		//        GridController = "Worker",
+		//        GridAction = "IndexPartial",
+		//        Model = Model
+		//    });
+		//});
+    });
+    
+    nbsettings.Groups.Add(group => {
+        group.Text = "Фильтр";
+        group.Expanded = false;
+        group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+        MVCxNavBarItem item = null;
+        group.ItemStyle.HoverStyle.Font.Bold = true;
+        group.ItemStyle.HoverStyle.Font.Underline = true;
+        group.ItemStyle.SelectedStyle.Font.Bold = true;
+
+        item = group.Items.Add("Только активные", "mnuFilterActive", "~/Images/filter_state_active_x16.png");
+        item.ToolTip = "Отображать в списке только активные данные";
+        //item.NavigateUrl = "javascript:dxGridViewAgents.ApplyFilter('StateId = 1');";
+        
+        item = group.Items.Add("Требующие корректировки", "mnuFilterCorrect", "~/Images/filter_state_needcorrect_x16.png");
+        item.ToolTip = "Отображать в списке только требующие корректировки данные";
+        //item.NavigateUrl = "javascript:dxGridViewAgents.ApplyFilter('StateId = 2');";
+        
+        item = group.Items.Add("Только запрещенные", "mnuFilterBan", "~/Images/filter_state_ban_x16.png");
+        item.ToolTip = "Отображать в списке только требующие запрещенные данные";
+        //item.NavigateUrl = "javascript:dxGridViewAgents.ApplyFilter('StateId = 4');";
+        
+        item = group.Items.Add("Корзина", "mnuFilterDeleted", "~/Images/filter_state_deleted_x16.png");
+        item.ToolTip = "Отображать в списке только удаленные данные";
+        //item.NavigateUrl = "javascript:dxGridViewAgents.ApplyFilter('StateId = 5');";
+    });
+    nbsettings.Groups.Add(group =>
+    {
+        group.Text = "Отчеты";
+        group.Expanded = false;
+        group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+        group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.CssClass = "navpanellink";
+        MVCxNavBarItem item = null;
+        
+        item = group.Items.Add("Microsoft Excel", "mnuExportToXLSX", "~/Images/FILEEXCEL_X16.png");
+        item.ToolTip = "Экспорт списка документов в Microsoft Excel";
+        //item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "Worker", Action = "ExportTo", type = "XLSX", subtype = Url.RequestContext.RouteData.Values["action"] });
+        
+        item = group.Items.Add("Adobe PDF", "mnuExportToPDF", "~/Images/FILEPDF_X16.png");
+        item.ToolTip = "Экспорт списка документов в Adobe PDF";
+        //item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "Worker", Action = "ExportTo", type = "PDF", subtype = Url.RequestContext.RouteData.Values["action"] });
+
+        item = group.Items.Add("Перейти в отчеты...", "mnuReportNavToReportsMain", "~/Images/arrowgreen.png");
+        item.ToolTip = "Перейти в раздел отчетов...";
+        //item.ClientEnabled = haveEdit;
+        //item.NavigateUrl = Url.Action("Index", new { area = "Reports", Controller = "Report" });
+    });
+    nbsettings.Groups.Add(group =>
+    {
+        group.Text = "Сервис";
+        group.Name = "grpSettings";
+        group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+        group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+        
+
+        group.SetContentTemplateContent(c =>
+        {
+            //Html.RenderPartial("SettingsPartial", new ViewDataDictionary { { "GridName", "dxGridViewAgents" } });
+        });
+    });
+}).GetHtml()
+</div>

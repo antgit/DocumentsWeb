@@ -1,0 +1,192 @@
+﻿@model DocumentsWeb.Areas.Finances.Models.DocumentFinanceModel
+@using System.Globalization
+@using DocumentsWeb.Areas.Products.Models
+@using DocumentsWeb.Models
+@using BusinessObjects
+
+@Html.DevExpress().GridView(settings=>{
+    settings.Name = "gvDocDetails";
+    settings.KeyFieldName = "RowId";
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+    settings.CallbackRouteValues = new { Controller = Url.RequestContext.RouteData.Values["controller"], Action = "DetailsGridPartial", modelId = Model.ModelId };
+    settings.SettingsEditing.AddNewRowRouteValues = new { Controller = Url.RequestContext.RouteData.Values["controller"], Action = "DetailsGridAddNewPartial", ownewrModelId = Model.ModelId };
+    settings.SettingsEditing.UpdateRowRouteValues = new { Controller = Url.RequestContext.RouteData.Values["controller"], Action = "DetailsGridUpdatePartial", ownewrModelId = Model.ModelId };
+    settings.SettingsEditing.DeleteRowRouteValues = new { Controller = Url.RequestContext.RouteData.Values["controller"], Action = "DetailsGridDeletePartial", ownewrModelId = Model.ModelId };
+    settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+    settings.SettingsBehavior.AllowFocusedRow = true;
+
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+    settings.Styles.Cell.Font.Size = System.Web.UI.WebControls.FontUnit.Point(10);
+    settings.Styles.Cell.Paddings.Padding = System.Web.UI.WebControls.Unit.Pixel(0);
+    settings.Styles.Cell.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+    settings.KeyboardSupport = true;
+    settings.Styles.AlternatingRow.Enabled = DefaultBoolean.True;
+    settings.Settings.ShowFooter = true;
+    settings.SetFooterRowTemplateContent(c =>
+    {
+        ViewContext.Writer.Write("<div id=\"gridLnkCreate\" style=\"width: 100%; text-align: center; font-size: 10pt;\">");
+        Html.DevExpress().HyperLink(hl =>
+        {
+            hl.Name = "lnkAddNewDetailRow";
+            hl.Properties.Text = "Создать";
+            hl.ToolTip = "Создать";
+            hl.NavigateUrl = "javascript:gvDocDetails.AddNewRow();";
+            hl.Enabled = !Model.IsReadOnly;
+        }).Render();
+        ViewContext.Writer.Write("</div>");
+    });
+
+    settings.Columns.Add(cc =>
+    {
+        cc.Name = "colImageAction";
+        cc.Width = System.Web.UI.WebControls.Unit.Pixel(35);
+        cc.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+        cc.Settings.AllowDragDrop = DefaultBoolean.False;
+        cc.Settings.AllowSort = DefaultBoolean.False;
+        cc.SetDataItemTemplateContent(c =>
+        {
+            ViewContext.Writer.Write("<table><tr>");
+            ViewContext.Writer.Write("<td>");
+            Html.DevExpress().HyperLink(hl =>
+            {
+                hl.Properties.ImageUrl = Url.Content("~/Images/edit10x10.png");
+                hl.ToolTip = "Изменить";
+                hl.NavigateUrl = "javascript:gvDocDetails.StartEditRow(" + c.ItemIndex.ToString(CultureInfo.InvariantCulture) + ");";
+                hl.Enabled = !Model.IsReadOnly;
+            }).Render();
+            ViewContext.Writer.Write("</td><td>");
+            Html.DevExpress().HyperLink(hl =>
+            {
+                hl.Properties.ImageUrl = Url.Content("~/Images/DELETEDELEMENT_X16.png");
+                hl.ToolTip = "Удалить";
+                hl.NavigateUrl = "javascript:if (confirm(\"Удалить строку документа?\")) {gvDocDetails.DeleteRow(" + c.ItemIndex.ToString(CultureInfo.InvariantCulture) + ");}";
+                hl.Enabled = !Model.IsReadOnly;
+            }).Render();
+            ViewContext.Writer.Write("</td></tr></table>");
+        });
+    });
+
+    settings.Columns.Add(column =>
+    {
+        column.FieldName = GlobalPropertyNames.ProductName;
+        column.Caption = "Товар";
+        column.HeaderStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+        column.Width = 300;
+    });
+    
+    settings.Columns.Add(column =>
+    {
+        column.FieldName = GlobalPropertyNames.Summa;
+        column.Caption = "Сумма";
+        column.HeaderStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+        column.PropertiesEdit.DisplayFormatString = "0.00";
+        column.Width = 80;
+    });
+    settings.Columns.Add(GlobalPropertyNames.Memo, "Примечание").Width = 400; 
+
+    settings.SetEditFormTemplateContent(c =>
+    {
+        //ViewContext.Writer.Write("<div class=\"edit_form\">");
+
+        ViewContext.Writer.Write("<input type=\"hidden\" name=\"OwnerId\" id=\"OwnerId\" value=\"" + Model.Id + "\" />");
+        ViewContext.Writer.Write("<input type=\"hidden\" name=\"RowId\" id=\"RowId\" value=\"" + (c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "RowId"):"") + "\"/ >");
+
+        ViewContext.Writer.Write("<table class=\"edit_form_table2\">");
+        ViewContext.Writer.Write("<tr><td colspan=\"6\">");
+        Html.DevExpress().Button(btnSettings =>
+        {
+            btnSettings.Name = "btnUpdate";
+            btnSettings.ControlStyle.CssClass = "button";
+            btnSettings.Text = "Сохранить";
+            btnSettings.ClientSideEvents.Click = "function(s, e){ gvDocDetails.UpdateEdit(); }";
+        }).Render();
+        
+        Html.DevExpress().Button(btnSettings =>
+        {
+            btnSettings.Name = "btnCancel";
+            btnSettings.ControlStyle.CssClass = "button";
+            btnSettings.Text = "Отмена";
+            btnSettings.ClientSideEvents.Click = "function(s, e){ gvDocDetails.CancelEdit(); }";
+        }).Render();
+        ViewContext.Writer.Write("</td></tr>");
+
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            //edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Номенклатура:";
+            edtSettings.AssociatedControlName = "ProductNomenclatureId";
+        }
+        ).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.RenderPartial("ProductNomenclaturePartial", Model, new ViewDataDictionary { { "ProductId", (c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "ProductId") : null) } });
+        ViewContext.Writer.Write("<td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            //edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Товар:";
+            edtSettings.AssociatedControlName = GlobalPropertyNames.ProductId;
+            edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            edtSettings.Properties.Style.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+        }
+        ).Render();
+        ViewContext.Writer.Write("</td><td colspan=\"3\">");
+        Html.RenderPartial("ProductPartial", Model, new ViewDataDictionary { { "ProductId", (c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "ProductId") : null) } });
+        ViewContext.Writer.Write("</td></tr><tr><td class=\"table_label\">");
+        
+
+        Html.DevExpress().Label(edtSettings =>
+        {
+            //edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Сумма:";
+            edtSettings.AssociatedControlName = GlobalPropertyNames.Summa;
+            edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        }
+        ).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().SpinEdit(edtSettings =>
+        {
+            edtSettings.Name = GlobalPropertyNames.Summa;
+            edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            //edtSettings.ControlStyle.CssClass = "editor";
+            //edtSettings.Enabled = false;
+            edtSettings.ShowModelErrors = true;
+            edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            edtSettings.Properties.DisplayFormatString = "0.00";
+        }).Bind((c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "Summa"):0)).Render();
+        ViewContext.Writer.Write("</td></tr><tr><td class=\"table_label\">");
+
+        
+        Html.DevExpress().Label(edtSettings =>
+        {
+            //edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Примечание:";
+            edtSettings.AssociatedControlName = GlobalPropertyNames.Memo;
+        }
+        ).Render();
+        ViewContext.Writer.Write("</td><td colspan=\"5\">");
+        Html.DevExpress().Memo(edtSettings =>
+        {
+            edtSettings.Name = GlobalPropertyNames.Memo;
+            //edtSettings.ControlStyle.CssClass = "editor2";
+            edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            edtSettings.ShowModelErrors = true;
+            edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }
+        ).Bind((c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "Memo"):0)).Render();
+        ViewContext.Writer.Write("</td></tr></table>");
+    });
+
+    settings.CustomJSProperties = (sender, e) =>
+    {
+        MVCxGridView grid = (MVCxGridView)sender;
+        e.Properties["cpDocSumma"] = Model.CalculateSum();
+    };
+
+    settings.ClientSideEvents.ColumnResizing = "function (s, e) {if (e.column.name == 'colImageAction') {e.cancel = true;}}";
+    settings.ClientSideEvents.EndCallback = "function(s,e){DocSumma.SetValue(s.cpDocSumma);DocSummaTax.SetValue(s.cpDocSumma*0.2);DocSummaTotal.SetValue(s.cpDocSumma*1.2);}";
+}).Bind(Model.Details.Where(s => s.StateId != State.STATEDELETED)).GetHtml()

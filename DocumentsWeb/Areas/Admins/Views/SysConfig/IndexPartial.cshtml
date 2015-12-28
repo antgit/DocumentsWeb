@@ -1,0 +1,268 @@
+﻿@using DocumentsWeb.Areas.Admins.Models
+@using System.Web.UI.WebControls;
+@model SysConfigModel
+           
+@Html.DevExpress().PageControl(settings =>
+{
+    settings.Name = "tsEditSysConfig";
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    MVCxTabPage pageMain = settings.TabPages.Add("Общие");
+    pageMain.SetContent(() =>
+    {
+        ViewContext.Writer.Write("<table style=\"width: 800px;\">");
+        ViewContext.Writer.Write("<tr><td class=\"table_label\" style=\"width: 150px;\">");
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Тема по умолчанию:";
+            s.AssociatedControlName = "ReportsServer";
+        }).GetHtml();
+        ViewContext.Writer.Write("</td><td>");
+
+        ViewContext.Writer.Write("<label id=\"popupLabel\" style=\"color: blue; cursor: pointer;\">" + (Model.ThemeDefault == null || Model.ThemeDefault.Length == 0 ? "default" : Model.ThemeDefault) + "</label>");
+        ViewContext.Writer.Write("<input type=\"hidden\" id=\"ThemeDefault\" name=\"ThemeDefault\" value=\"" + (Model.ThemeDefault == null ? "" : Model.ThemeDefault) + "\" />");
+        
+        Html.DevExpress().PopupControl(pc =>
+        {
+            pc.Name = "pcThemDefault";
+            pc.PopupElementID = "popupLabel";
+            pc.Height = 250;
+            pc.Width = 520;
+
+            pc.ShowFooter = false;
+            pc.ShowHeader = false;
+            pc.PopupHorizontalAlign = PopupHorizontalAlign.LeftSides;
+            pc.PopupVerticalAlign = PopupVerticalAlign.Below;
+            pc.EnableAnimation = true;
+            pc.AllowDragging = false;
+            pc.CloseAction = CloseAction.MouseOut;
+            pc.ScrollBars = ScrollBars.Auto;
+
+            pc.SetContent(() =>
+            {
+                ViewContext.Writer.Write("<div id=\"ThemesContainer\">");
+                foreach (ThemeGroupModel themeGroup in ThemesModel.Current.Groups)
+                {
+                    ViewContext.Writer.Write("<div class=\"ThemeGroup\">" + themeGroup.Title + "</div>");
+
+                    int i = 0;
+                    ViewContext.Writer.Write("<table class=\"sitemap\">");
+                    ViewContext.Writer.Write("<tr>");
+                    foreach (ThemeModel theme in themeGroup.Themes)
+                    {
+                        if (theme.Name != "DevEx")
+                        {
+                            if (i == 3)
+                            {
+                                ViewContext.Writer.Write("</tr><tr>");
+                                i = 0;
+                            }
+
+                            ViewContext.Writer.Write("<td>");
+                            ViewContext.Writer.Write("<div class=\"" + theme.SpriteCssClass + "\" style=\"cursor: pointer;\" onclick=\"javascript:$('#popupLabel').text('" + (theme.Name.Length == 0 ? "default" : theme.Name) + "');$('#ThemeDefault').val('" + theme.Name + "');parent.pcThemDefault.Hide();\">" + theme.Title + "</div>");
+                            //ASPxClientUtils.SetCookie(DXDemo.CurrentThemeCookieKey, '" + theme.Name + "'); window.location.reload();
+                            ViewContext.Writer.Write("</td>");
+                            i++;
+                        }
+                    }
+                    ViewContext.Writer.Write("</tr>");
+                    ViewContext.Writer.Write("</table>");
+                }
+                ViewContext.Writer.Write("</div>");
+            });
+        }).Render();
+
+        ViewContext.Writer.Write("</td></tr><tr><td class=\"table_label\">");
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "О компании:";
+            s.AssociatedControlName = "FooterBanerText";
+        }).GetHtml();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TextBox(s =>
+        {
+            s.Name = "FooterBanerText";
+            s.ControlStyle.CssClass = "editor";
+            s.Width = Unit.Percentage(100);
+        }).Bind(Model.FooterBanerText).Render();
+
+        ViewContext.Writer.Write("</td></tr><tr><td class=\"table_label\">");
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Разрешить регистрацию компаний:";
+            s.AssociatedControlName = "SolveRegistryCompany";
+        }).GetHtml();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().CheckBox(s =>
+        {
+            s.Name = "SolveRegistryCompany";
+            s.ControlStyle.CssClass = "editor";
+            s.Width = Unit.Percentage(100);
+        }).Bind(Model.SolveRegistryCompany).Render();
+        
+        ViewContext.Writer.Write("</td></tr></table>");
+    });
+    
+    MVCxTabPage pageReports = settings.TabPages.Add("Отчеты");
+    pageReports.SetContent(() =>
+    {
+        ViewContext.Writer.Write("<table style=\"width: 800px;\">");
+        ViewContext.Writer.Write("<tr><td class=\"table_label\" style=\"width: 150px;\">");
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Сервер отчетов:";
+            s.AssociatedControlName = "ReportsServer";
+        }).GetHtml();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TextBox(s =>
+        {
+            s.Name = "ReportsServer";
+            s.ControlStyle.CssClass = "editor";
+            s.Width = Unit.Percentage(100);
+        }).Bind(Model.ReportsServer).Render();
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Папка на сервере отчетов:";
+            s.AssociatedControlName = "ReportsServerFolder";
+        }).GetHtml();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TextBox(s =>
+        {
+            s.Name = "ReportsServerFolder";
+            s.ControlStyle.CssClass = "editor";
+            s.Width = Unit.Percentage(100);
+        }).Bind(Model.ReportsServerFolder).Render();
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Серверное расположение Web отчетов Stimulsoft:";
+            s.AssociatedControlName = "ReportsLocation";
+        }).GetHtml();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TextBox(s =>
+        {
+            s.Name = "ReportsLocation";
+            s.ControlStyle.CssClass = "editor";
+            s.Width = Unit.Percentage(100);
+        }).Bind(Model.ReportsLocation).Render();
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Использовать Flash для печатных форм:";
+            s.AssociatedControlName = "UseFlashForWebForms";
+        }).GetHtml();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().CheckBox(s =>
+        {
+            s.Name = "UseFlashForWebForms";
+            s.ControlStyle.CssClass = "editor";
+            s.Width = Unit.Percentage(100);
+        }).Bind(Model.UseFlashForWebForms).Render();
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Использовать Flash просмотр веб отчетов Stimulsoft:";
+            s.AssociatedControlName = "UseFlashForReports";
+        }).GetHtml();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().CheckBox(s =>
+        {
+            s.Name = "UseFlashForReports";
+            s.ControlStyle.CssClass = "editor";
+            s.Width = Unit.Percentage(100);
+        }).Bind(Model.UseFlashForReports).Render();
+        
+        ViewContext.Writer.Write("</td><tr></table>");
+    });
+    
+    MVCxTabPage pageCache = settings.TabPages.Add("Кэш");
+    pageCache.SetContent(() =>
+    {
+        Html.DevExpress().HyperLink(hl =>
+        {
+            hl.Name = "hlClearCache";
+            hl.Properties.Text = "Очистить кэш";
+            hl.NavigateUrl = Url.Content("~/SysConfig/ClearCache");
+        }).Render();
+    });
+
+    MVCxTabPage pageSMTP = settings.TabPages.Add("SMTP");
+    pageSMTP.SetContent(() =>
+    {
+        ViewContext.Writer.Write("<table style=\"width: 800px;\">");
+        ViewContext.Writer.Write("<tr><td class=\"table_label\" style=\"width: 150px;\">");
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "SMTP сервер:";
+            s.AssociatedControlName = "SMTPServer";
+        }).GetHtml();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TextBox(s =>
+        {
+            s.Name = "SMTPServer";
+            s.ControlStyle.CssClass = "editor";
+            s.Width = Unit.Percentage(100);
+        }).Bind(Model.SMTPServer).Render();
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\" style=\"width: 150px;\">");
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "SMTP пользователь:";
+            s.AssociatedControlName = "SMTPUser";
+        }).GetHtml();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TextBox(s =>
+        {
+            s.Name = "SMTPUser";
+            s.ControlStyle.CssClass = "editor";
+            s.Width = Unit.Percentage(100);
+        }).Bind(Model.SMTPUser).Render();
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\" style=\"width: 150px;\">");
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "SMTP пароль:";
+            s.AssociatedControlName = "SMTPPassword";
+        }).GetHtml();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TextBox(s =>
+        {
+            s.Name = "SMTPPassword";
+            s.ControlStyle.CssClass = "editor";
+            s.Width = Unit.Percentage(100);
+            //s.Properties.Password = true;
+        }).Bind(Model.SMTPPassword).Render();
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\" style=\"width: 150px;\">");
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Email адрес администратора:";
+            s.AssociatedControlName = "SMTPAdminEmail";
+        }).GetHtml();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TextBox(s =>
+        {
+            s.Name = "SMTPAdminEmail";
+            s.ControlStyle.CssClass = "editor";
+            s.Width = Unit.Percentage(100);
+        }).Bind(Model.SMTPAdminEmail).Render();
+        
+        ViewContext.Writer.Write("</td><tr></table>");
+    });
+}).GetHtml()

@@ -1,0 +1,203 @@
+﻿@using BusinessObjects
+@using DevExpress
+@using DevExpress.Web
+@using DevExpress.Utils
+@using DevExpress.Web.Mvc
+@using DevExpress.Web.Mvc.UI
+@using Unit = System.Web.UI.WebControls.Unit
+@model DocumentsWeb.Areas.Ourp.Models.EquipmentDetailModel
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		Name.Focus();
+	});
+</script>
+
+<table style="width: 500px; height: 100%;">
+    <tr>
+        <td style="width: 100px;">
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Код:";
+                s.AssociatedControlName = GlobalPropertyNames.Code;
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = GlobalPropertyNames.Code;
+                s.ReadOnly = true;
+                s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            }).Bind(Model.Code).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 100px;">
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Номенклатурный номер:";
+                s.AssociatedControlName = GlobalPropertyNames.Nomenclature;
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = GlobalPropertyNames.Nomenclature;
+                s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            }).Bind(Model.Nomenclature).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 100px;">
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Наименование:";
+                s.AssociatedControlName = GlobalPropertyNames.Name;
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = GlobalPropertyNames.Name;
+                s.ReadOnly = Model.IsSystem | Model.IsReadOnly;
+                s.Width = Unit.Percentage(100);
+                s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            }).Bind(Model.Name).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 100px;">
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Дата выпуска:";
+                s.AssociatedControlName = "DateBuild";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().DateEdit(s =>
+            {
+                s.Name = "DateBuild";
+                s.ReadOnly = Model.IsSystem | Model.IsReadOnly;
+                s.Width = Unit.Percentage(100);
+                s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            }).Bind(Model.DateBuild).GetHtml()
+        </td>
+    </tr>
+
+    <tr>
+        <td style="width: 100px;">
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Ед. измерения:";
+                s.AssociatedControlName = GlobalPropertyNames.UnitId;
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().ComboBox(s =>
+            {
+                s.Name = GlobalPropertyNames.UnitId;
+                s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+                s.Width = Unit.Percentage(100);
+                s.ControlStyle.CssClass = "editor";
+                s.Properties.ValueField = GlobalPropertyNames.Id;
+                s.Properties.TextField = GlobalPropertyNames.Name;
+                s.Properties.ValueType = typeof(int);
+                s.Properties.FilterMinLength = 2;
+                s.Properties.IncrementalFilteringMode = DevExpress.Web.ASPxEditors.IncrementalFilteringMode.Contains;
+            }).BindList(DocumentsWeb.Areas.General.Models.WebUnitModel.GetCollection()).Bind(Model.UnitId).GetHtml()
+        </td>
+    </tr>
+
+    <tr>
+        <td style="width: 100px;">
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Номер чертежа:";
+                s.AssociatedControlName = "DrawingNumber";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = "DrawingNumber";
+                s.ReadOnly = Model.IsSystem | Model.IsReadOnly;
+                s.Width = Unit.Percentage(100);
+                s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            }).Bind(Model.DrawingNumber).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 100px;">
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Номер сборочного чертежа:";
+                s.AssociatedControlName = "DrawingAssemblayNumber";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = "DrawingAssemblayNumber";
+                s.ReadOnly = Model.IsSystem | Model.IsReadOnly;
+                s.Width = Unit.Percentage(100);
+                s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            }).Bind(Model.DrawingAssemblyNumber).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 100px;">
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Вес:";
+                s.AssociatedControlName = "Weight";
+            }).GetHtml()
+        </td>
+        <td>
+           @Html.DevExpress().SpinEdit(s =>
+           {
+               s.Name = "Weight";
+               s.ControlStyle.CssClass = "editor";
+               s.Width = Unit.Percentage(100);
+               s.Style.Add("float", "left");
+               s.Properties.DisplayFormatString = "0.00";
+               s.Properties.MaxValue = 10000;
+               s.Properties.MinValue = 0;
+           }).Bind(Model.Weight).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 100px;">
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Примечание:";
+                s.AssociatedControlName = GlobalPropertyNames.Memo;
+            }).GetHtml()
+        </td>
+        <td>
+           @Html.DevExpress().Memo(s =>
+            {
+                s.Name = GlobalPropertyNames.Memo;
+                s.Properties.NullText = "Введите примечание или описание документа...";
+                s.ControlStyle.CssClass = "editor";
+                s.Height = System.Web.UI.WebControls.Unit.Pixel(40);
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ClientEnabled = !Model.IsReadOnly;
+            }).Bind(Model.Memo).GetHtml()
+        </td>
+    </tr>
+</table>

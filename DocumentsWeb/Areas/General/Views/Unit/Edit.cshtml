@@ -1,0 +1,22 @@
+﻿@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentsWeb.Areas.General.Models
+@using DevExpress.Web.Mvc
+@using DevExpress.Web.Mvc.UI
+@using DocumentsWeb.Models
+@model WebUnitModel
+
+@{
+    Html.EnableClientValidation();
+    bool haveEdit = !Model.IsReadOnly && WADataProvider.LibrariesElementRightView.IsAllow(Right.UIEDIT, WebModuleNames.WEB_UNIT) && !WADataProvider.CommonRightView.ReadOnly;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script type="text/javascript">
+    @if(Model.IsSystem |!haveEdit) { ViewContext.Writer.Write("if (typeof parent.pcEdit != 'undefined') { parent.pcEdit.SetVisibleSaveButton(false); }"); }
+</script>
+
+@using (Html.BeginForm("Edit", "Unit", FormMethod.Post, new { @class = "edit_form", @id = "editForm"}))
+{
+    @Html.Partial("EditPartial", Model)
+}

@@ -1,0 +1,105 @@
+﻿@using DocumentsWeb.Areas.Analitics.Models
+@using DocumentsWeb.Areas.Marketings.Models
+@using DocumentsWeb.Models
+@using System.Linq
+@using BusinessObjects
+
+@{
+    string subGroup = ViewData["subGroup"] != null && ViewData["subGroup"].ToString().Length > 0 ? ViewData["subGroup"].ToString() : null;
+    string GroupId = ViewData["GId"] != null && ViewData["GId"].ToString() != "null" ? (string)ViewData["GId"] : null;
+    string tm = ViewData["TM"] != null && ViewData["TM"].ToString() != "null" ? (string)ViewData["TM"] : null;
+    string mId = (string)ViewData["mId"];
+    List<AnaliticModel> rows = new List<AnaliticModel>();
+    List<DocumentAnaliticModel> group = new List<DocumentAnaliticModel>();
+    if (subGroup != null)
+    {
+        rows = AnaliticModel.GetSubCollection(subGroup);
+    }
+    if (GroupId != null && tm != null)
+    {
+        if (tm.Length == 0) 
+        {
+            tm = "0";
+        }
+        DocumentMktgModel dm = (DocumentMktgModel)WADataProvider.ModelsCache.Get(mId);
+        for (int i = 0; i < dm.Analitics.Count; i++)
+        {
+            if (dm.Analitics[i].StateId != State.STATEDELETED && dm.Analitics[i].GroupId == int.Parse(GroupId) && dm.Analitics[i].AnaliticId == int.Parse(tm))
+            {
+                group.Add(dm.Analitics[i]);
+            }
+        }
+    }
+}
+
+@Html.DevExpress().CallbackPanel(cpSettings => {
+    cpSettings.Name = "SubGroupsCallback";
+    cpSettings.CallbackRouteValues = new { Controller = "Mktg", Action = "EditGroupListPartial" };
+    cpSettings.ClientSideEvents.BeginCallback = "function (s, e) {var gp = GroupId.GetValue(); e.customArgs['GId'] = gp; e.customArgs['subGroup'] = (gp == 8 ? \"07\" : (gp == 9 ? \"03\" : \"\")); e.customArgs['TM'] = AnaliticId.GetValue(); e.customArgs['mId'] = '" + mId + "'; }";
+    cpSettings.SetContent(() =>
+    {
+        ViewContext.Writer.Write("<input type=\"hidden\" id=\"groupCount\" name=\"groupCount\" value=\"" + rows.Count.ToString() + "\" />");
+        ViewContext.Writer.Write("<input type=\"hidden\" id=\"GId\" name=\"GId\" value=\"" + GroupId + "\" />");
+        ViewContext.Writer.Write("<input type=\"hidden\" id=\"TM\" name=\"TM\" value=\"" + tm + "\" />");
+        ViewContext.Writer.Write("<table>");
+        for (int i = 0; i < rows.Count; i++)
+        {
+            ViewContext.Writer.Write("<div>");
+            ViewContext.Writer.Write("<tr><td>");
+            if (i == 0)
+            {
+                Html.DevExpress().Label(s =>
+                {
+                    s.Text = "Подгруппа товара: ";
+                    s.ControlStyle.Font.Bold = true;
+                    s.Style.Add("float", "left");
+                }).Render();
+                ViewContext.Writer.Write("<br />");
+            }
+            Html.DevExpress().Label(lSettings =>
+            {
+                lSettings.ControlStyle.CssClass = "editor";
+                lSettings.Text = rows[i].Name;
+                lSettings.Width = 250;
+            }).Render();
+            ViewContext.Writer.Write("<input type=\"hidden\" id=\"Analitic2Id_" + i.ToString() + "\" name=\"Analitic2Id_" + i.ToString() + "\" value=\"" + rows[i].Id.ToString() + "\" /></div>");
+            ViewContext.Writer.Write("</td><td>");
+            ViewContext.Writer.Write("<div>");
+            if (i == 0)
+            {
+                Html.DevExpress().Label(s =>
+                {
+                    s.Text = "Количество SKU в подгруппе: ";
+                    s.ControlStyle.Font.Bold = true;
+                    s.Style.Add("float", "left");
+                }).Render();
+                ViewContext.Writer.Write("<br />");
+            }
+            
+            DocumentAnaliticModel m = null;
+            try
+            {
+                m = group.First(f => f.Analitic2Id == rows[i].Id);
+            }
+            catch {}
+            Html.DevExpress().SpinEdit(edtSettings =>
+            {
+                edtSettings.Name = "SummValue2_" + i.ToString();
+                edtSettings.ControlStyle.CssClass = "editor";
+                edtSettings.Width = 250;
+                edtSettings.Style.Add("float", "left");
+                edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                edtSettings.Properties.DisplayFormatString = "0";
+                edtSettings.Properties.DisplayFormatInEditMode = true;
+                edtSettings.Properties.NumberType = SpinEditNumberType.Integer;
+                edtSettings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+                edtSettings.Properties.MaxValue = 10000;
+                edtSettings.Properties.MinValue = 0;
+            }).Bind(m == null ? 0 : m.SummValue2).Render();
+            ViewContext.Writer.Write("</div>");
+            ViewContext.Writer.Write("</td></tr>");
+        }
+        ViewContext.Writer.Write("</table>");
+    });
+}).GetHtml()

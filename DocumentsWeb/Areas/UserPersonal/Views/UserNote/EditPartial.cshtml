@@ -1,0 +1,32 @@
+﻿@using BusinessObjects
+@using DocumentsWeb.Controllers
+@using DocumentsWeb.Areas.General.Models
+@model DocumentsWeb.Areas.UserPersonal.Models.UserNoteModel
+           
+@Html.DevExpress().PageControl(settings =>{
+        settings.Name = "tsEditUserNote";
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        settings.ClientSideEvents.Init = "OntsEditUserNoteInit";
+        settings.Styles.Content.CssClass = "tabcontent";    
+        MVCxTabPage pageMain = settings.TabPages.Add("Текст заметки...");
+        pageMain.SetContent(() =>
+        {
+            ViewContext.Writer.Write("<input type=\"hidden\" id=\"KindId\" name=\"KindId\" value=\"" + Model.KindId + "\" />");
+            
+            ViewContext.Writer.Write("<table style=\"width: 100%;\">");
+            ViewContext.Writer.Write("<tr style=\"height: 260px;\"><td>");
+            @Html.DevExpress().Memo(s =>{
+                s.Name = GlobalPropertyNames.Memo;
+                s.Properties.NullText = "Введите примечание или описание...";
+                s.Properties.ConvertEmptyStringToNull = true;
+                s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.Height = 250;
+                
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.Memo).GetHtml();
+            ViewContext.Writer.Write("</td></tr></table>");
+        });
+    }).GetHtml()

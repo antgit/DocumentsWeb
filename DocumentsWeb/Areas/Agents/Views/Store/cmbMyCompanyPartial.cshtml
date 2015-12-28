@@ -1,0 +1,26 @@
+﻿@using BusinessObjects
+@using DocumentsWeb.Models
+@using DocumentsWeb.Areas.Agents.Models
+@model ClientModel
+
+         
+@Html.DevExpress().ComboBox(settings =>{
+    settings.Name = GlobalPropertyNames.MyCompanyId;
+    settings.ReadOnly = Model.IsReadOnly | Model.IsSystem | Model.Id > 0;
+    if (!settings.ReadOnly)
+    {
+        settings.Properties.NullDisplayText = "Выберите предприятие...";
+        settings.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), "cmbMyCompanyId");
+    }
+    //settings.CallbackRouteValues = new { Area = "Agents", Controller = "Store", Action = "StorekeeperPartial" };
+    settings.Properties.EnableCallbackMode = true;
+    settings.Properties.ValueField = GlobalPropertyNames.Id;
+    settings.Properties.TextField = GlobalPropertyNames.Name;
+    settings.Properties.ValueType = typeof(int);
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.ShowModelErrors = true;
+    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+    settings.Properties.ClientSideEvents.ValueChanged = "function AgentDepartmentFromId_Changed(s, e) { StorekeeperId.PerformCallback(); }";
+}).BindList(ClientModel.GetMyDepatments()).Bind(Model.MyCompanyId == 0 ? null : (int?)Model.MyCompanyId).GetHtml()

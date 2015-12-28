@@ -1,0 +1,96 @@
+﻿@using System.Web.UI.WebControls
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Регистрация";
+
+    string CompanyName = "";
+    string WorkerName = "";
+    string Pohone = "";
+    string Email = "";
+    string Login = "";
+    string Password = "";
+    
+    if (HttpContext.Current.Request.Cookies["Registry"] != null) 
+    {
+        CompanyName = HttpContext.Current.Request.Cookies["Registry_CompanyName"].Value;
+        WorkerName = HttpContext.Current.Request.Cookies["Registry_WorkerName"].Value;
+        Pohone = HttpContext.Current.Request.Cookies["Registry_Pohone"].Value;
+        Email = HttpContext.Current.Request.Cookies["Registry_Email"].Value;
+        Login = HttpContext.Current.Request.Cookies["Registry_Login"].Value;
+        Password = HttpContext.Current.Request.Cookies["Registry_Password"].Value;
+    }
+}
+
+<table style="width: 100%; height: 100%; margin-top: 100px;">
+    <tr>
+        <td style="width: 50%;">
+        </td>
+        <td>
+@Html.DevExpress().RoundPanel(s=>
+{
+    s.Width = Unit.Pixel(450);
+    s.HeaderText = "Благодарим за регистрацию!";
+    s.SetContent(() =>
+    {
+        Html.DevExpress().Label(ls =>
+        {
+            ls.Text = "<b>Поздравляем!</b><br /> Теперь Вы являетесь зарегистрированным пользователем сервиса \"Мое дело\". На указанный Вами электронный ящих был отправлен пароль для входа в систему.";
+            ls.Width = Unit.Percentage(100);
+            ls.EncodeHtml = false;
+        }).Render();
+        Html.DevExpress().Label(ls =>
+        {
+            ls.Text = "<br /><b>Ваши данные:</b><br />";
+            ls.Width = Unit.Percentage(100);
+            ls.EncodeHtml = false;
+        }).Render();
+        Html.DevExpress().Label(ls =>
+        {
+            ls.Text = "&nbsp;&nbsp;&nbsp;&nbsp;Компания: <b>" + CompanyName + "</b><br />";
+            ls.Width = Unit.Percentage(100);
+            ls.EncodeHtml = false;
+        }).Render();
+        Html.DevExpress().Label(ls =>
+        {
+            ls.Text = "&nbsp;&nbsp;&nbsp;&nbsp;Ф.И.О. сотрудника: <b>" + WorkerName + "</b><br />";
+            ls.Width = Unit.Percentage(100);
+            ls.EncodeHtml = false;
+        }).Render();
+        Html.DevExpress().Label(ls =>
+        {
+            ls.Text = "&nbsp;&nbsp;&nbsp;&nbsp;Телефон: <b>" + Pohone + "</b><br />";
+            ls.Width = Unit.Percentage(100);
+            ls.EncodeHtml = false;
+        }).Render();
+        Html.DevExpress().Label(ls =>
+        {
+            ls.Text = "&nbsp;&nbsp;&nbsp;&nbsp;E-mail: <b>" + Email + "</b><br />";
+            ls.Width = Unit.Percentage(100);
+            ls.EncodeHtml = false;
+        }).Render();
+        Html.DevExpress().Label(ls =>
+        {
+            ls.Text = "&nbsp;&nbsp;&nbsp;&nbsp;Логин: <b>" + Login + "</b><br />";
+            ls.Width = Unit.Percentage(100);
+            ls.EncodeHtml = false;
+        }).Render();
+        Html.DevExpress().Label(ls =>
+        {
+            ls.Text = "&nbsp;&nbsp;&nbsp;&nbsp;Пароль: <b>" + Password + "</b><br />";
+            ls.Width = Unit.Percentage(100);
+            ls.EncodeHtml = false;
+        }).Render();
+        ViewContext.Writer.Write("<br /><br />");
+        Html.DevExpress().HyperLink(hl => {
+            hl.Style.Add("float", "right");
+            hl.Properties.Text = "Войти";
+            hl.NavigateUrl = "~/Account/LogOn";
+        }).Render();
+    });
+}).GetHtml()
+        </td>
+        <td style="width: 50%;">
+        </td>
+    </tr>
+</table>

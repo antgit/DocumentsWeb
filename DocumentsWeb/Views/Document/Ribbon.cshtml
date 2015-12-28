@@ -1,0 +1,114 @@
+﻿<script type="text/javascript">
+function EditDocument(id){
+    //window.open('@DevExpressHelper.GetUrl(new { Controller = "Document", Action = "Edit"})/' + id, '_blank', 'width=' + (screen.width - 40) + ',height=' + (screen.height - 140) + ',left=20,top=20,resizable=1,scrollbars=0,location=0');
+    window.open('@DevExpressHelper.GetUrl(new { Controller = "Document", Action = "Edit"})/' + id);
+}
+
+function OnMenuItemClick(s, e) {
+    switch (e.item.name) {
+        case "mnuAdd":
+            if(gvFoldersTree.IsGroupRow(gvFoldersTree.GetFocusedRowIndex()))
+                break;
+            var folderId=gvFoldersTree.GetRowKey(gvFoldersTree.GetFocusedRowIndex());
+            //window.open('@DevExpressHelper.GetUrl(new { Controller = "Document", Action = "Create"})?folderId='+folderId, '_blank', 'width=' + (screen.width - 40) + ',height=' + (screen.height - 140) + ',left=20,top=20,resizable=1,scrollbars=0,location=0');
+            window.open('@DevExpressHelper.GetUrl(new { Controller = "Document", Action = "Create"})?folderId='+folderId);
+            break;
+        case "mnuEdit":
+            var id = gvDocuments.GetRowKey(gvDocuments.GetFocusedRowIndex());
+            if (id == null)
+                break;
+            EditDocument(id);
+            break;
+        case "mnuDelete":
+            var id = gvDocuments.GetFocusedRowIndex();
+            if (id == -1)
+                break;
+            if (confirm("Удалить?"))
+               document.location = '@DevExpressHelper.GetUrl(new { Controller = "Document", Action = "DeleteDocument"})?Id=' + gvDocuments.GetRowKey(id);
+               @*gvDocuments.DeleteRow(id);*@
+            break;
+        case "mnuRefresh":
+            var url = "Document/IndexPartial?refresh=true";
+                $.post(url, function (data) {
+                    if (data) {
+                        // callback to show image/flag 
+                    } else {
+                        // callback to show error/permission 
+                    }
+                });
+            gvDocuments.PerformCallback();
+            break;
+        case "mnuShowCustomizationWindow":
+            if(gvDocuments.IsCustomizationWindowVisible())
+                gvDocuments.HideCustomizationWindow();
+            else
+                gvDocuments.ShowCustomizationWindow();
+            break;
+        @*case "mnuExport":
+            break;
+        case "mnuExportToXLSX":
+            document.location = 'DevExpressHelper.GetUrl(new { Controller = "Document", Action = "ExportTo", type="XLSX", subtype=Url.RequestContext.RouteData.Values["action"]})';
+            break;
+        case "mnuExportToPDF":
+            document.location = 'DevExpressHelper.GetUrl(new { Controller = "Document", Action = "ExportTo", type = "PDF", subtype = Url.RequestContext.RouteData.Values["action"] })';
+            break;*@
+        case "mnuActions":
+            break;
+        case "mnuCreateFrom":
+            break;
+        default:
+            alert(e.item.name);
+            break;
+    }        
+}
+</script>
+
+@Html.DevExpress().Menu(settings =>
+{
+    settings.EnableHotTrack = true;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Name = "mFeatures";
+    settings.ClientSideEvents.ItemClick = "OnMenuItemClick";
+
+    settings.Items.Add(item =>
+    {
+        item.Name = "mnuAdd";
+        item.Text = "Добавить";
+        item.Image.Url = @Url.Content("~/Images/WIZARD_X16.png"); 
+    });
+    settings.Items.Add(item =>
+    {
+        item.Name = "mnuEdit";
+        item.Text = "Изменить";
+        item.Image.Url = @Url.Content("~/Images/PROPERTIES_X16.png"); 
+    });
+    settings.Items.Add(item =>
+    {
+        item.Name = "mnuDelete";
+        item.Text = "Удалить";
+        item.Image.Url = @Url.Content("~/Images/DELETEDELEMENT_X16.png"); 
+    });
+    settings.Items.Add(item =>
+    {
+        item.Name = "mnuRefresh";
+        item.Text = "Обновить";
+        item.Image.Url = @Url.Content("~/Images/REFRESHGREEN_X16.png");
+    });
+    settings.Items.Add(item =>
+    {
+        item.Name = "mnuShowCustomizationWindow";
+        item.Text = "Выбор колонок";
+        item.Image.Url = @Url.Content("~/Images/gear.png");
+    });
+    settings.Items.Add(item =>
+    {
+        item.Name = "mnuActions";
+        item.Text = "Действия";
+        item.Items.Add(subItem =>
+        {
+            subItem.Name = "mnuCreateFrom";
+            subItem.Text = "Создать на основе";
+        });
+    });
+}).GetHtml()
+

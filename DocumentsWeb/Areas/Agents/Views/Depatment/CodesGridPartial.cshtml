@@ -1,0 +1,144 @@
+﻿@using System.Web.UI.WebControls
+@using BusinessObjects
+@using DocumentsWeb.Areas.Agents.Models
+@model WebDepatmentModel
+@Html.DevExpress().GridView(settings=>{
+    settings.Name = "gvCodes";
+    settings.CallbackRouteValues = new { Controller = "Depatment", Action = "CodesGridPartial", agId = Model.Id };
+    settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Depatment", Action = "AddNewCodePartial" };
+    settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Depatment", Action = "UpdateCodePartial" };
+    settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Styles.Cell.Paddings.Padding = System.Web.UI.WebControls.Unit.Pixel(2); 
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;    
+    settings.KeyFieldName = GlobalPropertyNames.Id;
+    settings.SettingsBehavior.AllowFocusedRow = true;
+    settings.Columns.Add("CodeName", "Наименование");
+    settings.Columns.Add("CodeCode", "Код");
+
+    settings.CommandColumn.Visible = true;
+    settings.CommandColumn.CellStyle.VerticalAlign = VerticalAlign.Top;
+    settings.CommandColumn.ButtonType = ButtonType.Image;
+    settings.CommandColumn.Width = 20;
+    settings.CommandColumn.Caption = " ";
+    settings.CommandColumn.EditButton.Visible = true;
+    settings.CommandColumn.EditButton.Image.ToolTip = "Редактировать данные";
+    settings.CommandColumn.EditButton.Image.Width = System.Web.UI.WebControls.Unit.Pixel(10);
+    settings.CommandColumn.EditButton.Image.Url = Url.Content("~/Images/edit10x10.png");
+
+    settings.Settings.ShowFooter = true;
+
+    settings.SetFooterRowTemplateContent(c => ViewContext.Writer.Write("<div style=\"width: 100%; text-align: center; font-size: 10pt;\"><a href=\"javascript:gvCodes.AddNewRow();\">Создать</a></div>"));
+    
+    settings.SetEditFormTemplateContent(c =>
+    {
+        ViewContext.Writer.Write("<input type=\"hidden\" id=\"ElementId\" name=\"ElementId\" value=\"" + Model.Id + "\">");
+
+        ViewContext.Writer.Write("<table style=\"width: 450px;\">");
+        ViewContext.Writer.Write("<tr><td colspan=\"2\">");
+        ViewContext.Writer.Write("<table><tr><td>");
+        Html.DevExpress().Button(btnSettings =>
+        {
+            btnSettings.Name = "btnUpdate";
+            btnSettings.ControlStyle.CssClass = "button";
+            btnSettings.Text = "Сохранить";
+            btnSettings.ClientSideEvents.Click = "function(s, e){ gvCodes.UpdateEdit(); }";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().Button(btnSettings =>
+        {
+            btnSettings.Name = "btnCancel";
+            btnSettings.ControlStyle.CssClass = "button";
+            btnSettings.Text = "Отмена";
+            btnSettings.ClientSideEvents.Click = "function(s, e){ gvCodes.CancelEdit(); }";
+        }).Render();
+        ViewContext.Writer.Write("</td></tr></table>");
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Наименование:";
+            edtSettings.AssociatedControlName = "CodeNameId";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().ComboBox(edtSettings =>
+        {
+            edtSettings.Name = "CodeNameId";
+            edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            edtSettings.ClientEnabled = DataBinder.Eval(c.DataItem, "Id") == null;
+            edtSettings.Properties.ValueField = "Id";
+            edtSettings.Properties.TextField = "Name";
+            edtSettings.Properties.ValueType = typeof(int);
+            edtSettings.Properties.NullDisplayText = "Выберите наименование кода...";
+            edtSettings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+            //edtSettings.Properties.FilterMinLength = 2;
+            edtSettings.ControlStyle.CssClass = "editor";
+            edtSettings.ShowModelErrors = true;
+            edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).BindList(CodeValueModel.GetCodeNames((int)WhellKnownDbEntity.Depatment)).Bind(DataBinder.Eval(c.DataItem, "CodeNameId")).GetHtml();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Значение:";
+            edtSettings.AssociatedControlName = "Value";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TextBox(edtSettings =>
+        {
+            edtSettings.Name = "Value";
+            edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            edtSettings.Properties.NullDisplayText = "Введите значение...";
+            edtSettings.ControlStyle.CssClass = "editor";
+            edtSettings.ShowModelErrors = true;
+            edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(DataBinder.Eval(c.DataItem, "Value")).GetHtml();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Номер:";
+            edtSettings.AssociatedControlName = "OrderNo";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().SpinEdit(edtSettings =>
+        {
+            edtSettings.Name = "OrderNo";
+            edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            edtSettings.Properties.NullDisplayText = "Введите номер...";
+            edtSettings.ControlStyle.CssClass = "editor";
+            edtSettings.ShowModelErrors = true;
+            edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(DataBinder.Eval(c.DataItem, "OrderNo")).GetHtml();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Примечание:";
+            edtSettings.AssociatedControlName = GlobalPropertyNames.Memo;
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().Memo(edtSettings =>
+        {
+            edtSettings.Name = GlobalPropertyNames.Memo;
+            edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            edtSettings.Properties.NullDisplayText = "Введите примечание...";
+            edtSettings.ControlStyle.CssClass = "editor";
+            edtSettings.ShowModelErrors = true;
+            edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(DataBinder.Eval(c.DataItem, "Memo")).GetHtml();
+        ViewContext.Writer.Write("</td></tr></table>");
+    });
+}).Bind(Model.CodesCollection).GetHtml()

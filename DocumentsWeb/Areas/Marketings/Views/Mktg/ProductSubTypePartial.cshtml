@@ -1,0 +1,25 @@
+﻿@using BusinessObjects;
+@using DocumentsWeb.Models;
+@using DocumentsWeb.Areas.Analitics.Models;
+
+@{
+    string ProdType = "";
+
+    try { ProdType = Convert.ToString(ViewData["Type"]); } catch { ProdType = ""; }
+}
+
+@Html.DevExpress().ComboBox(s =>
+{
+    s.ControlStyle.CssClass = "editor";
+    s.Name = "Analitic2Id";
+    s.CallbackRouteValues = new { Area = "Marketings", Controller = "Mktg", Action = "ProductSubType" };
+    s.Properties.ValueField = GlobalPropertyNames.Id;
+    s.Properties.TextField = GlobalPropertyNames.Name;
+    s.Properties.ValueType = typeof(int);
+    s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    s.Width = 250;
+    s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+    s.Properties.ClientSideEvents.BeginCallback = "function (s, e) { e.customArgs['Type'] = (GroupId.GetValue() == 8 ? \"07\" : (GroupId.GetValue() == 9 ? \"03\" : \"\")); e.customArgs['Analitic2Id'] = \"" + ViewData["Analitic2Id"] + "\" }";
+    s.Properties.ClientSideEvents.EndCallback = ViewData["Analitic2Id"] == null ? "function (s, e) { s.SetValue(null); }" : "function (s, e) { s.SetValue(" + Convert.ToString(ViewData["Analitic2Id"]) + "); }";
+}).BindList(AnaliticModel.GetSubCollection(ProdType)).Bind(ViewData["Analitic2Id"]).GetHtml()

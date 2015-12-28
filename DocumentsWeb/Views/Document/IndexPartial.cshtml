@@ -1,0 +1,118 @@
+﻿@using BusinessObjects
+@Html.DevExpress().GridView(settings=>{
+    settings.Name="gvDocuments";
+    settings.CallbackRouteValues = new { Controller = "Document", Action = "IndexPartial" };
+    //settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Document", Action = "DeleteDocument"};  
+    settings.Settings.ShowFilterBar = GridViewStatusBarMode.Visible;
+    settings.SettingsBehavior.AllowFocusedRow = true;
+    settings.KeyFieldName = GlobalPropertyNames.Id;
+    settings.Settings.ShowGroupPanel = true;
+    settings.Settings.ShowFilterRow = true;
+    settings.Settings.ShowFilterRowMenu = true;
+    settings.SettingsBehavior.EnableCustomizationWindow = true;
+    settings.SettingsPager.PageSize = Utils.GetPageSize(settings);
+    settings.SettingsPager.Position = System.Web.UI.WebControls.PagerPosition.Top;
+    settings.SettingsPager.AlwaysShowPager = true;
+    settings.Settings.ShowVerticalScrollBar = true;
+    settings.Settings.ShowHorizontalScrollBar = true;
+
+    settings.Styles.Cell.Font.Size = System.Web.UI.WebControls.FontUnit.Point(11);
+    settings.Styles.Cell.Paddings.Padding = System.Web.UI.WebControls.Unit.Pixel(2);
+    settings.Styles.Cell.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+    
+    settings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control; 
+
+    settings.ClientSideEvents.EndCallback = "function (s, e) { var height = splResizing.GetPane(0).GetClientHeight(); s.SetHeight(height); }";
+    settings.ClientSideEvents.Init = "function (s, e) { var height = splResizing.GetPane(0).GetClientHeight(); s.SetHeight(height); }";
+
+    settings.SetPagerBarTemplateContent(c =>
+    {
+        Html.RenderPartial("TablePager", new ViewDataDictionary
+        {
+            { "ContentObject", c }
+        });
+    });
+    
+    settings.Columns.Add(column =>
+    {
+        column.Caption = "";
+        column.Width = 20;
+        column.SetDataItemTemplateContent(c =>
+        {
+            string icon = (int)DataBinder.Eval(c.DataItem, "StateId") == BusinessObjects.State.STATEACTIVE
+                ? Url.Content("~/Images/DOCUMENTDONE_X16.png")
+                : Url.Content("~/Images/DOCUMENTNOTDONE_X16.png");
+            ViewContext.Writer.Write("<img src=\"" + icon + "\" onclick=\"EditDocument(" + DataBinder.Eval(c.DataItem, "Id") + ")\" style=\"cursor: pointer;\" />");
+        });
+    });
+    settings.Columns.Add(column =>
+    {
+        column.FieldName = GlobalPropertyNames.Date;
+        column.Caption = "Дата";
+        column.Width = 70;
+        column.PropertiesEdit.DisplayFormatString = "d";
+        column.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+        column.ColumnType = MVCxGridViewColumnType.DateEdit;
+    });
+    MVCxGridViewColumn col_number = settings.Columns.Add("DocNumber", "Номер");
+    col_number.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+    col_number.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+    col_number.Width = 120;
+    
+    MVCxGridViewColumn col_name = settings.Columns.Add("Name", "Имя");
+    col_name.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+    col_name.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+    col_name.Width = 200;
+    
+    settings.Columns.Add(column =>
+    {
+        column.FieldName = GlobalPropertyNames.DocSumma;
+        column.Caption = "Сумма";
+        column.Width = 100;
+        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+        column.PropertiesEdit.DisplayFormatString = "0.00";
+        column.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+    });
+
+    MVCxGridViewColumn col_ag_from = settings.Columns.Add("AgentDepartmentFromName", "Кто");
+    col_ag_from.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+    col_ag_from.Visible = true;
+    col_ag_from.Width = 450;
+    
+    //MVCxGridViewColumn col_who = settings.Columns.Add("AgDepartmentFromCode", "Кто (код)");
+    //col_who.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+    //col_who.Width = 150;
+    //col_who.Visible = false;
+
+    MVCxGridViewColumn col_whom = settings.Columns.Add("AgentToName", "Кому");
+    col_whom.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+    col_whom.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+    col_whom.Width = 450;
+
+    MVCxGridViewColumn col_state = settings.Columns.Add("StateName", "Состояние");
+    col_state.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+    col_state.Width = 100;
+    
+    
+    //MVCxGridViewColumn col_mycompanyname = settings.Columns.Add("MyCompanyName", "Владелец");
+    //col_mycompanyname.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+    //col_mycompanyname.Visible = false;
+    
+    MVCxGridViewColumn date_modify_col = settings.Columns.Add("DateModified", "Дата изменения");
+    date_modify_col.Visible = false;
+    date_modify_col.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+    date_modify_col.Width = 100;
+
+    MVCxGridViewColumn col_id = settings.Columns.Add("Id", "Ид");
+    col_id.Visible = false;
+    col_id.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+    col_id.Width = 100;
+    
+    //MVCxGridViewColumn col_mycompanycode = settings.Columns.Add("MyCompanyCode", "Владелец (Код)");
+    //col_mycompanycode.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+    //col_mycompanycode.Visible = false;
+    settings.GroupSummary.Add(DevExpress.Data.SummaryItemType.Count, "Id");
+    settings.ClientSideEvents.BeginCallback = "function(s,e){ e.customArgs['folderId'] = gvFoldersTree.IsGroupRow(gvFoldersTree.GetFocusedRowIndex())? -1 : gvFoldersTree.GetRowKey(gvFoldersTree.GetFocusedRowIndex());}"; 
+}).Bind(Model).GetHtml()

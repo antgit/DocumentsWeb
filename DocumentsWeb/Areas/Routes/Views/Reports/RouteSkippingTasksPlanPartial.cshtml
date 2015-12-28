@@ -1,0 +1,21 @@
+﻿@{
+    int Value = ViewData["RouteMemberId"] != null ? int.Parse(ViewData["RouteMemberId"].ToString()) : 0;
+    if (Value == 0) {
+        Value = this.Session["RouteSkippingTasks_Auto"] == null ? 0 : int.Parse(this.Session["RouteSkippingTasks_Auto"].ToString());
+    }
+}
+
+@Html.DevExpress().ComboBox(p =>
+{
+    p.Name = "PlanValue";
+
+    p.CallbackRouteValues = new { Area = "Routes", Controller = "Reports", Action = "RouteSkippingTasksPlanPartial" };
+
+    p.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    
+    p.Properties.ValueField = "RouteId";
+    p.Properties.TextField = "RouteName";
+    p.Properties.ValueType = typeof(int);
+
+    p.Properties.ClientSideEvents.BeginCallback = "function(s, e) { e.customArgs['RouteMemberId'] = AutoValue.GetValue(); }";
+}).BindList(DocumentsWeb.Areas.Routes.Models.RouteHeaderModel.GetRoutesHeaders().Where(w => w.RouteMemberId == Value)).Bind(this.Session["RouteSkippingTasks_Plan"]).GetHtml()

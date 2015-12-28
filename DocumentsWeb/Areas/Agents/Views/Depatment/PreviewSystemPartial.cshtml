@@ -1,0 +1,138 @@
+﻿@using BusinessObjects
+@using DocumentsWeb.Models
+@model DocumentsWeb.Areas.Agents.Models.WebDepatmentModel
+<table class="edit_form_table2">
+    @if (WADataProvider.CommonRightView.AdminEnterprize)
+    {
+        <tr>
+            <td class="table_label">
+                @Html.DevExpress().Label(settings =>
+                    {
+                        settings.Text = "Идентификатор:";
+                    }).GetHtml()
+            </td>
+            <td>                       
+                @Html.DevExpress().Label(settings =>
+                    {
+                        settings.Properties.Style.Font.Bold = true;
+                    }).Bind(Model.Id).GetHtml() 
+            </td>
+        </tr>
+        
+                <tr>
+            <td class="table_label">
+                @Html.DevExpress().Label(settings =>
+           {
+               settings.Text = "Гуид:";
+           }).GetHtml()
+            </td>
+            <td>                       
+                @Html.DevExpress().Label(settings =>
+           {
+               settings.Properties.Style.Font.Bold = true;
+           }).Bind(Model.Guid).GetHtml() 
+            </td>
+        </tr>
+    }
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                                   {
+                                       settings.Text = "Дата изменения:";
+                                       settings.AssociatedControlName = GlobalPropertyNames.DateModified;
+                                   }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                                   {
+                                       settings.Name = GlobalPropertyNames.DateModified;
+                                       settings.Properties.Style.Font.Bold = true;
+                                   }).Bind(Model.DateModified).GetHtml() 
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                                   {
+                                       settings.Text = "Пользователь:";
+                                       settings.AssociatedControlName = GlobalPropertyNames.UserName;
+                                   }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                                   {
+                                       settings.Name = GlobalPropertyNames.UserName;
+                                       settings.Properties.Style.Font.Bold = true;
+                                       settings.Properties.Style.ForeColor = string.IsNullOrEmpty(Model.UserName) ? System.Drawing.Color.Red : settings.Properties.Style.ForeColor;
+                                   }).Bind(string.IsNullOrEmpty(Model.UserName) ? "<Данные отсутствуют!>" : Model.UserName).GetHtml() 
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Компания-владелец:";
+                    settings.AssociatedControlName = "txtMyCompanyName";
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = "txtMyCompanyName";
+                    settings.Properties.Style.Font.Bold = true;
+                }).Bind(Model.MyCompanyName).GetHtml() 
+        </td>
+    </tr>
+    @if (WADataProvider.CommonRightView.AdminEnterprize)
+    {
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+           {
+               s.Text = "Ид компании:";
+               s.AssociatedControlName = "txtMyCompanyId";
+           }).GetHtml()
+            ViewContext.Writer.Write("</td><td>");
+            @Html.DevExpress().Label(s =>
+           {
+               s.Name = "txtMyCompanyId";
+               s.Properties.Style.Font.Bold = true;
+           }).Bind(Model.MyCompanyId).GetHtml()
+           ViewContext.Writer.Write("</td></tr>");
+    }
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                                   {
+                                       settings.Text = "Текущее состояние:";
+                                       settings.AssociatedControlName = "txtStateName";
+                                   }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                                   {
+                                       settings.Name = "txtStateName";
+                                       settings.Properties.Style.Font.Bold = true;
+                                   }).Bind(Model.StateName).GetHtml() 
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                                   {
+                                       settings.Text = "Атрибуты:";
+                                       settings.AssociatedControlName = "txtFlagsValueString";
+                                   }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                                   {
+                                       settings.Name = "txtFlagsValueString";
+                                       settings.Properties.Style.Font.Bold = false;
+                                       settings.Properties.Style.ForeColor = string.IsNullOrEmpty(Model.FlagsValueString()) ? System.Drawing.Color.Red : settings.Properties.Style.ForeColor;
+                                   }).Bind(string.IsNullOrEmpty(Model.FlagsValueString()) ? "<Дополнительные флаги не установлены!>" : Model.FlagsValueString()).GetHtml() 
+        </td>
+    </tr>
+</table>
+                                           
+
+

@@ -1,0 +1,244 @@
+﻿@{
+    string WindowTitle = "";
+    string OnClosing = "";
+    string OnSave = "";
+    string[] AutoUpdateGrids = new string[0];
+    bool AutoUpdateControl = false;
+    bool ShowFooter = false;
+
+    try { ShowFooter = bool.Parse(ViewData["ShowFooter"].ToString()); } catch { }
+    string gridStyle = "dxgvControl_" + Utils.CurrentTheme;
+    
+    try { WindowTitle = ViewData["Title"].ToString(); } catch { }
+    try { OnClosing = ViewData["OnClosing"].ToString(); } catch { }
+    try { OnSave = ViewData["OnSave"].ToString(); } catch { }
+    try { AutoUpdateControl = bool.Parse(ViewData["AutoUpdateControl"].ToString()); } catch { }
+    try { if (ViewData["AutoUpdateGrids"] != null) { AutoUpdateGrids = (string[])ViewData["AutoUpdateGrids"]; } } catch { }
+}
+
+<script type="text/javascript">
+    var add_object = null;
+    var term_id = null;
+
+    jQuery.fn.center = function () {
+        this.css("position","absolute");
+        this.css("top", (($(window).height() - this.outerHeight()) / 2) + $(window).scrollTop() + "px");
+        this.css("left", (($(window).width() - this.outerWidth()) / 2) + $(window).scrollLeft() + "px");
+        return this;
+    }
+
+
+
+    function pcEdit_OnClosing_AutoUpdateControl(s, e) {
+        if (add_object != null) {
+            if (pcEditUserNote.ResultSave) {
+                id = pcEditUserNote.ResultId;
+                name = pcEditUserNote.ResultName;
+                if (id > 0) {
+                    var item = add_object.FindItemByValue(id);
+                    if (item == null) {
+                        add_object.InsertItem(0, name, id);
+                    } else {
+                        add_object.RemoveItem(item.index);
+                        add_object.InsertItem(0, name, id);
+                    }
+                    add_object.SetValue(id);
+                } else {
+                    add_object.SetValue(name);
+                }
+            }
+        }
+    }
+
+    function SaveSuccess() {
+        @{
+            if (OnSave.Length > 0)
+            {
+                ViewContext.Writer.Write(OnSave + "(pcEditUserNote);");
+            }
+        }
+        @foreach(string grid in AutoUpdateGrids) { ViewContext.Writer.Write(grid + ".PerformCallback();"); }
+    }
+    
+    
+    function ClosingPopup(s, e) {
+        @{
+            if (AutoUpdateControl)
+            {
+                ViewContext.Writer.Write("pcEdit_OnClosing_AutoUpdateControl(s, e);");
+            }
+            if (OnClosing.Length > 0)
+            {
+                ViewContext.Writer.Write(OnClosing + "(s, e);");
+            }
+        }
+        //add_object = null;
+        s.SetVisibleSaveButton(true);
+    }
+
+    function pcEdit_AfterResizing (s, e) {
+        $('#pcLoadProgress').width(pcEditUserNote.GetWindowWidth());
+        $('#pcLoadProgress').height(pcEditUserNote.GetWindowHeight() + 1);
+        $('#pcLoadProgress').center();
+    }
+
+    function pcEdit_Shown (s, e) {
+        $('#pcLoadProgress').show();
+    }
+
+    function pcEdit_OnContentLoaded (e) {
+        if (term_id != null) {
+            window.clearTimeout(term_id);
+            term_id = null;
+        }
+        $('#pcLoadProgress').hide();
+    }
+
+
+    function pcEdit_Submit() {
+        pcEdit_Shown(null, null);
+        pcEditUserNote.GetContentIFrameWindow().document.getElementById('editForm').submit();
+    }
+</script>
+
+@Html.DevExpress().PopupControl(settings =>{
+    settings.Name = ViewData["Name"] == null ? "pcEditUserNote" : (string)ViewData["Name"];
+    settings.ShowHeader = true;
+    settings.ShowShadow = true;
+    settings.AutoUpdatePosition = true;
+
+    settings.ShowFooter = ShowFooter;
+    settings.FooterText = string.Empty;
+   
+    settings.SetHeaderTemplateContent(c => {
+        ViewContext.Writer.Write("<table border=0 style=\"width: 100%; height: 100%;\">");
+        ViewContext.Writer.Write("<tr><td>");
+
+        Html.DevExpress().HyperLink(hl =>
+        {
+            hl.Name = "btnPopupSaveUserNote";
+            hl.NavigateUrl = "javascript:pcEdit_Submit();";
+            hl.Properties.ImageUrl = Url.Content("~/Images/SAVE_x16.png");
+            hl.ToolTip = "Сохранить";
+        }).Render();
+
+        ViewContext.Writer.Write("</td><td style=\"width: 100%; padding-left: 10px; text-align: center;\">");
+        ViewContext.Writer.Write("<label id=\"pcEditTitle\">" + WindowTitle + "</label>");
+        ViewContext.Writer.Write("</td><td style=\"padding-right: 5px;\">");
+        
+        Html.DevExpress().HyperLink(hl =>
+        {
+            hl.NavigateUrl = "javascript:pcEditUserNote.ResultSave = false;pcEditUserNote.Hide();";
+            hl.Properties.ImageUrl = Url.Content("~/Images/close_x16.gif");
+            hl.ToolTip = "Закрыть";
+        }).Render();
+        
+        ViewContext.Writer.Write("</td></tr>");
+        ViewContext.Writer.Write("</table>");
+    });
+    
+    settings.AllowDragging = false;
+    settings.AllowResize = false;
+    settings.ResizingMode = ResizingMode.Postponed;
+    settings.EnableAnimation = false;
+    settings.Modal = true;
+    settings.PopupHorizontalAlign = PopupHorizontalAlign.WindowCenter;
+    settings.PopupVerticalAlign = PopupVerticalAlign.WindowCenter;
+    settings.ClientSideEvents.Closing = "ClosingPopup";
+    settings.ClientSideEvents.Shown = "pcEdit_Shown";
+    settings.ClientSideEvents.AfterResizing = "pcEdit_AfterResizing";
+    settings.CloseAction = CloseAction.None;
+    //settings.ClientSideEvents.CloseUp = "function(s, e){ pcEditUserNote.SetContentHtml(''); }";
+}).GetHtml()
+
+<div id="pcLoadProgress" style="z-index: 100000000; position: absolute; background-color: #FFF; border: 1ps solid silver; display: none;">
+    <table style="width: 100%; height: 100%;" class="@gridStyle">
+        <tr>
+            <td style="vertical-align: middle; text-align: center;">
+                @Html.DevExpress().Image(img =>
+                {
+                    img.ImageUrl = Url.Content("~/Images/busy.gif");
+                }).GetHtml()
+                <br />
+                <br />
+                @Html.DevExpress().Label(lb =>
+                {
+                    lb.ControlStyle.Font.Size = System.Web.UI.WebControls.FontUnit.Point(12);
+                    lb.Text = "Обработка запроса ...";
+                }).GetHtml()
+            </td>
+        </tr>
+    </table>
+</div>
+
+
+<script type="text/javascript">
+    window.setInterval(function () {
+        if (typeof pcEditUserNote != 'undefined') {
+            if (pcEditUserNote.GetVisible()) {
+                var frm = pcEditUserNote.GetContentIFrameWindow();
+                ASPxClientUtils.AttachEventToElement(frm, 'load', pcEdit_OnContentLoaded);
+                if (frm.document.getElementById("Id") != null) {
+                    pcEditUserNote.ResultId = frm.document.getElementById("Id").value;
+                } else {
+                    pcEditUserNote.ResultId = 0;
+                }
+                if (frm.document.getElementById("Name") != null) {
+                    pcEditUserNote.ResultName = frm.document.getElementById("Name").value;
+                } else {
+                    pcEditUserNote.ResultName = '';
+                }
+                if (frm.document.getElementById("SaveFlag") != null && frm.document.getElementById("SaveFlag").value == 1) {
+                    frm.document.getElementById("SaveFlag").value = 0;
+                    pcEditUserNote.ResultSave = true;
+                    pcEditUserNote.Hide();
+                    $('#pcLoadProgress').hide();
+                    SaveSuccess();
+                } else {
+                    pcEditUserNote.ResultSave = false;
+                }
+            }
+        }
+    }, 12);
+    
+    pcEditUserNote.SetVisibleSaveButton = function (val) {
+        if (val == true) {
+            $('#btnPopupSaveUserNote').show();
+        } else {
+            $('#btnPopupSaveUserNote').hide();
+        }
+    };
+
+    pcEditUserNote.SetCaption = function (val) {
+        $('#pcEditTitle').text(val);
+    };
+
+    pcEditUserNote.GetCaption = function () {
+        return $('#pcEditTitle').text();
+    };
+
+    pcEditUserNote.Load = function (url, width, height) {
+        pcEditUserNote.SetContentUrl(url);
+        window.setTimeout(function () {
+            ASPxClientUtils.AttachEventToElement(pcEditUserNote.GetContentIFrameWindow(), 'load', pcEdit_OnContentLoaded);
+            pcEditUserNote.SetSize(width, height);
+            pcEditUserNote.UpdatePosition();
+            pcEditUserNote.Show();
+        }, 12);
+        if (term_id != null) {
+            window.clearTimeout(term_id);
+            term_id = null;
+        }
+        term_id = window.setTimeout(function () {
+            pcEdit_OnContentLoaded();
+        }, 5000);
+    };
+
+    pcEditUserNote.SetUpdateControl = function (val) {
+        add_object = val;
+    };
+
+    pcEditUserNote.GetUpdateControl = function () {
+        return add_object;
+    };
+</script>

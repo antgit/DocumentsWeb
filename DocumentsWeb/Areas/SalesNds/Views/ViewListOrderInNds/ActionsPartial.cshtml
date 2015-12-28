@@ -1,0 +1,159 @@
+﻿@using BusinessObjects
+@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentWeb.Extentions
+@using DocumentsWeb.Models
+@{   
+    bool haveCreate = WADataProvider.FolderElementRightView.IsAllow(Right.DOCCREATE, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_SALES_IN_ORDER_NDS).Id);
+    bool haveEdit = WADataProvider.FolderElementRightView.IsAllow(Right.DOCEDIT, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_SALES_IN_ORDER_NDS).Id);
+    bool haveDelete = WADataProvider.FolderElementRightView.IsAllow(Right.DOCTRASH, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_SALES_IN_ORDER_NDS).Id);
+    bool haveView = WADataProvider.FolderElementRightView.IsAllow(Right.DOCVIEW, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_SALES_IN_ORDER_NDS).Id);
+    string helpDefaultLink = string.Empty;
+    if (ViewData.ContainsKey("HelpDefaultLink"))
+    {
+        helpDefaultLink = ViewData["HelpDefaultLink"].ToString();
+    }
+}
+
+<script type="text/javascript">
+    var controllerName = 'SaleOrderIn';
+    var viewListControllerName = 'ViewListOrderInNds';
+</script>
+<script src="@Url.Content("~/Scripts/salesnds/actions.js")" type="text/javascript"></script>
+
+
+@Html.DevExpress().NavBar(
+settings =>
+{
+    settings.Name = "nbFeatures";
+    settings.AllowExpanding = true;
+    settings.AllowSelectItem = true;
+    settings.AutoCollapse = false;
+    settings.EnableHotTrack = true;
+    settings.EnableAnimation = true;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.ClientSideEvents.ItemClick = "OnMenuItemClick";
+    settings.EncodeHtml = false;
+    settings.SaveStateToCookies = true;
+    settings.SaveStateToCookiesID = Url.RequestContext.RouteData.Values["controller"] + "Nav";
+    settings.Groups.Add(group => {
+        group.Text = "Действия";
+        group.HeaderStyle.Font.Bold = true;
+        group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+        group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.CssClass = "navpanellink";
+        group.HeaderImage.Url = Url.Content("~/Images/documentokey_x16.png");
+
+        MVCxNavBarItem item = group.Items.Add("Помощь", "mnuActionHelp", "~/Images/INFO_X16.png");
+        item.ToolTip = "Показать справочную информацию";
+        item.Image.Url = "~/Images/INFO_X16.png";
+        if (string.IsNullOrEmpty(helpDefaultLink))
+            item.NavigateUrl = "javascript:alert('Справочная информация отсутствует!');";
+        else
+        {
+            item.Target = "_blank";
+            item.NavigateUrl = helpDefaultLink.StartsWith("~/") ? Url.Content(helpDefaultLink) : helpDefaultLink;
+        }
+        
+        if (haveCreate)
+        {
+            item = group.Items.Add("Создать", "mnuAdd", "~/Images/new_x16.png");
+            item.ToolTip = "Создание нового документа";
+            item.NavigateUrl = DevExpressHelper.GetUrl(new {Controller = "SaleOrderIn", Action = "Create"});
+            item.Target = "_blank";
+
+            item = group.Items.Add("Создать по шаблону<div id=\"popupDiv\"></div>", "mnuAdd", "~/Images/new_x16.png");
+            item.ToolTip = "Создание нового документа по выбранному шаблону";
+            item.NavigateUrl = "javascript:ShowBrowseTemplate();";
+
+            item = group.Items.Add("Создать копию", "mnuAddCopy", "~/Images/copy_x16.png");
+            item.ToolTip = "Создание копии текущего выделенного в списке документа";
+            item.NavigateUrl = "javascript:createCopy();";
+        }
+
+        if (haveEdit)
+        {
+            item = group.Items.Add("Требовать корректировки", "mnuStateNeedCorrect", "~/Images/state_needcorrect_x16.png");
+            item.ToolTip = "Установка данного состояния возможная только при текущем состоянии не соответствующего \"Требовующего корректировки\" - например данное действие имеет смысл для проведенных документов, чтобы в дальшейшем откорректировать документ";
+            item.NavigateUrl = "javascript:alert('В разработке, в ближайшее время функция будет доступна');";
+        }
+                                     
+        item = group.Items.Add("Обновить", "mnuRefresh", "~/Images/refresh_x16.png");
+        item.ToolTip = "Обновить данные в списке документов. Рекомендуемое действие вместо обновления страницы.";
+        item.NavigateUrl = "javascript:gvSalesDocuments.PerformCallback('refresh=true');";
+    });
+
+    settings.Groups.Add(group => {
+        group.Text = "Фильтр";
+        group.Expanded = false;
+        group.ItemLinkMode = GroupItemLinkMode.ContentBounds;
+        group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.HoverStyle.Font.Bold = true;
+        group.ItemStyle.HoverStyle.Font.Underline = true;
+        group.ItemStyle.SelectedStyle.Font.Bold = true;
+        group.HeaderImage.Url = Url.Content("~/Images/documentfilter_x16.png");
+
+        MVCxNavBarItem item = group.Items.Add("Только активные", "mnuFilterActive", "~/Images/filter_state_active_x16.png");
+        item.ToolTip = "Отображать в списке только активные (проведенные) документы";
+        item.NavigateUrl = "javascript:gvSalesDocuments.ApplyFilter('StateId = 1');";
+        
+        item = group.Items.Add("Требующие корректировки", "mnuFilterCorrect", "~/Images/filter_state_needcorrect_x16.png");
+        item.ToolTip = "Отображать в списке только требующие корректировки (непроведенные) документы";
+        item.NavigateUrl = "javascript:gvSalesDocuments.ApplyFilter('StateId = 2');";
+
+        item = group.Items.Add("Черновики", "mnuFilterBan", "~/Images/filter_state_ban_x16.png");
+        item.ToolTip = "Отображать в списке только документы-черновики";
+        item.NavigateUrl = "javascript:gvSalesDocuments.ApplyFilter('StateId = 0');";
+            
+        item = group.Items.Add("Корзина", "mnuFilterDeleted", "~/Images/filter_state_deleted_x16.png");
+        item.ToolTip = "Отображать в списке только удаленные документы";
+        item.NavigateUrl = "javascript:gvSalesDocuments.ApplyFilter('StateId = 5');";
+    });
+    settings.Groups.Add(group =>
+    {
+        group.Text = "Отчеты";
+        group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+        group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.CssClass = "navpanellink";
+        group.HeaderImage.Url = Url.Content("~/Images/stireportv3_x16.png");
+        group.Expanded = false;
+        MVCxNavBarItem item = null;
+
+        item = group.Items.Add("Реестр документов", "mnuReportsIn", "~/Images/STIREPORT_X16.png");
+        item.ToolTip = "Отчет \"Реестр заказов покупателя\" за выбраный период времени";
+        item.Target = "_blank";
+        Library report = WADataProvider.WA.Cashe.GetCasheData<Library>().ItemCode<Library>("WEBREP_SALENDS_DOCLISTORDERIN");
+        if (report != null)
+        {
+            item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "Report", Action = "Build", Area = "Reports" }) + "?id=" + report.Id;
+        }
+
+        if (WADataProvider.HiearchyElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_REPORTS))
+        {
+            item = group.Items.Add("Перейти в отчеты...", "mnuReportNavToReportsMain", "~/Images/arrowgreen.png");
+            item.ToolTip = "Перейти в раздел отчетов...";
+            item.NavigateUrl = Url.Action("Index", new { area = "Reports", Controller = "Report" });
+        }
+    });
+    settings.Groups.Add(group =>
+    {
+        group.Text = "Сервис";
+        group.Name = "grpSettings";
+        group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+        group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.Expanded = false;
+        group.HeaderImage.Url = Url.Content("~/Images/settings_x16.png");
+
+        group.SetContentTemplateContent(c => Html.RenderPartial("SettingsPartial", new ViewDataDictionary { 
+            { "GridName", "gvSalesDocuments" },
+            { "GridController", Url.RequestContext.RouteData.Values["controller"].ToString() },
+            { "GridAction", "IndexPartial" },
+            { "ColumnsConfig", true }
+        }));
+    });
+}).GetHtml()

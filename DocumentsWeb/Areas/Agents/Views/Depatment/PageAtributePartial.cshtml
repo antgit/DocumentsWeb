@@ -1,0 +1,66 @@
+﻿@using BusinessObjects
+@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentsWeb.Models
+@using DocumentsWeb.Areas.Agents.Models
+@using DocumentsWeb.Areas.Analitics.Models
+@using DocumentsWeb.Controllers
+@using DocumentsWeb.Areas.General.Models
+@model WebDepatmentModel
+@{
+    bool haveEdit = !Model.IsReadOnly && WADataProvider.LibrariesElementRightView.IsAllow(Right.UIEDIT, WebModuleNames.WEB_DEPATMENTS) && !WADataProvider.CommonRightView.ReadOnly;
+}
+        <table style="width:600px;">
+        
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+   {
+       s.ControlStyle.CssClass = "label";
+       s.Text = "Признак:";
+       s.AssociatedControlName = GlobalPropertyNames.Code;
+       s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Code);
+   }).GetHtml()
+        </td><td>
+        @Html.DevExpress().TextBox(s =>
+   {
+       s.Name = GlobalPropertyNames.Code;
+       s.ReadOnly = !haveEdit;
+       if (!s.ReadOnly)
+       {
+           s.Properties.NullText = "Введите признак...";
+           s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Code);
+       }
+       s.ControlStyle.CssClass = "editor";
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+       s.ShowModelErrors = true;
+       s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+       s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+   }).Bind(Model.Code).GetHtml()
+        </td></tr>
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+   {
+       s.ControlStyle.CssClass = "label";
+       s.Text = "Код поиска:";
+       s.AssociatedControlName = GlobalPropertyNames.CodeFind;
+       s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.CodeFind);
+   }).GetHtml()
+        </td><td>
+        @Html.DevExpress().TextBox(s =>
+   {
+       s.Name = GlobalPropertyNames.CodeFind;
+       s.ReadOnly = !haveEdit;
+       if (!s.ReadOnly)
+       {
+           s.Properties.NullText = "Введите код поиска...";
+           s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.CodeFind);
+       }
+       s.ControlStyle.CssClass = "editor";
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+       s.ShowModelErrors = true;
+       s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+       s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+   }).Bind(Model.CodeFind).GetHtml()
+        </td></tr>
+        </table>

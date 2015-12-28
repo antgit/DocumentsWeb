@@ -1,0 +1,412 @@
+﻿@using BusinessObjects
+@using DevExpress.Web.Mvc.UI
+@using DevExpress.Web.Mvc
+@using DevExpress.Web.ASPxEditors
+@using DevExpress.Web.ASPxClasses
+@using DevExpress.Utils
+@model DocumentsWeb.Areas.General.Models.TimePeriodModel
+
+<input type="hidden" id="StateId" name="StateId" value="@Model.StateId" />
+
+@Html.DevExpress().PageControl(settings =>{
+    settings.Name = "tsEditTimePeriod";
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.ClientSideEvents.Init = "OntsEditTimeInit";
+    settings.Styles.Content.CssClass = "tabcontent";
+    MVCxTabPage pageMain = settings.TabPages.Add("Главная");
+    pageMain.SetContent(() =>
+    {
+        ViewContext.Writer.Write("<table style=\"width: 500px;\">");
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        @Html.DevExpress().Label(s =>{
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Наименование:";
+            s.AssociatedControlName = GlobalPropertyNames.Name;
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        @Html.DevExpress().TextBox(s =>{
+            s.Name = GlobalPropertyNames.Name;
+            s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+            s.Properties.NullText = "Введите наименование ...";
+            s.ControlStyle.CssClass = "editor";
+            s.ShowModelErrors = true;
+            s.Style.Add("float", "left");
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.Name).Render();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr " + (DocumentsWeb.Models.WADataProvider.CommonRightView.AdminEnterprize ? "" : "style=\"display: none;\"") + "><td class=\"table_label\">");
+        @Html.DevExpress().Label(s =>{
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Код:";
+            s.AssociatedControlName = GlobalPropertyNames.Code;
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        @Html.DevExpress().TextBox(s =>{
+            s.Name = GlobalPropertyNames.Code;
+            s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+            s.Properties.NullText = "Введите код ...";
+            s.ControlStyle.CssClass = "editor";
+            s.Style.Add("float", "left");
+            s.ShowModelErrors = true;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.Code).Render();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Тип:";
+            s.AssociatedControlName = "KindId";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        @Html.DevExpress().ComboBox(s =>
+        {
+            s.Name = "KindId";
+            s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+            s.ControlStyle.CssClass = "editor";
+            s.ReadOnly = !(Model.Id == 0 && Model.canChangeType);
+            s.Properties.Items.Add(new ListEditItem("График работы", BusinessObjects.TimePeriod.KINDID_WORK));
+            s.Properties.Items.Add(new ListEditItem("График перерыва", BusinessObjects.TimePeriod.KINDID_BREAK));
+            s.Properties.ValueType = typeof(int);
+        }).Bind(Model.KindId).Render();
+        ViewContext.Writer.Write("</td></tr>");
+        @*<td class=\"table_label\">*@
+        ViewContext.Writer.Write("<tr>");
+        ViewContext.Writer.Write("<td colspan=\"2\">");
+        ViewContext.Writer.Write("<table style=\"float:left; padding-top: 10px; padding-bottom: 10px;\"><tr><td class=\"table_label\">");
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Понедельник:";
+            s.AssociatedControlName = "MondayW";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().CheckBox(s =>
+        {
+            s.Name = "MondayW";
+            s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+        }).Bind(Model.MondayW).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Начало:";
+            s.AssociatedControlName = "MondayS";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TimeEdit(s=>
+        {
+            s.Name="MondayS";
+            s.Width = 60;
+            s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+        }).Bind(Model.MondayS).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Конец:";
+            s.AssociatedControlName = "MondayS";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TimeEdit(s =>
+        {
+            s.Name = "MondayE";
+            s.Width = 60;
+            s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+        }).Bind(Model.MondayE).Render();
+        ViewContext.Writer.Write("</td></tr><tr><td>");
+
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Вторник:";
+            s.AssociatedControlName = "TuesdayW";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().CheckBox(s =>
+        {
+            s.Name = "TuesdayW";
+            s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+        }).Bind(Model.TuesdayW).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Начало:";
+            s.AssociatedControlName = "TuesdayS";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TimeEdit(s =>
+        {
+            s.Name = "TuesdayS";
+            s.Width = 60;
+            s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+        }).Bind(Model.TuesdayS).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Конец:";
+            s.AssociatedControlName = "TuesdayS";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TimeEdit(s =>
+        {
+            s.Name = "TuesdayE";
+            s.Width = 60;
+            s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+        }).Bind(Model.TuesdayE).Render();
+        ViewContext.Writer.Write("</td></tr><tr><td>");
+
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Среда:";
+            s.AssociatedControlName = "WednesdayW";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().CheckBox(s =>
+        {
+            s.Name = "WednesdayW";
+            s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+        }).Bind(Model.WednesdayW).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Начало:";
+            s.AssociatedControlName = "WednesdayS";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TimeEdit(s =>
+        {
+            s.Name = "WednesdayS";
+            s.Width = 60;
+            s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+        }).Bind(Model.WednesdayS).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Конец:";
+            s.AssociatedControlName = "WednesdayS";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TimeEdit(s =>
+        {
+            s.Name = "WednesdayE";
+            s.Width = 60;
+            s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+        }).Bind(Model.WednesdayE).Render();
+        ViewContext.Writer.Write("</td></tr><tr><td>");
+
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Четверг:";
+            s.AssociatedControlName = "ThursdayW";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().CheckBox(s =>
+        {
+            s.Name = "ThursdayW";
+            s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+        }).Bind(Model.ThursdayW).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Начало:";
+            s.AssociatedControlName = "ThursdayS";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TimeEdit(s =>
+        {
+            s.Name = "ThursdayS";
+            s.Width = 60;
+            s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+        }).Bind(Model.ThursdayS).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Конец:";
+            s.AssociatedControlName = "ThursdayS";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TimeEdit(s =>
+        {
+            s.Name = "ThursdayE";
+            s.Width = 60;
+            s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+        }).Bind(Model.ThursdayE).Render();
+        ViewContext.Writer.Write("</td></tr><tr><td>");
+
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Пятница:";
+            s.AssociatedControlName = "FridayW";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().CheckBox(s =>
+        {
+            s.Name = "FridayW";
+            s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+        }).Bind(Model.FridayW).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Начало:";
+            s.AssociatedControlName = "FridayS";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TimeEdit(s =>
+        {
+            s.Name = "FridayS";
+            s.Width = 60;
+            s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+        }).Bind(Model.FridayS).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Конец:";
+            s.AssociatedControlName = "FridayS";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TimeEdit(s =>
+        {
+            s.Name = "FridayE";
+            s.Width = 60;
+            s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+        }).Bind(Model.FridayE).Render();
+        ViewContext.Writer.Write("</td></tr><tr><td>");
+
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Суббота:";
+            s.AssociatedControlName = "SaturdayW";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().CheckBox(s =>
+        {
+            s.Name = "SaturdayW";
+            s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+        }).Bind(Model.SaturdayW).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Начало:";
+            s.AssociatedControlName = "SaturdayS";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TimeEdit(s =>
+        {
+            s.Name = "SaturdayS";
+            s.Width = 60;
+            s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+        }).Bind(Model.SaturdayS).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Конец:";
+            s.AssociatedControlName = "SaturdayS";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TimeEdit(s =>
+        {
+            s.Name = "SaturdayE";
+            s.Width = 60;
+            s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+        }).Bind(Model.SaturdayE).Render();
+        ViewContext.Writer.Write("</td></tr><tr><td>");
+
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Воскресенье:";
+            s.AssociatedControlName = "SundayW";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().CheckBox(s =>
+        {
+            s.Name = "SundayW";
+            s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+        }).Bind(Model.SundayW).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Начало:";
+            s.AssociatedControlName = "SundayS";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TimeEdit(s =>
+        {
+            s.Name = "SundayS";
+            s.Width = 60;
+            s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+        }).Bind(Model.SundayS).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Конец:";
+            s.AssociatedControlName = "SundayS";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TimeEdit(s =>
+        {
+            s.Name = "SundayE";
+            s.Width = 60;
+            s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+        }).Bind(Model.SundayE).Render();            
+        ViewContext.Writer.Write("</td></tr></table>");
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        @Html.DevExpress().Label(s =>{
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Описание:";
+            s.AssociatedControlName = GlobalPropertyNames.Memo;
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        @Html.DevExpress().Memo(s =>{
+            s.Name = GlobalPropertyNames.Memo;
+            s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+            s.Properties.NullText = "Введите описание ...";
+            s.ControlStyle.CssClass = "editor";
+            s.Height = 80;
+            s.ShowModelErrors = true;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.Memo).Render();
+        ViewContext.Writer.Write("</td></tr></table>");
+    });
+
+    MVCxTabPage props = settings.TabPages.Add("Свойства");
+    props.Visible = DocumentsWeb.Models.WADataProvider.CommonRightView.AdminEnterprize;
+    props.SetContent(() =>
+    {
+        ViewContext.Writer.Write("<table style=\"width: 500px;\">");
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Идентификатор:";
+            s.AssociatedControlName = "Id";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        @Html.DevExpress().TextBox(s =>
+        {
+            s.Name = "Id";
+            s.ControlStyle.CssClass = "editor";
+            s.ReadOnly = true;
+        }).Bind(Model.Id).Render();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Имя пользователя:";
+            s.AssociatedControlName = GlobalPropertyNames.UserName;
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        @Html.DevExpress().TextBox(s =>
+        {
+            s.Name = GlobalPropertyNames.UserName;
+            s.ControlStyle.CssClass = "editor";
+            s.ReadOnly = true;
+        }).Bind(Model.UserName).Render();
+        ViewContext.Writer.Write("</td></tr></table>");
+    });
+}).GetHtml()

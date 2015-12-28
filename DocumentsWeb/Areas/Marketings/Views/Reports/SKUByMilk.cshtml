@@ -1,0 +1,75 @@
+﻿@using System.Web.UI.WebControls
+@using Stimulsoft.Report.Mvc
+
+@{
+    ViewBag.Title = "Отчет SKU по молочке";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Html.StiMvcViewerFxRenderScripts()
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#contentTable").height($(window).innerHeight() - 20);
+        $(window).resize(function () {
+            $("#contentTable").height($(window).innerHeight() - 20);
+        });
+    });
+</script>
+
+@{
+    List<DocumentsWeb.Areas.Agents.Models.ClientModel> list = DocumentsWeb.Areas.Agents.Models.ClientModel.GetMyDepatmentsView();
+    list.Insert(0, new DocumentsWeb.Areas.Agents.Models.ClientModel { Id = 0, Name = "Все" });
+}
+
+<table id="contentTable" style="width: 100%; height:100%; border: 1px solid black;">
+    <tr>
+        <td>
+        @using (Html.BeginForm("SKUByMilkSubmit", "Reports", FormMethod.Post, new { @class = "edit_form", @id = "editForm" }))
+        { 
+            <table>
+                <tr>
+                    <td>
+                        @Html.DevExpress().Label(p =>
+                        {
+                            p.Text = "Дата:";
+                            p.AssociatedControlName = "DateValue";
+                        }).GetHtml()
+                        @Html.DevExpress().DateEdit(p =>
+                        {
+                            p.Name = "DateValue";
+                            p.Date = DateTime.Now;
+                        }).Bind(this.Session["SKUByMilk_Date"] == null ? DateTime.Now : (DateTime?)this.Session["SKUByMilk_Date"]).GetHtml()
+                    </td>
+                    <td>
+                        @Html.DevExpress().Label(p =>
+                        {
+                            p.Text = "Филиал:";
+                            p.AssociatedControlName = "AutoValue";
+                        }).GetHtml()
+                        @Html.DevExpress().ComboBox(p =>
+                        {
+                            p.Name = "DepatmentValue";
+                            p.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                            p.Properties.ValueField = "Id";
+                            p.Properties.TextField = "Name";
+                            p.Properties.ValueType = typeof(int);
+                        }).BindList(list).Bind(this.Session["SKUByMilk_Depatment"]).GetHtml()
+                    </td>
+                    <td style="vertical-align: bottom;">
+                        @Html.DevExpress().Button(p => {
+                            p.Name = "btnSubmit";
+                            p.Text = "Построить";
+                            p.UseSubmitBehavior = true;
+                        }).GetHtml()
+                    </td>
+                </tr>
+            </table>
+        }
+        </td>
+    </tr>
+    <tr>
+        <td valign="top" style="width: 100%; height: 100%;">
+            @Html.Partial("SKUByMilkPartial")
+        </td>
+    </tr>
+</table>

@@ -1,0 +1,22 @@
+﻿@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentsWeb.Models
+@model DocumentsWeb.Areas.General.Models.WebCurrencyModel
+
+@{
+    Html.EnableClientValidation();
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    bool haveEdit = WADataProvider.LibrariesElementRightView.IsAllow(Right.UIEDIT, WebModuleNames.WEB_CURRENCY) && !WADataProvider.CommonRightView.ReadOnly;
+}
+
+<script type="text/javascript">
+    @if(Model.IsSystem | Model.IsReadOnly | !haveEdit) { ViewContext.Writer.Write("if (typeof parent.pcEdit != 'undefined') { parent.pcEdit.SetVisibleSaveButton(false); }"); }
+    function OnPropDpcsInit(s, e) {
+         s.SetHeight($(window).height());
+    }
+</script>
+
+@using (Html.BeginForm("Edit", "Currency", FormMethod.Post, new { @class = "edit_form", @id = "editForm" }))
+{
+    @Html.Partial("EditPartial", Model);
+}

@@ -1,0 +1,46 @@
+﻿@using BusinessObjects
+@using DocumentsWeb.Areas.Agents.Models
+
+@{
+    string SelectedItemChanged = (string)ViewData["SelectedItemChanged"];
+    int? WorkerId = null;
+    bool ReadOnly = false;
+    string GridName = ViewData["GridName"].ToString();
+    try
+    {
+        WorkerId = int.Parse(ViewData["WorkerId"].ToString());   
+    }
+    catch{}
+    try
+    {
+        ReadOnly = bool.Parse(ViewData["ReadOnly"].ToString());
+    }
+    catch { }
+}
+
+@Html.DevExpress().ComboBox(s =>
+{
+    s.ControlStyle.CssClass = "editor";
+    s.Name = GridName;
+    
+    s.CallbackRouteValues = new { Area = "Contracts", Controller = "Contract", Action = "WorkerPartial" };
+    s.Properties.EnableCallbackMode = true;
+    s.Properties.CallbackPageSize = 20;
+
+    s.Properties.ValueField = GlobalPropertyNames.Id;
+    s.Properties.TextField = GlobalPropertyNames.Name;
+    s.Properties.ValueType = typeof(int);
+    s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    s.Properties.FilterMinLength = 3;
+    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+
+    s.ReadOnly = ReadOnly;
+
+    s.Properties.ClientSideEvents.BeginCallback = "function(s, e) { e.customArgs['WorkerId'] = '" + WorkerId.ToString() + "'; e.customArgs['GridName'] = '" + GridName + "'; e.customArgs['ReadOnly'] = '" + ReadOnly.ToString() + "'; }";
+    if (SelectedItemChanged != null)
+    {
+        s.Properties.ClientSideEvents.SelectedIndexChanged = SelectedItemChanged;
+    }
+}).BindList(ClientModel.GetWorkersRange, ClientModel.GetWorkerByID).Bind(WorkerId).GetHtml()

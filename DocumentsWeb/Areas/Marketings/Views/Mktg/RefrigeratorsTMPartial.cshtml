@@ -1,0 +1,43 @@
+﻿@using BusinessObjects
+@using DocumentsWeb.Areas.Analitics.Models
+
+@{
+    int? AnaliticId = null;
+    try
+    {
+        AnaliticId = int.Parse(ViewData["AnaliticId"].ToString());   
+    }
+    catch{}
+}
+
+@Html.DevExpress().ComboBox(s =>
+{
+    s.ControlStyle.CssClass = "editor";
+    s.Name = "AnaliticId";
+
+    s.CallbackRouteValues = new { Area = "Marketings", Controller = "Mktg", Action = "RefrigeratorsTMPartial" };
+    s.Properties.EnableCallbackMode = true;
+    s.Properties.CallbackPageSize = 20;
+    
+    s.Properties.ValueField = GlobalPropertyNames.Id;
+    s.Properties.TextField = GlobalPropertyNames.Name;
+    s.Properties.ValueType = typeof(int);
+    s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    s.Properties.FilterMinLength = 3;
+    EditButton b = s.Properties.Buttons.Add();
+    b.Image.Url = "~/Images/refresh_x10.png";
+    b.ToolTip = "Обновить";
+    b = s.Properties.Buttons.Add();
+    b.Image.Url = "~/Images/add10x10.png";
+    b.ToolTip = "Создать новую";
+    b = s.Properties.Buttons.Add();
+    b.Image.Url = "~/Images/reply_x10.gif";
+    b.ToolTip = "Последнее значение";
+    s.Width = 250;
+    s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+    s.Properties.ClientSideEvents.SelectedIndexChanged = "TM_SelectedIndexChanged";
+    s.Properties.ClientSideEvents.ButtonClick = "TM_ButtonClick";
+    s.Properties.ClientSideEvents.BeginCallback = "function(s, e) { e.customArgs['AnaliticId'] = s.GetValue(); }";
+    s.Properties.ClientSideEvents.EndCallback = "function(s, e) { s.SetValue(null); }";
+}).BindList(AnaliticModel.GetBrandsRange, AnaliticModel.GetBrandByID).Bind(AnaliticId).GetHtml()

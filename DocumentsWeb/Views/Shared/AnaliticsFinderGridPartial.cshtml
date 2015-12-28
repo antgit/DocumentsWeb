@@ -1,0 +1,71 @@
+﻿@using DocumentsWeb.Code
+@using DocumentsWeb.Models
+@using BusinessObjects
+@using DocumentsWeb.Areas.Analitics.Models
+@{
+    string Name = (string)ViewData["Name"];
+    string hierarchyCode = (string)ViewData["hierarchyCode"];
+    Hierarchy hierarchy = WADataProvider.WA.Cashe.GetCasheData<Hierarchy>().ItemCode<Hierarchy>(hierarchyCode);
+    List<AnaliticModel> coll = hierarchy.GetTypeContents<Analitic>().Where(s => !s.IsTemplate && s.IsStateActive && !s.IsHiden && WADataProvider.IsCompanyIdAllowIdToCurrentUser(s.MyCompanyId)).Select(AnaliticModel.ConvertToModel).ToList();
+}
+
+@Html.DevExpress().GridView(settings=>{
+    settings.Name = "gv" + Name;
+    settings.KeyFieldName = GlobalPropertyNames.Id;
+    settings.Width = System.Web.UI.WebControls.Unit.Pixel(800);
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+
+    settings.Settings.ShowVerticalScrollBar = true;
+    settings.Settings.VerticalScrollableHeight = 200;
+    settings.CallbackRouteValues = new { Area = "Analitics", Controller = "Home", Action = "AnaliticsFinderGridPartial" };
+    settings.SettingsBehavior.AllowFocusedRow = true;
+
+    settings.Settings.ShowFilterRow = true;
+    settings.Settings.ShowFilterRowMenu = true;
+    settings.Settings.ShowHorizontalScrollBar = true;
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+    settings.Styles.AlternatingRow.Enabled = DefaultBoolean.True;
+
+    settings.Columns.Add(column =>
+    {
+        column.FieldName = "Name";
+        column.Caption = "Наименование";
+        column.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+        column.Width = System.Web.UI.WebControls.Unit.Pixel(350);
+    });
+
+    //settings.Columns.Add(column =>
+    //{
+    //    column.FieldName = "TaxNumber";
+    //    column.Caption = "ИНН";
+    //    column.Width = System.Web.UI.WebControls.Unit.Pixel(100);
+    //    column.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+    //});
+
+    //settings.Columns.Add(column =>
+    //{
+    //    column.FieldName = "Okpo";
+    //    column.Caption = "Окпо";
+    //    column.Width = System.Web.UI.WebControls.Unit.Pixel(100);
+    //    column.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+    //});
+
+    //settings.Columns.Add(column =>
+    //{
+    //    column.FieldName = "Phone";
+    //    column.Caption = "Телефон";
+    //    column.Width = System.Web.UI.WebControls.Unit.Pixel(100);
+    //    column.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+    //});
+    if (WADataProvider.CurrentUserCompanyMultyCount())
+    {
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "MyCompanyName";
+            column.Caption = "Компания-владелец";
+            column.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+            column.Width = System.Web.UI.WebControls.Unit.Pixel(350);
+        });    
+    }
+    settings.ClientSideEvents.BeginCallback = "function (s, e) { e.customArgs['Name'] = '" + Name + "'; e.customArgs['hierarchyCode'] = '" + hierarchyCode + "'; }";
+}).Bind(coll).GetHtml()

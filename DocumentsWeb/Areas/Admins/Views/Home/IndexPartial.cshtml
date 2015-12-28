@@ -1,0 +1,112 @@
+﻿@using BusinessObjects.Security
+@using DocumentsWeb.Models
+<h1 style=" font-size:24px">Администрирование системы - настройки, управление пользователями, разрешениями, настройки разделов документов...</h1>
+<hr />
+<h2 style=" font-size:18px">Пользователи...</h2>
+<hr />
+@if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_USERHOME))
+{
+    @Html.DevExpress().HyperLink(s =>
+{
+    s.Properties.ImageUrl = Url.Content("~/Images/blog.png");
+    s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "UserPersonal", Controller = "Home", Action = "Index" });
+}).GetHtml()
+    
+    @Html.DevExpress().HyperLink(s =>
+{
+    s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "UserPersonal", Controller = "Home", Action = "Index" });
+    s.Properties.Text = "Личная страница";
+    s.ControlStyle.Font.Bold = true;
+}).GetHtml()
+    ViewContext.Writer.Write(" - ваша собственная страница <br />");
+}
+
+@if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_AGENTCATEGORY))
+{
+    @Html.DevExpress().HyperLink(s =>
+{
+    s.Properties.ImageUrl = Url.Content("~/Images/users.png");
+    s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Admins", Controller = "User", Action = "Index" });
+}).GetHtml()
+    
+    @Html.DevExpress().HyperLink(s =>
+{
+    s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Admins", Controller = "User", Action = "Index" });
+    s.Properties.Text = "Пользователи";
+    s.ControlStyle.Font.Bold = true;
+}).GetHtml()
+    ViewContext.Writer.Write(" - управление пользователями, установка и изменение паролей, блокировка и т.д. <br />");
+}
+
+@if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_AGENTCATEGORY))
+{
+@Html.DevExpress().HyperLink(s =>
+{
+    s.Properties.ImageUrl = Url.Content("~/Images/users.png");
+    s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Admins", Controller = "ConnectedUser", Action = "Index" });
+}).GetHtml()
+    
+    @Html.DevExpress().HyperLink(s =>
+{
+    s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Admins", Controller = "ConnectedUser", Action = "Index" });
+    s.Properties.Text = "Подключенные пользователи";
+    s.ControlStyle.Font.Bold = true;
+}).GetHtml()
+    ViewContext.Writer.Write(" - список текущих подключенных пользователей <br />");
+
+}
+<hr />
+<h2 style=" font-size:18px">Настройки системы...</h2>
+<hr />
+@if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_USERSETUP))
+{
+    @Html.DevExpress().HyperLink(s =>
+{
+    s.Properties.ImageUrl = Url.Content("~/Images/sys_config.png");
+    s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "UserPersonal", Controller = "AccountSetup", Action = "Index" });
+}).GetHtml()
+    
+    @Html.DevExpress().HyperLink(s =>
+{
+    s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "UserPersonal", Controller = "AccountSetup", Action = "Index" });
+    s.Properties.Text = "Настройка аккаунта";
+    s.ControlStyle.Font.Bold = true;
+}).GetHtml()
+    ViewContext.Writer.Write(" - настройки текущего пользователя. <br />");
+}
+
+@if (WADataProvider.CommonRightView.AdminEnterprize)
+{
+    @Html.DevExpress().HyperLink(s =>
+{
+    s.Properties.ImageUrl = Url.Content("~/Images/sys_config.png");
+    s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Admins", Controller = "SysConfig", Action = "Index" });
+}).GetHtml()
+    
+    @Html.DevExpress().HyperLink(s =>
+{
+    s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Admins", Controller = "SysConfig", Action = "Index" });
+    s.Properties.Text = "Глобальные настройки системы";
+    s.ControlStyle.Font.Bold = true;
+}).GetHtml()
+    ViewContext.Writer.Write(" - общие настройки системы. <br />");
+}
+
+@if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_PAYMENTTYPE))
+{
+    @Html.DevExpress().HyperLink(s =>
+{
+    s.Properties.ImageUrl = Url.Content("~/Images/DOCUMENTDONE_X16.png");
+    s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Admins", Controller = "ViewListDocumentConfig", Action = "Index" });
+}).GetHtml()
+    
+    @Html.DevExpress().HyperLink(s =>
+{
+    s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Admins", Controller = "ViewListDocumentConfig", Action = "Index" });
+    s.Properties.Text = "Настройка разделов документов";
+    s.ControlStyle.Font.Bold = true;
+}).GetHtml()
+    ViewContext.Writer.Write(" - настройки форматов отображения данных, панели действий и логики обработки документов. <br />");
+}
+
+

@@ -1,0 +1,10 @@
+﻿@model DocumentsWeb.Areas.Kb.Models.TaskModel
+@Html.DevExpress().HtmlEditor(settings =>
+{
+    settings.Name = "Memo";
+    settings.CallbackRouteValues = new { Controller = "Task", Action = "MemoPartial", id=Model.Id};
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    //settings.Width = 800;
+    settings.Settings.AllowDesignView = !Model.IsReadOnly;
+    settings.Settings.AllowHtmlView = !Model.IsReadOnly;
+}).Bind(Model.Memo).GetHtml() 

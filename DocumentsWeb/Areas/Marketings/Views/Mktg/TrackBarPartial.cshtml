@@ -1,0 +1,37 @@
+﻿@using DocumentsWeb.Models
+@using DocumentsWeb.Areas.Analitics.Models
+@model DocumentsWeb.Areas.Marketings.Models.DocumentMktgModel
+
+@{
+    int AnId;
+    try { AnId = int.Parse(ViewData["AnId"].ToString()); } catch { AnId = 0; }
+}
+@Html.DevExpress().CallbackPanel(f =>
+{
+    f.Name = "TrackBarCaller_" + ViewData["Name"].ToString();
+    f.CallbackRouteValues = new { Controller = "Document", Action = "EditDocumentMktgTrackBarPartial", mId = Model.ModelId };
+    f.SetContent(() =>
+    {
+        Html.DevExpress().TrackBar(s =>
+            {
+                s.Name = ViewData["Name"].ToString();
+                s.Properties.MaxValue = 100;
+                s.Width = 247;
+                s.Properties.ScalePosition = ScalePosition.LeftOrTop;
+                s.Properties.ValueToolTipPosition = ValueToolTipPosition.RightOrBottom;
+                s.Properties.ValueType = typeof(int);
+                s.ReadOnly = Model.IsReadOnly;
+                s.Properties.Items.AddRange(AnaliticModel.GetVariants(AnId));
+                if (ViewData.ContainsKey("ValueChangedScript"))
+                {
+                    s.Properties.ClientSideEvents.ValueChanged = "function(s, e) {" + ViewData["ValueChangedScript"].ToString() + "}";
+                }
+                if (ViewData.ContainsKey("InitScript"))
+                {
+                    s.Properties.ClientSideEvents.Init = "function(s, e) {" + ViewData["InitScript"].ToString() + "}";
+                }
+            }
+        ).Bind(Convert.ToDouble(ViewData["Value"])).Render();
+    });
+    f.ClientSideEvents.BeginCallback = "function OnBeginCallback(s, e) { e.customArgs[\"AnId\"] = AnaliticId4.GetValue(); e.customArgs[\"Value\"] = Value.GetValue(); e.customArgs[\"Name\"] = s.GetName(); }";
+}).GetHtml()

@@ -1,0 +1,29 @@
+﻿@using BusinessObjects
+@using DocumentsWeb.Areas.Analitics.Models
+@using DocumentsWeb.Areas.Products.Models
+@model ProductModel
+           
+@Html.DevExpress().ComboBox(s =>
+{
+    s.Name = "PakcTypeNameId";
+    s.ReadOnly = Model.IsReadOnly | Model.IsSystem; ;
+    if(!s.ReadOnly)
+    {
+        s.ToolTip = ProductData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), "PakcTypeNameId");
+    }
+    EditButton b = s.Properties.Buttons.Add();
+    b.Image.Url = "~/Images/search_x10.png";
+    b.ToolTip = "Поиск";
+            
+    s.ControlStyle.CssClass = "editor";
+    s.ShowModelErrors = true;
+    s.Properties.ValueField = GlobalPropertyNames.Id;
+    s.Properties.TextField = GlobalPropertyNames.Name;
+    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    s.Properties.ValueType = typeof(int);
+    s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+    s.Properties.FilterMinLength = 2;
+    s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    s.Properties.ClientSideEvents.ButtonClick = "function(s, e) { switch(e.buttonIndex) { case 0: AnaliticsFinderPackType.Show(); break; } }";
+}).BindList(AnaliticModel.GetCollection(Hierarchy.SYSTEM_ANALITIC_PACKTYPE)).Bind(Model.PakcTypeId == 0 ? null : (int?)Model.PakcTypeId).GetHtml()

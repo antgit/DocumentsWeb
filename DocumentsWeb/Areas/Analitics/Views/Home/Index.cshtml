@@ -1,0 +1,32 @@
+﻿@using System.Web.UI.WebControls
+@{
+    ViewBag.Title = "Аналитические справочники...";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@Html.Partial("NavpanelPartial")
+@Html.DevExpress().Splitter(settings =>
+{
+    settings.Name = "splFullScreenMode";
+    settings.Orientation = Orientation.Vertical;
+    settings.Styles.Pane.Paddings.Padding = 0;
+    settings.FullscreenMode = true;
+
+    settings.Panes.Add(contentPane =>
+    {
+        contentPane.ScrollBars = ScrollBars.Auto;
+        contentPane.SetContent(() =>
+        {
+            @Html.RenderPartial("IndexPartial");
+        });
+    });
+
+    settings.Panes.Add(footerPane =>{
+        footerPane.Size = 80;
+        footerPane.AllowResize = DefaultBoolean.False;
+        footerPane.ShowSeparatorImage = DefaultBoolean.False;
+        footerPane.SetContent(() =>
+        {
+            @Html.RenderPartial("FooterPartial");
+        });
+    });
+}).GetHtml()

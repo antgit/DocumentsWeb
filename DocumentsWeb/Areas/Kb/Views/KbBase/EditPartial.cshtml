@@ -1,0 +1,175 @@
+﻿@using DocumentsWeb.Areas.Agents.Models
+@using DocumentsWeb.Areas.General.Models
+@using DocumentsWeb.Areas.Kb.Models
+@using DocumentsWeb.Models;
+@using BusinessObjects;
+@model KnowledgeModel
+
+<input type="hidden" id="KindId" name="KindId" value="@Model.KindId" />
+<input type="hidden" id="HierarchyId" name="HierarchyId" value="@Model.HierarchyId" />
+<table style="width: 100%;">
+    <tr>
+        <td class="table_label">
+                  @Html.DevExpress().Label(s =>
+                      {
+                          s.ControlStyle.CssClass = "label";
+                          s.Style.Add("float", "left");
+                          s.Text = "Предприятие:";
+                          s.AssociatedControlName = GlobalPropertyNames.MyCompanyId;
+                          if ((Model.MyCompanyId == 0 ? null : (int?)Model.MyCompanyId)==null)
+                              s.ControlStyle.ForeColor = System.Drawing.Color.Red;
+                          s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.MyCompanyId);
+                      }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().ComboBox(s =>
+                {
+                    s.ControlStyle.CssClass = "editor";
+                    s.Name = GlobalPropertyNames.MyCompanyId;
+                    s.ReadOnly = Model.IsReadOnly | Model.IsSystem | Model.Id > 0;
+                    if(!s.ReadOnly)
+                    {
+                        s.Properties.NullDisplayText = "Выберите предприятие...";
+                        s.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.MyCompanyId);
+                    }
+                    s.Properties.ValueField = GlobalPropertyNames.Id;
+                    s.Properties.TextField = GlobalPropertyNames.Name;
+                    s.Properties.ValueType = typeof(int);
+                    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    s.ShowModelErrors = true;
+                    s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                    s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                    //s.Properties.ClientSideEvents.ValueChanged = "function AgentDepartmentFromId_Changed(s, e) { StorekeeperId.PerformCallback(); }";
+                }).BindList(ClientModel.GetMyDepatments()).Bind(Model.MyCompanyId == 0 ? null : (int?)Model.MyCompanyId).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>{
+                                             s.ControlStyle.CssClass = "label";
+                                             s.Text = "Наименование:";
+                                             s.AssociatedControlName = GlobalPropertyNames.Name;
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBox(s =>{
+                                               s.Name = GlobalPropertyNames.Name;
+                                               s.ControlStyle.CssClass = "editor";
+                                               s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                                               s.ShowModelErrors = true;
+                                               s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+                                               if(!s.ReadOnly)
+                                                   s.Properties.NullText = KnowledgeData.GetNullText(GlobalPropertyNames.Name);
+                                               s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                                               s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.Name).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>
+                {
+                    s.ControlStyle.CssClass = "label";
+                    s.Text = "Печать:";
+                    s.AssociatedControlName = GlobalPropertyNames.NameFull;
+                }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBox(s =>
+                {
+                    s.Name = GlobalPropertyNames.NameFull;
+                    s.ControlStyle.CssClass = "editor";
+                    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    s.ShowModelErrors = true;
+                    s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+                    if (!s.ReadOnly)
+                        s.Properties.NullText = KnowledgeData.GetNullText(GlobalPropertyNames.NameFull);
+                    s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                    s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                }).Bind(Model.NameFull).GetHtml()
+        </td>
+    </tr>
+    @if (Model.KindId == Knowledge.KINDID_ONLINE)
+    {
+        <tr>
+            <td class="table_label">
+                @Html.DevExpress().Label(s =>
+                    {
+                        s.ControlStyle.CssClass = "label";
+                        s.Text = "Url:";
+                        s.AssociatedControlName = GlobalPropertyNames.CodeFind;
+                    }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().TextBox(s =>
+                    {
+                        s.Name = GlobalPropertyNames.CodeFind;
+                        s.ControlStyle.CssClass = "editor";
+                        s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                        s.ShowModelErrors = true;
+                        s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+                        if (!s.ReadOnly)
+                            s.Properties.NullText = KnowledgeData.GetNullText(GlobalPropertyNames.CodeFind);
+                        s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                        s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                    }).Bind(Model.CodeFind).GetHtml()
+            </td>
+        </tr>
+    }
+    @if (Model.KindId == Knowledge.KINDID_LOCAL)
+    {
+        <tr>
+            <td class="table_label">
+                @Html.DevExpress().Label(s =>
+                    {
+                        s.ControlStyle.CssClass = "label";
+                        s.Text = "Файл:";
+                        s.AssociatedControlName = GlobalPropertyNames.FileId;
+                    }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().ComboBox(s =>
+                    {
+                        s.Name = GlobalPropertyNames.FileId;
+                        s.ControlStyle.CssClass = "editor";
+                        s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                        s.Properties.TextField = GlobalPropertyNames.Name;
+                        s.Properties.ValueField = GlobalPropertyNames.Id;
+                        s.Properties.ValueType = typeof(int);
+                        s.Properties.DropDownWidth = System.Web.UI.WebControls.Unit.Pixel(300);
+                        s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                        s.Properties.FilterMinLength = 3;
+                        s.ShowModelErrors = true;
+                        s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+                        s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                        s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                    }).BindList(FileDataModel.GetCollectionBind(Hierarchy.SYSTEM_FILEDATA_KNOWLEDGE, Model.FileId)).Bind(Model.FileId).GetHtml()
+            </td>
+        </tr>
+    }
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>{
+                                             s.ControlStyle.CssClass = "label";
+                                             s.Text = "Описание:";
+                                             s.AssociatedControlName = GlobalPropertyNames.Memo;
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Memo(s =>{
+                                            s.Name = GlobalPropertyNames.Memo;
+                                            s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+                                            if (!s.ReadOnly)
+                                                s.Properties.NullText = KnowledgeData.GetNullText(GlobalPropertyNames.Memo);
+                                            s.Properties.ConvertEmptyStringToNull = true;
+                                            s.ControlStyle.CssClass = "editor";
+                                            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                                            s.Height = 80;
+                
+                                            s.ShowModelErrors = true;
+                                            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                                            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.Memo).GetHtml()
+        </td>
+    </tr>
+</table>

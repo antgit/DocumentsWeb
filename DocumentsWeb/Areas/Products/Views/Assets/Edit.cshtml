@@ -1,0 +1,30 @@
+﻿@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentsWeb.Models
+@using DocumentsWeb.Areas.Products.Models
+@model ProductModel
+           
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    Html.EnableClientValidation();
+    bool haveEdit = WADataProvider.LibrariesElementRightView.IsAllow(Right.UIEDIT, WebModuleNames.WEB_ASSETS) && !WADataProvider.CommonRightView.ReadOnly;
+}
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jErrorPanelActions.js")" type="text/javascript"></script>
+<script type="text/javascript">
+    @if(Model.Id!=0 | Model.IsSystem | Model.IsReadOnly |!haveEdit) { ViewContext.Writer.Write("if (typeof parent.pcEdit != 'undefined') { parent.pcEdit.SetVisibleSaveButton(false); }"); }
+
+    $(document).ready(function () {
+    $(".triggerError").click(function () {
+        $(".panelError").toggle("fast");
+        $(this).toggleClass("active");
+        return false;
+    });
+    });
+</script>
+
+@using (Html.BeginForm("Edit", "Assets", FormMethod.Post, new { @class = "edit_form", @id = "editForm" }))
+{ 
+    @Html.Partial("EditPartial", Model)
+}

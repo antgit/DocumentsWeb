@@ -1,0 +1,55 @@
+﻿/* you can specify a greater or lesser percentage for the 
+page width. Or, you can specify an exact pixel width. */
+.page {
+    width: 100%;
+    height:100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#main {
+    padding: 0px 0px 0px 0px;
+    background-color: #fff;
+    border-radius: 0px 0 0 0;
+    -webkit-border-radius: 0px 0 0 0;
+    -moz-border-radius: 0px 0 0 0;
+}
+/* TABLE
+----------------------------------------------------------*/
+
+table
+{
+    border: 0px none #FFFFFF;
+    border-collapse: collapse;
+}
+
+table td
+{
+    padding: 0px;
+    border: 1px solid #FFFFFF;
+}
+
+table th
+{
+    padding: 0px 0px;
+    text-align: left;
+    background-color: #e8eef4;
+    border: solid 1px #e8eef4;
+}
+
+table td.reports div {
+	width: 210px;
+	font-size: 12px;
+	color: #b0b0b0;
+}
+
+table td.reports a {
+	font-size: 16px;
+	font-weight: bold;
+	color: #5c87b2;
+	text-decoration: none;
+}
+
+table td.reports a:hover {
+	color: Blue;
+}

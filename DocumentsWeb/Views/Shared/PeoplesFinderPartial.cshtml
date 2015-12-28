@@ -1,0 +1,78 @@
+﻿@using System.Globalization
+@using DocumentsWeb.Code;
+
+@{
+    string Name = (string)ViewData["Name"];
+    string ComboboxName = (string)ViewData["ComboboxName"];
+    string ComboboxMyCompany = (string)ViewData["ComboboxMyCompany"];
+    int ComboboxButtonIndex = (int)ViewData["ComboboxButtonIndex"];
+    bool onlyUsers = (bool)ViewData["onlyUsers"];
+    bool showAgentsInChains = ViewData["showAgentsInChains"] != null && (bool)ViewData["showAgentsInChains"];
+
+    string currCompanies = "";
+    List<int> userScopeView = DocumentsWeb.Models.WADataProvider.CurrentUser.GetCompaniesList();//DocumentsWeb.Models.WADataProvider.WA.Access.GetCompanyScopeView(HttpContext.Current.User.Identity.Name);
+    foreach(int id in userScopeView) {
+        if (currCompanies.Length > 0) {
+            currCompanies += " OR ";
+        }
+        currCompanies += "[MyCompanyId] = " + id.ToString(CultureInfo.InvariantCulture);
+    }
+}
+
+@Html.DevExpress().PopupControl(pc =>
+{
+    pc.Name = Name;
+    pc.PopupElementID = ComboboxName + "_B" + ComboboxButtonIndex.ToString() + "Img";
+    pc.Height = 250;
+    pc.Width = 520;
+
+    pc.ShowFooter = false;
+    pc.ShowHeader = false;
+    pc.PopupHorizontalAlign = PopupHorizontalAlign.LeftSides;
+    pc.PopupVerticalAlign = PopupVerticalAlign.Below;
+    pc.EnableAnimation = true;
+    pc.AllowDragging = false;
+    pc.CloseAction = CloseAction.MouseOut;
+
+    if (showAgentsInChains)
+    {
+        pc.ClientSideEvents.PopUp = "function (s, e) { gv" + Name + ".PerformCallback(); }";
+    }
+    else
+    {
+        if (ComboboxMyCompany != null)
+        {
+            pc.ClientSideEvents.PopUp = "function (s, e) { gv" + Name + ".ApplyFilter('[MyCompanyId] = ' + " + ComboboxMyCompany + ".GetValue()); }";
+        }
+        else
+        {
+            pc.ClientSideEvents.PopUp = "function (s, e) { gv" + Name + ".ApplyFilter('" + currCompanies + "'); }";
+            //'MyCompanyId = ' + " + DocumentsWeb.Models.WADataProvider.CurrentUser.MyCompanyId.ToString() + "
+        }
+    }    
+    
+    pc.SetContent(() =>
+    {
+        ViewContext.Writer.Write("<table style=\"width: 100%;\"><tr><td>");
+        Html.RenderPartial("PeoplesFinderGridPartial", new ViewDataDictionary { 
+            { "Name", Name },
+            { "onlyUsers", onlyUsers },
+            { "ComboboxMyCompany", ComboboxMyCompany },
+            { "showAgentsInChains", showAgentsInChains },
+            { "myCompanyId", ViewData["myCompanyId"]}
+        });
+        ViewContext.Writer.Write("</td></tr><tr><td><table style=\"float:right;\"><tr><td>");
+        Html.DevExpress().Button(s=>{
+            s.Name = "gv" + Name + "_btnSelect";
+            s.Text = "Выбрать";
+            s.ClientSideEvents.Click = "function (s, e) { var id = gv" + Name + ".GetRowKey(gv" + Name + ".GetFocusedRowIndex()); if (id != null) { " + ComboboxName + ".SetValue(id); } " + Name + ".Hide(); }";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().Button(s=>{
+            s.Name = "gv" + Name + "_btnCancel";
+            s.Text = "Отмена";
+            s.ClientSideEvents.Click = "function (s, e) { " + Name + ".Hide(); }";
+        }).Render();
+        ViewContext.Writer.Write("</td></tr></table></td></tr></table>");
+    });    
+}).GetHtml()

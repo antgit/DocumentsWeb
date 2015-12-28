@@ -1,0 +1,339 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>BusinessObjects.Workflows</name>
+    </assembly>
+    <members>
+        <member name="T:BusinessObjects.Workflows.WfCore">
+            <summary>
+            Дополнительные методы работы в WF
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.WfCore.FindByCodeInternal(System.String)">
+            <summary>Поиск системного WF в текущей библиотеке по коду</summary>
+            <param name="code">Код</param>
+        </member>
+        <member name="M:BusinessObjects.Workflows.WfCore.FindByCode(BusinessObjects.Workarea,System.String)">
+            <summary>Поиск WF в базе данных</summary>
+            <param name="wa">Рабочая область</param>
+            <param name="code">Код</param>
+        </member>
+        <member name="P:BusinessObjects.Workflows.DocFlow.ActivitySendToUser.Message">
+            <summary>
+            Текущее сообщение, которое требуется передать
+            </summary>
+        </member>
+        <member name="P:BusinessObjects.Workflows.DocFlow.ActivitySendToUser.Owner">
+            <summary>
+            Документ владелец
+            </summary>
+        </member>
+        <member name="P:BusinessObjects.Workflows.DocFlow.ActivitySendToUser.User">
+            <summary>
+            Пользователь
+            </summary>
+        </member>
+        <member name="T:BusinessObjects.Workflows.Web.ActivityRegisterNewCompany">
+            <summary>
+            Регистрация новой компании...
+            </summary>
+            <remarks>При регистрации новой компании:
+            - создается новое предприятие
+            - создается новый пользователь
+            - создается новый сотрудник компании
+            - создается новый вид цены для компании
+            - выдаются разрешения для пользователя в разрезе компании.
+            </remarks>
+        </member>
+        <member name="P:BusinessObjects.Workflows.Web.ActivityRegisterNewCompany.CurrentWorkarea">
+            <summary>
+            Рабочая область
+            </summary>
+        </member>
+        <member name="P:BusinessObjects.Workflows.Web.ActivityRegisterNewCompany.Email">
+            <summary>
+            Email администратора новой компании
+            </summary>
+        </member>
+        <member name="P:BusinessObjects.Workflows.Web.ActivityRegisterNewCompany.UserLogin">
+            <summary>
+            Логин пользователя-администратора новой компании
+            </summary>
+        </member>
+        <member name="P:BusinessObjects.Workflows.Web.ActivityRegisterNewCompany.UserName">
+            <summary>
+            Имя пользователя-администратора новой компании
+            </summary>
+        </member>
+        <member name="P:BusinessObjects.Workflows.Web.ActivityRegisterNewCompany.CompanyName">
+            <summary>
+            Наименование компании
+            </summary>
+        </member>
+        <member name="P:BusinessObjects.Workflows.Web.ActivityRegisterNewCompany.Password">
+            <summary>
+            Пароль для нового пользователя системы
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.SalesReturnSupplyerToStoreReturnSupplyer.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.SalesOutToSalesReturnByer.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.SalesAssortimentToOrderOut.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.SalesAssortimentToSaleAccountOut.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.ServicesOrderInToAccountOut.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.SaleAccountOutToMoneyIn.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.SalesOutToPriceList.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.SalesOutToTaxOut.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.SalesInToSalesOrderIn.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.SalesInventoryToActOut.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.ServicesAccountOutToActOut.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.SalesAccountInToSalesIn.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.StoreInReturnSupplyer.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.SalesAssortimentToPriceList.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.ContractToSalesOut.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.ServicesAccountOutToMoneyIn.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.SalesInToStoreIn.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.StoreOutReturnReturnByer.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.SalesOrderOutToSalesAccountIn.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.SalesInToTaxIn.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.ServicesActInToTaxIn.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.SalesInToSalesOrderOut.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.SalesInToPriceList.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.ServicesAccountInToMoneyOut.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.ServicesActOutToTaxOut.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.SalesOutToSalesOrderOut.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.ServicesActOutToMoneyIn.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.SalesInToSalesReturnSupplyer.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.SalesOutToSalesAccount.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.PriceListCommandIndToPriceListInd.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.ServicesOrderOutToAccountIn.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.SalesReturnByerToStoreReturnByer.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.SalesOutToStoreOut.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.StoreInMove.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.SalesOrderInToSalesOut.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.SalesOrderInToAccountOut.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.SalesInToSalesAccountIn.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.PriceListCommandToPriceList.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.SalesInToMove.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.BookKeep.BookKeepCreateFromSalesOut.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.SalesAssortimentToOrderIn.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.SalesAccountOutToSalesOut.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.ServicesActInToMoneyOut.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.CustomActions.ActionServicesRecalcNds.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.SalesOutToMoneyIn.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.SalesAssortimentToSalesOut.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.ServicesAccountInToActIn.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.CustomActions.ActionsSalesOutRecalcNds.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.SalesInventoryToActIn.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.SalesAccountInToMoneyOut.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.CustomActions.ActionsSalesInRecalcNds.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:BusinessObjects.Workflows.Documents.SalesOrderOutToSalesIn.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+    </members>
+</doc>

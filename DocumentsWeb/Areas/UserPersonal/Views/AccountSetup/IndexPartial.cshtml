@@ -1,0 +1,68 @@
+﻿@using System.Web.UI.WebControls;
+@model DocumentsWeb.Areas.UserPersonal.Models.AccountConfigModel
+           
+        <table style="width: 800px;">
+        <tr><td class="table_label" style="width: 150px;">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Тема по умолчанию:";
+            s.AssociatedControlName = "ReportsServer";
+        }).GetHtml()
+        </td><td>
+
+        @Html.Raw("<label id=\"popupLabel\" style=\"color: blue; cursor: pointer;\">" + (string.IsNullOrEmpty(@Model.ThemeDefault) ? "default" : @Model.ThemeDefault) + "</label>")
+        @Html.Raw("<input type=\"hidden\" id=\"ThemeDefault\" name=\"ThemeDefault\" value=\"" + (@Model.ThemeDefault ?? string.Empty) + "\" />")
+        
+        @Html.DevExpress().PopupControl(pc =>
+        {
+            pc.Name = "pcThemDefault";
+            pc.PopupElementID = "popupLabel";
+            pc.Height = 500;
+            pc.Width = 550;
+
+            pc.ShowFooter = false;
+            pc.ShowHeader = false;
+            pc.PopupHorizontalAlign = PopupHorizontalAlign.LeftSides;
+            pc.PopupVerticalAlign = PopupVerticalAlign.Below;
+            pc.EnableAnimation = true;
+            pc.AllowDragging = false;
+            pc.CloseAction = CloseAction.MouseOut;
+            pc.ScrollBars = ScrollBars.Auto;
+
+            pc.SetContent(() =>
+            {
+                ViewContext.Writer.Write("<div id=\"ThemesContainer\">");
+                foreach (ThemeGroupModel themeGroup in ThemesModel.Current.Groups)
+                {
+                    ViewContext.Writer.Write("<div class=\"ThemeGroup\">" + themeGroup.Title + "</div>");
+
+                    int i = 0;
+                    ViewContext.Writer.Write("<table class=\"sitemap\">");
+                    ViewContext.Writer.Write("<tr>");
+                    foreach (ThemeModel theme in themeGroup.Themes)
+                    {
+                        if (theme.Name != "DevEx")
+                        {
+                            if (i == 3)
+                            {
+                                ViewContext.Writer.Write("</tr><tr>");
+                                i = 0;
+                            }
+
+                            ViewContext.Writer.Write("<td>");
+                            //ViewContext.Writer.Write("<div class=\"" + theme.SpriteCssClass + "\" style=\"cursor: pointer;\" onclick=\"javascript:$('#popupLabel').text('" + (theme.Name.Length == 0 ? "default" : theme.Name) + "');$('#ThemeDefault').val('" + theme.Name + "');parent.pcThemDefault.Hide();\">" + theme.Title + "</div>");
+                            ViewContext.Writer.Write("<div class=\"" + theme.SpriteCssClass + "\" style=\"cursor: pointer;\" onclick=\"$.ajax({ type: 'GET', url: '" + Url.Content("~/UserConfig/SetUserTheme") + "', async: false, data: { ThemeName : '" + theme.Name + "' } }); window.location.reload();\">" + theme.Title + "</div>");
+                            ViewContext.Writer.Write("</td>");
+                            i++;
+                        }
+                    }
+                    ViewContext.Writer.Write("</tr>");
+                    ViewContext.Writer.Write("</table>");
+                }
+                ViewContext.Writer.Write("</div>");
+            });
+        }).GetHtml()
+
+        </td></tr>
+        </table>

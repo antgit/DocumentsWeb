@@ -1,0 +1,86 @@
+﻿@using System.Globalization
+@using DevExpress.Web.Mvc
+@using DevExpress.Web.Mvc.UI
+@using DevExpress.Web.ASPxGridView
+@using DocumentsWeb.Areas.General.Models
+@using DevExpress.Utils;
+@model DocumentsWeb.Areas.General.Models.INotesOwner
+
+@Html.DevExpress().GridView(settings=>{
+    settings.Name = "gvNotes";
+    settings.CallbackRouteValues = new { Area = "General", Controller = "Note", Action = "NotesGrid", modelId = Model.ModelId };
+    settings.SettingsEditing.AddNewRowRouteValues = new { Area = "General", Controller = "Note", Action = "AddNote", modelId = Model.ModelId };
+    settings.SettingsEditing.UpdateRowRouteValues = new { Area = "General", Controller = "Note", Action = "UpdateNote", modelId = Model.ModelId };
+    settings.SettingsEditing.DeleteRowRouteValues = new { Area = "General", Controller = "Note", Action = "DeleteNote", modelId = Model.ModelId };
+    settings.KeyFieldName = "NoteRowId";
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Settings.VerticalScrollableHeight = 350;
+    settings.Settings.ShowVerticalScrollBar = true;
+    settings.Settings.ShowHorizontalScrollBar = true;
+    settings.SettingsPager.Visible = false;
+    settings.SettingsBehavior.AllowFocusedRow = true;
+    settings.KeyboardSupport = true;
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+
+    settings.Columns.Add(cc =>
+    {
+        cc.Name = "colImageAction";
+        cc.Width = System.Web.UI.WebControls.Unit.Pixel(25);
+        cc.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+        cc.Settings.AllowDragDrop = DefaultBoolean.False;
+        cc.Settings.AllowSort = DefaultBoolean.False;
+        cc.Settings.AllowDragDrop = DefaultBoolean.False;
+        cc.Settings.AllowSort = DefaultBoolean.False;
+        cc.SetDataItemTemplateContent(c =>
+        {
+            ViewContext.Writer.Write("<table><tr>");
+            ViewContext.Writer.Write("<td>");
+            Html.DevExpress().HyperLink(hl =>
+            {
+                hl.Properties.ImageUrl = Url.Content("~/Images/edit10x10.png");
+                hl.ToolTip = "Изменить";
+                hl.NavigateUrl = "javascript:gvNotes.StartEditRow(" + c.ItemIndex.ToString(CultureInfo.InvariantCulture) + ");";
+                hl.ClientEnabled = ((int)DataBinder.Eval(c.DataItem, "NoteUserOwnerId")) == DocumentsWeb.Models.WADataProvider.CurrentUser.Id;
+            }).Render();
+            //ViewContext.Writer.Write("</td><td>");
+            //Html.DevExpress().HyperLink(hl =>
+            //{
+            //    hl.Properties.ImageUrl = Url.Content("~/Images/DELETEDELEMENT_X16.png");
+            //    hl.ToolTip = "Удалить";
+            //    hl.NavigateUrl = "javascript:if (confirm(\"Удалить примечание?\")) {gvNotes.DeleteRow(" + c.ItemIndex.ToString(CultureInfo.InvariantCulture) + ");}";
+            //}).Render();
+            ViewContext.Writer.Write("</td></tr></table>");
+        });
+    });
+
+    var col_NoteOrderNo = settings.Columns.Add("NoteOrderNo", "№");
+    col_NoteOrderNo.Width = 40;
+    col_NoteOrderNo.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+
+    MVCxGridViewColumn col_NoteDate = settings.Columns.Add("NoteDate", "Дата");
+    col_NoteDate.PropertiesEdit.DisplayFormatString = "d";
+    col_NoteDate.Width = 80;
+        
+    var col_NoteName = settings.Columns.Add("NoteName", "Тема");
+    col_NoteName.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    
+    var NoteWorkerName = settings.Columns.Add("NoteWorkerName", "Сотрудник");
+    NoteWorkerName.Width = 250;
+
+    settings.Settings.ShowPreview = true;
+    settings.PreviewFieldName = "NoteMemo";
+    
+    settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+    settings.SetEditFormTemplateContent(c =>
+    {
+        Html.RenderPartial("Edit", NoteModel.ConvertToModel(c));
+    });
+
+    settings.ClientSideEvents.ColumnResizing = "function (s, e) {if (e.column.name == 'colImageAction') {e.cancel = true;}}";
+    settings.Settings.ShowFooter = true;
+    settings.SetFooterRowTemplateContent(c =>
+    {
+        if(NoteModel.CanCreateNotes(Model))
+            ViewContext.Writer.Write("<div style=\"width: 100%; text-align: center; font-size: 10pt;\"><a href=\"javascript:gvNotes.AddNewRow();\">Создать</a></div>");
+    });
+}).Bind(Model.Notes).GetHtml()

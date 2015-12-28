@@ -1,0 +1,58 @@
+﻿<table style = "padding: 5px;">
+    <tr>
+        <td>
+            @Html.DevExpress().Image(i => {
+                i.ImageUrl = Url.Content("~/Images/HELP_X16.gif");
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().HyperLink(hl => {
+                hl.NavigateUrl = "http://edu.hercules.ua/mod/forum/view.php?id=787";
+                hl.Properties.Text = "Что нового";
+                hl.Properties.Target = "_blank";
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().Image(i => {
+                i.ImageUrl = Url.Content("~/Images/HELP_X16.gif");
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().HyperLink(hl => {
+                hl.NavigateUrl = "http://edu.hercules.ua/mod/lesson/view.php?id=788";
+                hl.Properties.Text = "Инструкция";
+                hl.Properties.Target = "_blank";
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().Image(i => {
+                i.ImageUrl = Url.Content("~/Images/HELP_X16.gif");
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().HyperLink(hl => {
+                hl.NavigateUrl = "http://edu.hercules.ua/mod/forum/view.php?id=790";
+                hl.Properties.Text = "Обсудить на форуме";
+                hl.Properties.Target = "_blank";
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DevExpress().Image(i => {
+                i.ImageUrl = Url.Content("~/Images/HELP_X16.gif");
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().HyperLink(hl => {
+                hl.NavigateUrl = "http://edu.hercules.ua/mod/forum/view.php?id=799";
+                hl.Properties.Text = "Сообщить об ошибке";
+                hl.Properties.Target = "_blank";
+            }).GetHtml()
+        </td>
+    </tr>
+</table>

@@ -1,0 +1,24 @@
+﻿@model DocumentsWeb.Areas.General.Models.FileDataModel
+@Html.DevExpress().GridView(settings =>
+{
+    settings.Name = "gvFileVersions";
+    settings.CallbackRouteValues = new { Controller = "File", Action = "FileVersionsPartial", rowId = Model.RowId };
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control; 
+    settings.Settings.VerticalScrollableHeight = 150;
+    settings.Settings.ShowVerticalScrollBar = true;
+    settings.Columns.Add(column =>
+    {
+        column.Caption = "Действие";
+        column.SetDataItemTemplateContent(c =>
+        {
+            Html.DevExpress().HyperLink(s =>
+            {
+                s.Properties.Text = "Скачать";
+                s.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "File", Action = "GetFileVersion", rowId = DataBinder.Eval(c.DataItem, "RowId") });
+            }).Render();
+        });
+    });
+    settings.Columns.Add("DateModified", "Дата");
+    settings.Columns.Add("UserName", "Пользователь");
+}).Bind(Model.Versions).GetHtml()

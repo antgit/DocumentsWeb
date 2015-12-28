@@ -1,0 +1,64 @@
+﻿.ContentLeftInner,
+.ContentLeftInner_Intro
+{
+    height: auto !important;
+    height: 852px;
+}
+
+.ContentCenter
+{
+    overflow-x: hidden;
+}
+
+.ContentCenterInner,
+.ContentCenterInner_Intro
+{
+    height: auto !important;
+    height: 600px;
+}
+
+.NavigationBar .dxnb-header .dxnb-btn,
+.NavigationBar .dxnb-headerCollapsed .dxnb-btn,
+.NavigationBar .dxnb-itemSelected,
+.NavigationBar .NewImage,
+.NavigationBar .UpdatedImage,
+.ActiveTab .Left,
+.ActiveTab .Center,
+.ActiveTab .Right,
+.BannerButton_LearnMore,
+.BannerButton_LearnMoreHover,
+.BannerButton_Download,
+.BannerButton_DownloadHover,
+.BannerButton_BuyNow,
+.BannerButton_BuyNowHover,
+.BannerButton_Videos,
+.BannerButton_VideosHover,
+.CodeNavBar .dxWeb_nbCollapse,
+.CodeNavBar .dxWeb_nbExpand,
+.FooterLogo
+{
+    background-image: url(Sprite.gif);
+}
+
+.NavigationBar .dxnb-header,
+.NavigationBar .dxnb-content
+{
+    background-image: none;
+}
+
+.NavigationBar .dxnb-headerCollapsedHover
+{
+    background-image: none;
+    background-color: #e3eafd;
+}
+
+#ThemeSelectorButton 
+{
+    display: none;
+}
+
+.CodeNavBar .dxnb-content
+{
+    height: expression(this.scrollHeight > 359 ? "360px" : "auto"); 
+    width: 666px;
+}

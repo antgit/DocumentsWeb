@@ -1,0 +1,460 @@
+﻿@using BusinessObjects
+@model DocumentsWeb.Areas.Agents.Models.ClientModel
+<table class="edit_form_table">
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Наименование:";
+                    settings.AssociatedControlName = GlobalPropertyNames.Name;
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = GlobalPropertyNames.Name;
+                    settings.Properties.Style.Font.Bold = true;
+                }).Bind(Model.Name).GetHtml() 
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Печать:";
+                    settings.AssociatedControlName = GlobalPropertyNames.NameFull;
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = GlobalPropertyNames.NameFull;
+                    settings.Properties.Style.Font.Bold = true;
+                    settings.Properties.Style.ForeColor = string.IsNullOrEmpty(Model.NameFull) ? System.Drawing.Color.Red : settings.Properties.Style.ForeColor;
+                }).Bind(string.IsNullOrEmpty(Model.NameFull) ? "<Данные отсутствуют!>" : Model.NameFull).GetHtml() 
+        </td>
+    </tr>
+    
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Международное:";
+                    settings.AssociatedControlName = GlobalPropertyNames.InternationalName;
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = GlobalPropertyNames.InternationalName;
+                    settings.Properties.Style.Font.Bold = false;
+                    settings.Properties.Style.ForeColor = string.IsNullOrEmpty(Model.InternationalName) ? System.Drawing.Color.Red : settings.Properties.Style.ForeColor;
+                }).Bind(string.IsNullOrEmpty(Model.InternationalName) ? "<Данные отсутствуют!>" : Model.InternationalName).GetHtml() 
+        </td>
+    </tr>
+    
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Фамилия:";
+                    settings.AssociatedControlName = GlobalPropertyNames.FirstName;
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = GlobalPropertyNames.FirstName;
+                    settings.Properties.Style.Font.Bold = false;
+                    settings.Properties.Style.ForeColor = string.IsNullOrEmpty(Model.FirstName) ? System.Drawing.Color.Red : settings.Properties.Style.ForeColor;
+                }).Bind(string.IsNullOrEmpty(Model.FirstName) ? "<Данные отсутствуют!>" : Model.FirstName).GetHtml() 
+        </td>
+    </tr>
+
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Имя:";
+                    settings.AssociatedControlName = GlobalPropertyNames.LastName;
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = GlobalPropertyNames.LastName;
+                    settings.Properties.Style.Font.Bold = false;
+                    settings.Properties.Style.ForeColor = string.IsNullOrEmpty(Model.LastName) ? System.Drawing.Color.Red : settings.Properties.Style.ForeColor;
+                }).Bind(string.IsNullOrEmpty(Model.LastName) ? "<Данные отсутствуют!>" : Model.LastName).GetHtml() 
+        </td>
+    </tr>
+    
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Отчество:";
+                    settings.AssociatedControlName = GlobalPropertyNames.MidleName;
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = GlobalPropertyNames.MidleName;
+                    settings.Properties.Style.Font.Bold = false;
+                    settings.Properties.Style.ForeColor = string.IsNullOrEmpty(Model.MidleName) ? System.Drawing.Color.Red : settings.Properties.Style.ForeColor;
+                }).Bind(string.IsNullOrEmpty(Model.MidleName) ? "<Данные отсутствуют!>" : Model.MidleName).GetHtml() 
+        </td>
+    </tr>
+
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Пол:";
+                    settings.AssociatedControlName = GlobalPropertyNames.SexName;
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = GlobalPropertyNames.SexName;
+                    settings.Properties.Style.Font.Bold = false;
+                }).Bind(string.IsNullOrEmpty(Model.SexName) ? "<Данные отсутствуют!>" : Model.SexName).GetHtml() 
+        </td>
+    </tr>
+
+    <tr>
+        <td colspan="2"><hr /></td>
+    </tr>
+    
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Код:";
+                    settings.AssociatedControlName = GlobalPropertyNames.Code;
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = GlobalPropertyNames.Code;
+                    settings.Properties.Style.Font.Bold = false;
+                    settings.Properties.Style.ForeColor = string.IsNullOrEmpty(Model.Code) ? System.Drawing.Color.Red : settings.Properties.Style.ForeColor;
+                }).Bind(string.IsNullOrEmpty(Model.Code) ? "<Данные отсутствуют!>" : Model.Code).GetHtml() 
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Код поиска:";
+                    settings.AssociatedControlName = GlobalPropertyNames.CodeFind;
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = GlobalPropertyNames.CodeFind;
+                    settings.Properties.Style.Font.Bold = false;
+                    settings.Properties.Style.ForeColor = string.IsNullOrEmpty(Model.CodeFind) ? System.Drawing.Color.Red : settings.Properties.Style.ForeColor;
+                }).Bind(string.IsNullOrEmpty(Model.CodeFind) ? "<Данные отсутствуют!>" : Model.CodeFind).GetHtml() 
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2"><hr /></td>
+    </tr>
+    
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Телефон:";
+                    settings.AssociatedControlName = GlobalPropertyNames.Phone;
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = GlobalPropertyNames.Phone;
+                    settings.Properties.Style.Font.Bold = false;
+                    settings.Properties.Style.ForeColor = string.IsNullOrEmpty(Model.Phone) ? System.Drawing.Color.Red : settings.Properties.Style.ForeColor;
+                }).Bind(string.IsNullOrEmpty(Model.Phone) ? "<Телефон не указан!>" : Model.Phone).GetHtml() 
+        </td>
+    </tr>
+
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "ИНН:";
+                    settings.AssociatedControlName = "TaxNumber";
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = "TaxNumber";
+                    settings.Properties.Style.Font.Bold = true;
+                    settings.Properties.Style.ForeColor = string.IsNullOrEmpty(Model.TaxNumber) ? System.Drawing.Color.Red : settings.Properties.Style.ForeColor;
+                }).Bind(string.IsNullOrEmpty(Model.TaxNumber) ? "<Данные отсутствуют!>" : Model.TaxNumber).GetHtml() 
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Номер cтраховки:";
+                    settings.AssociatedControlName = GlobalPropertyNames.InsuranceNumber;
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = GlobalPropertyNames.InsuranceNumber;
+                    settings.Properties.Style.Font.Bold = true;
+                    settings.Properties.Style.ForeColor = string.IsNullOrEmpty(Model.InsuranceNumber) ? System.Drawing.Color.Red : settings.Properties.Style.ForeColor;
+                }).Bind(string.IsNullOrEmpty(Model.InsuranceNumber) ? "<Данные отсутствуют!>" : Model.InsuranceNumber).GetHtml() 
+        </td>
+    </tr>
+
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Серия страховки:";
+                    settings.AssociatedControlName = GlobalPropertyNames.InsuranceSeries;
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = GlobalPropertyNames.InsuranceSeries;
+                    settings.Properties.Style.Font.Bold = true;
+                    settings.Properties.Style.ForeColor = string.IsNullOrEmpty(Model.InsuranceSeries) ? System.Drawing.Color.Red : settings.Properties.Style.ForeColor;
+                }).Bind(string.IsNullOrEmpty(Model.InsuranceSeries) ? "<Данные отсутствуют!>" : Model.InsuranceSeries).GetHtml() 
+        </td>
+    </tr>    
+
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Налоговые льготы:";
+                    settings.AssociatedControlName = GlobalPropertyNames.TaxSocialPrivilege;
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = GlobalPropertyNames.TaxSocialPrivilege;
+                    settings.Properties.Style.Font.Bold = true;
+                }).Bind(Model.TaxSocialPrivilege==0 ? "<Данные отсутствуют!>" : Model.TaxSocialPrivilege.ToString("00000")).GetHtml() 
+        </td>
+    </tr>    
+    
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Табельный номер:";
+                    settings.AssociatedControlName = GlobalPropertyNames.TabNo;
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = GlobalPropertyNames.TabNo;
+                    settings.Properties.Style.Font.Bold = true;
+                    settings.Properties.Style.ForeColor = string.IsNullOrEmpty(Model.TabNo) ? System.Drawing.Color.Red : settings.Properties.Style.ForeColor;
+                }).Bind(string.IsNullOrEmpty(Model.TabNo) ? "<Данные отсутствуют!>" : Model.TabNo).GetHtml() 
+        </td>
+    </tr>
+
+
+    <tr>
+        <td colspan="2"><hr /></td>
+    </tr>
+    <tr>
+        <td class="table_label" colspan="2">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Фактический адрес:";
+                    settings.Properties.Style.Font.Bold = true;
+                    settings.AssociatedControlName = GlobalPropertyNames.AddressPhysical;
+                }).GetHtml()
+            <br />
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = GlobalPropertyNames.AddressPhysical;
+                    settings.Properties.Style.Font.Bold = false;
+                    settings.Properties.Style.ForeColor = string.IsNullOrEmpty(Model.AddressPhysical) ? System.Drawing.Color.Red : settings.Properties.Style.ForeColor;
+                }).Bind(string.IsNullOrEmpty(Model.AddressPhysical) ? "<Данные отсутствуют!>" : Model.AddressPhysical).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label" colspan="2">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Адрес прописки:";
+                    settings.Properties.Style.Font.Bold = true;
+                    settings.AssociatedControlName = GlobalPropertyNames.AddressLegal;
+                }).GetHtml()
+            <br />
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = GlobalPropertyNames.AddressLegal;
+                    settings.Properties.Style.Font.Bold = false;
+                    settings.Properties.Style.ForeColor = string.IsNullOrEmpty(Model.AddressLegal) ? System.Drawing.Color.Red : settings.Properties.Style.ForeColor;
+                }).Bind(string.IsNullOrEmpty(Model.AddressLegal) ? "<Данные отсутствуют!>" : Model.AddressLegal).GetHtml()
+                <hr />
+        </td>
+    </tr>      
+    
+    
+    
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Материально ответственный:";
+                    settings.AssociatedControlName = GlobalPropertyNames.Mol;
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().CheckBox(settings =>
+                {
+                    settings.Name = GlobalPropertyNames.Mol;
+                    settings.Properties.Style.Font.Bold = true;
+                    settings.ReadOnly = true;
+                }).Bind(Model.Mol).GetHtml() 
+        </td>
+    </tr>
+    
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Инвалидность:";
+                    settings.AssociatedControlName = GlobalPropertyNames.Invalidity;
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().CheckBox(settings =>
+                {
+                    settings.Name = GlobalPropertyNames.Invalidity;
+                    settings.Properties.Style.Font.Bold = true;
+                    settings.ReadOnly = true;
+                }).Bind(Model.Invalidity).GetHtml() 
+        </td>
+    </tr>
+
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Пенсионность:";
+                    settings.AssociatedControlName = GlobalPropertyNames.Pension;
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().CheckBox(settings =>
+                {
+                    settings.Name = GlobalPropertyNames.Pension;
+                    settings.Properties.Style.Font.Bold = true;
+                    settings.ReadOnly = true;
+                }).Bind(Model.Pension).GetHtml() 
+        </td>
+    </tr>
+
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Официальный сотрудник:";
+                    settings.AssociatedControlName = GlobalPropertyNames.LegalWorker;
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().CheckBox(settings =>
+                {
+                    settings.Name = GlobalPropertyNames.LegalWorker;
+                    settings.Properties.Style.Font.Bold = true;
+                    settings.ReadOnly = true;
+                }).Bind(Model.LegalWorker).GetHtml() 
+        </td>
+    </tr>    
+    
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings =>
+       {
+           settings.Text = "Дата приема:";
+           settings.AssociatedControlName = GlobalPropertyNames.DateStart;
+       }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+       {
+           settings.Name = GlobalPropertyNames.DateStart;
+           settings.Properties.Style.Font.Bold = true;
+           settings.Properties.Style.ForeColor = !Model.DateStart.HasValue ? System.Drawing.Color.Red : settings.Properties.Style.ForeColor;
+       }).Bind(!Model.DateStart.HasValue ? "<Данные отсутствуют!>" : Model.DateStart.Value.ToShortDateString()).GetHtml() 
+        </td>   
+    </tr>
+
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings =>
+       {
+           settings.Text = "Дата увольнения:";
+           settings.AssociatedControlName = GlobalPropertyNames.DateEnd;
+       }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+       {
+           settings.Name = GlobalPropertyNames.DateEnd;
+           settings.Properties.Style.Font.Bold = true;
+       }).Bind(!Model.DateEnd.HasValue ? "Не уволен, работает" : Model.DateEnd.Value.ToShortDateString()).GetHtml() 
+        </td>   
+    </tr>
+
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Место хранения трудовой книжки:";
+                    settings.AssociatedControlName = GlobalPropertyNames.PlaceEmploymentBookName;
+                }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+                {
+                    settings.Name = GlobalPropertyNames.PlaceEmploymentBookName;
+                    settings.Properties.Style.Font.Bold = true;
+                    settings.Properties.Style.ForeColor = string.IsNullOrEmpty(Model.PlaceEmploymentBookName) ? System.Drawing.Color.Red : settings.Properties.Style.ForeColor;
+                }).Bind(string.IsNullOrEmpty(Model.PlaceEmploymentBookName) ? "<Данные отсутствуют!>" : Model.PlaceEmploymentBookName).GetHtml() 
+        </td>
+        
+    </tr>
+
+    
+    <tr>
+        
+        <td colspan="2">
+            <hr /> <b>Описание:</b> <br />                      
+            @Html.DevExpress().Label(settings =>
+                                   {
+                                       settings.Name = GlobalPropertyNames.Memo;
+                                       settings.EncodeHtml = false;
+                                       settings.Properties.Style.ForeColor = string.IsNullOrEmpty(Model.Memo) ? System.Drawing.Color.Red : settings.Properties.Style.ForeColor;
+                                   }).Bind(string.IsNullOrEmpty(Model.Memo)? "<Описание отсутствует!>": Model.Memo).GetHtml() 
+        </td>
+    </tr>
+
+</table>
+                                           
+
+

@@ -1,0 +1,349 @@
+﻿@using BusinessObjects
+@using DocumentsWeb.Models
+@using DocumentsWeb.Areas.Analitics.Models
+@using System.Linq
+@using System.Linq.Expressions
+@using BusinessObjects.Security;
+@using BusinessObjects.Web.Core;
+
+@model DocumentsWeb.Areas.Marketings.Models.DocumentMktgModel
+
+@{   
+    bool haveEdit = WADataProvider.FolderElementRightView.IsAllow(BusinessObjects.Security.Right.DOCEDIT, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_MKTG_MRAK).Id);
+}
+
+@Html.DevExpress().GridView(settings=> {
+    settings.Name = "gvDocRefrigeratorsTypes";
+    settings.KeyFieldName = "RowId";
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+    
+    settings.CallbackRouteValues = new { Area = "Marketings", Controller = "Mktg", Action = "RefrigeratorsTypesPartial", mId = Model.ModelId };
+    settings.SettingsEditing.AddNewRowRouteValues = new { Area = "Marketings", Controller = "Mktg", Action = "RefrigeratorsTypesAddPartial", mId = Model.ModelId };
+    settings.SettingsEditing.UpdateRowRouteValues = new { Area = "Marketings", Controller = "Mktg", Action = "RefrigeratorsTypesUpdatePartial", mId = Model.ModelId };
+    settings.SettingsEditing.DeleteRowRouteValues = new { Area = "Marketings", Controller = "Mktg", Action = "RefrigeratorsTypesDeletePartial", mId = Model.ModelId };
+    settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+    settings.SettingsBehavior.AllowFocusedRow = true;
+    settings.SettingsBehavior.AutoExpandAllGroups = true;
+    settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+    
+    settings.ClientSideEvents.BeginCallback = "function (s, e) { if(!gvDocRefrigerators.InCallback()) { gvDocRefrigerators.CancelEdit(); } }";
+
+    settings.Settings.ShowFooter = true;
+
+    settings.CommandColumn.Visible = true;
+    settings.CommandColumn.Width = 130;
+    settings.CommandColumn.Caption = "Действия";
+    //settings.CommandColumn.NewButton.Visible = true;
+    settings.CommandColumn.DeleteButton.Visible = haveEdit && !Model.IsReadOnly;
+    settings.CommandColumn.EditButton.Text = "Изменить";
+    settings.CommandColumn.EditButton.Visible = true;
+    
+    settings.Columns.Add("GroupName", "Тип оборудование").GroupIndex = 0;
+    settings.Columns.Add("Group2Name", "Принадлежность").GroupIndex = 1;
+    settings.Columns.Add("AnaliticName", "ТМ").Width = 150;
+    settings.Columns.Add("SummValue1", "Литраж").PropertiesEdit.DisplayFormatString = "0";
+    settings.Columns.Add("SummValue2", "Высота[см]").PropertiesEdit.DisplayFormatString = "0.0";
+    settings.Columns.Add("SummValue3", "Ширина[см]").PropertiesEdit.DisplayFormatString = "0.0";
+    settings.Columns.Add("SummValue4", "Глубина[см]").PropertiesEdit.DisplayFormatString = "0.0";
+    
+    settings.Columns.Add(GlobalPropertyNames.Memo, "Примечание");
+
+    settings.SetFooterRowTemplateContent(c =>
+    {
+        if (haveEdit && !Model.IsReadOnly)
+        {
+            ViewContext.Writer.Write("<div style=\"width: 100%; text-align: center; font-size: 10pt;\"><a href=\"javascript:gvDocRefrigeratorsTypes.AddNewRow();\">Создать</a></div>");
+        }
+    });
+    
+    settings.SetEditFormTemplateContent(c =>
+    {
+        ViewContext.Writer.Write("<div>");
+        ViewContext.Writer.Write(Html.Hidden("RowId", (c.ItemIndex >=0 ? DataBinder.GetPropertyValue(c.DataItem, "RowId") : "")));
+        ViewContext.Writer.Write(Html.Hidden("Id", (c.ItemIndex >= 0 ? DataBinder.GetPropertyValue(c.DataItem, "Id") : 0)));
+        ViewContext.Writer.Write("<table><tr><td colspan=\"2\">");
+        Html.DevExpress().Button(btnSettings =>
+        {
+            btnSettings.Name = "btnUpdate";
+            btnSettings.ControlStyle.CssClass = "button";
+            btnSettings.Text = "Сохранить";
+            btnSettings.ClientSideEvents.Click = "function(s, e){ gvDocRefrigeratorsTypes.UpdateEdit(); }";
+            btnSettings.ClientEnabled = haveEdit && !Model.IsReadOnly;
+        }).Render();
+        Html.DevExpress().Button(btnSettings =>
+        {
+            btnSettings.Name = "btnCancel";
+            btnSettings.ControlStyle.CssClass = "button";
+            btnSettings.Text = "Отмена";
+            btnSettings.ClientSideEvents.Click = "function(s, e){ gvDocRefrigeratorsTypes.CancelEdit(); }";
+        }).Render();
+        ViewContext.Writer.Write("</div>");
+        
+        ViewContext.Writer.Write("</td></tr><tr><td>");
+
+        ViewContext.Writer.Write("<div>");
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Принадлежность: ";
+            s.Style.Add("float", "left");
+        }).Render();
+        ViewContext.Writer.Write("<br />");
+        Html.DevExpress().ComboBox(s =>
+        {
+            s.ControlStyle.CssClass = "editor";
+            s.Name = "Group2Id";
+            s.Properties.ValueField = GlobalPropertyNames.Id;
+            s.Properties.TextField = GlobalPropertyNames.Name;
+            s.Properties.ValueType = typeof(int);
+            s.Width = 250;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            s.Properties.ClientSideEvents.SelectedIndexChanged = "function(s, e) { if (s.GetValue() == 17) { $(\"div[id^='div']\").hide(); $('#divCont').show(); } if (s.GetValue() == 18) { $(\"div[id^='div']\").hide(); $('#divPos').show(); $('#divComm').show(); } if (s.GetValue() == 19) { $(\"div[id^='div']\").hide(); $('#divTM').show(); } }";
+            s.Properties.ClientSideEvents.Init = "function(s, e) { if (s.GetValue() == 17) { $(\"div[id^='div']\").hide(); $('#divCont').show(); } if (s.GetValue() == 18) { $(\"div[id^='div']\").hide(); $('#divPos').show(); $('#divComm').show(); } if (s.GetValue() == 19) { $(\"div[id^='div']\").hide(); $('#divTM').show(); } }";
+        }).BindList(AnaliticGroupModel.GetGroups().Where(w => w.KindId == AnaliticGroupKind.MktgRefrigeratorAttachment)).Bind((c.ItemIndex >= 0 ? ((int?)DataBinder.Eval(c.DataItem, "Group2Id") == 0 ? null : DataBinder.Eval(c.DataItem, "Group2Id")) : null)).Render();
+        ViewContext.Writer.Write("</div>");
+
+        ViewContext.Writer.Write("</td><td>");
+
+        ViewContext.Writer.Write("<div id=\"divTM\" style=\"display: none;\">");
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Торговая марка: ";
+            s.Style.Add("float", "left");
+        }).Render();
+        ViewContext.Writer.Write("<br />");
+        Html.RenderPartial("RefrigeratorsTypesTMPartial", new ViewDataDictionary { { "AnaliticId", (c.ItemIndex >= 0 ? ((int?)DataBinder.Eval(c.DataItem, "AnaliticId") == 0 ? null : DataBinder.Eval(c.DataItem, "AnaliticId")) : null) } });
+        @*Html.DevExpress().ComboBox(s =>
+        {
+            s.ControlStyle.CssClass = "editor";
+            s.Name = "AnaliticId";
+            s.Properties.ValueField = GlobalPropertyNames.Id;
+            s.Properties.TextField = GlobalPropertyNames.Name;
+            s.Properties.ValueType = typeof(int);
+            s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+            s.Properties.FilterMinLength = 3;
+            EditButton b = s.Properties.Buttons.Add();
+            b.Image.Url = "~/Images/add10x10.png";
+            s.Width = 250;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            s.Properties.ClientSideEvents.ButtonClick = "TM_ButtonClick";
+        }).BindList(AnaliticModel.GetCollection(Hierarchy.SYSTEM_ANALITIC_BRANDS)).Bind((c.ItemIndex >= 0 ? ((int?)DataBinder.Eval(c.DataItem, "AnaliticId") == 0 ? null : DataBinder.Eval(c.DataItem, "AnaliticId")) : null)).Render();*@
+        ViewContext.Writer.Write("</div>");
+        
+        
+        //ViewContext.Writer.Write("</td><td>");
+
+        ViewContext.Writer.Write("<div id=\"divPos\" style=\"display: none;\">");
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Размещение: ";
+            s.Style.Add("float", "left");
+        }).Render();
+        ViewContext.Writer.Write("<br />");
+        Html.DevExpress().ComboBox(s =>
+        {
+            s.ControlStyle.CssClass = "editor";
+            s.Name = "Analitic2Id";
+            s.Properties.ValueField = GlobalPropertyNames.Id;
+            s.Properties.TextField = GlobalPropertyNames.Name;
+            s.Properties.ValueType = typeof(int);
+            s.Width = 250;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).BindList(AnaliticModel.GetCollection("SYSTEM_EQUIPMENTPLACEMENT")).Bind((c.ItemIndex >= 0 ? ((int?)DataBinder.Eval(c.DataItem, "Analitic2Id") == 0 ? null : DataBinder.Eval(c.DataItem, "Analitic2Id")) : null)).Render();
+        ViewContext.Writer.Write("</div>");
+        
+        ViewContext.Writer.Write("</td></tr><tr><td>");
+
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Тип ХО: ";
+            s.Style.Add("float", "left");
+        }).Render();
+        ViewContext.Writer.Write("<br />");
+        Html.DevExpress().ComboBox(s =>
+        {
+            s.ControlStyle.CssClass = "editor";
+            s.Name = "GroupId";
+            s.Properties.ValueField = GlobalPropertyNames.Id;
+            s.Properties.TextField = GlobalPropertyNames.Name;
+            s.Properties.ValueType = typeof(int);
+            s.Width = 250;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            s.Properties.ClientSideEvents.SelectedIndexChanged = "function(s, e) { if (s.GetValue() == 12) { $(\"[id^='RF']\").hide(); $('#RFLitrag').show(); } if (s.GetValue() == 10 || s.GetValue() == 11) { $(\"[id^='RF']\").hide(); $('#RFRazmer').show(); } }";
+            s.Properties.ClientSideEvents.Init = "function(s, e) { if (s.GetValue() == 12) { $(\"[id^='RF']\").hide(); $('#RFLitrag').show(); } if (s.GetValue() == 10 || s.GetValue() == 11) { $(\"[id^='RF']\").hide(); $('#RFRazmer').show(); } }";
+        }).BindList(AnaliticGroupModel.GetGroups().Where(w => w.KindId == AnaliticGroupKind.MktgRefrigeratorType)).Bind((c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "GroupId") : null)).Render();
+
+        ViewContext.Writer.Write("</td><td>");
+
+        ViewContext.Writer.Write("<div id=\"RFLitrag\" style=\"display: none;\">");
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Литраж: ";
+            s.Style.Add("float", "left");
+        }).Render();
+        ViewContext.Writer.Write("<br />");
+        /*Html.DevExpress().SpinEdit(edtSettings =>
+        {
+            edtSettings.Name = "SummValue1";
+            edtSettings.ControlStyle.CssClass = "editor";
+            edtSettings.Width = 250;
+            edtSettings.Style.Add("float", "left");
+            edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            edtSettings.Properties.DisplayFormatString = "0";
+            edtSettings.Properties.DisplayFormatInEditMode = true;
+            edtSettings.Properties.NumberType = SpinEditNumberType.Integer;
+            edtSettings.Properties.NumberFormat = SpinEditNumberFormat.Custom;
+            edtSettings.Properties.MinValue = 0;
+        }).Bind((c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "SummValue1") : 0.0)).Render();*/
+        Html.DevExpress().ComboBox(edtSettings =>
+        {
+            edtSettings.Name = "SummValue1";
+            edtSettings.ControlStyle.CssClass = "editor";
+            edtSettings.Width = 250;
+            edtSettings.Style.Add("float", "left");
+            edtSettings.Properties.ValueType = typeof(decimal);
+            edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            edtSettings.Properties.DisplayFormatString = "0";
+            edtSettings.Properties.DisplayFormatInEditMode = true;
+        }).BindList(new int[] {125, 200, 250, 300, 350, 400, 500, 600, 800, 1000, 2000}).Bind((c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "SummValue1") : 0)).Render();
+        ViewContext.Writer.Write("</div>");
+
+        ViewContext.Writer.Write("<table id=\"RFRazmer\" style=\"display: none; width: 250px; border-collapse: collapse;\">");
+
+        ViewContext.Writer.Write("<tr><td>");
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Высота[см]: ";
+            s.Style.Add("float", "left");
+        }).Render();
+        ViewContext.Writer.Write("<br />");
+        Html.DevExpress().SpinEdit(edtSettings =>
+        {
+            edtSettings.Name = "SummValue2";
+            //edtSettings.ControlStyle.CssClass = "editor";
+            edtSettings.Width = 81;
+            edtSettings.Style.Add("float", "left");
+            edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            edtSettings.Properties.DisplayFormatString = "0.00";
+            edtSettings.Properties.MaxValue = 10000;
+            edtSettings.Properties.MinValue = 0;
+        }).Bind((c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "SummValue2") : 0.0)).Render();
+        ViewContext.Writer.Write("</div>");
+
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Ширина[см]: ";
+            s.Style.Add("float", "left");
+        }).Render();
+        ViewContext.Writer.Write("<br />");
+        Html.DevExpress().SpinEdit(edtSettings =>
+        {
+            edtSettings.Name = "SummValue3";
+            //edtSettings.ControlStyle.CssClass = "editor";
+            edtSettings.Width = 81;
+            edtSettings.Style.Add("float", "left");
+            edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            edtSettings.Properties.DisplayFormatString = "0.00";
+            edtSettings.Properties.MaxValue = 10000;
+            edtSettings.Properties.MinValue = 0;
+        }).Bind((c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "SummValue3") : 0.0)).Render();
+        ViewContext.Writer.Write("</div>");
+
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Глубина[см]: ";
+            s.Style.Add("float", "left");
+        }).Render();
+        ViewContext.Writer.Write("<br />");
+        Html.DevExpress().SpinEdit(edtSettings =>
+        {
+            edtSettings.Name = "SummValue4";
+            //edtSettings.ControlStyle.CssClass = "editor";
+            edtSettings.Width = 81;
+            edtSettings.Style.Add("float", "left");
+            edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            edtSettings.Properties.DisplayFormatString = "0.00";
+            edtSettings.Properties.MaxValue = 10000;
+            edtSettings.Properties.MinValue = 0;
+        }).Bind((c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "SummValue4") : 0.0)).Render();
+        //ViewContext.Writer.Write("</div>");
+        
+        ViewContext.Writer.Write("</td></tr></table>");
+        
+        ViewContext.Writer.Write("</td></tr><tr><td>");
+
+        ViewContext.Writer.Write("<div id=\"divCont\" style=\"display: none;\">");
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Содержимое: ";
+            s.Style.Add("float", "left");
+        }).Render();
+        ViewContext.Writer.Write("<br />");
+        ViewContext.Writer.Write(Html.Partial("CheckBoxListPartial", Model, new ViewDataDictionary
+        {
+            { "Name", "StringValue1"},
+            { "Data", new ComboboxModel[] { 
+                new ComboboxModel { Id = 1, Name = "Овощи"},
+                new ComboboxModel { Id = 2, Name = "Фрукты"},
+                new ComboboxModel { Id = 3, Name = "Рыба и морепродукты"},
+                new ComboboxModel { Id = 4, Name = "Мясо"},
+                new ComboboxModel { Id = 5, Name = "Другие"}
+            } },
+            { "Value", (c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "StringValue1") : "") },
+            { "ColsCount", 1 },
+            { "Width", 250 }
+        }));
+        ViewContext.Writer.Write("</div>");
+
+        //ViewContext.Writer.Write("</td></tr><tr><td>");
+
+        ViewContext.Writer.Write("<div id=\"divComm\" style=\"display: none;\">");
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Дополнительно: ";
+            s.Style.Add("float", "left");
+        }).Render();
+        ViewContext.Writer.Write("<br />");
+        ViewContext.Writer.Write(Html.Partial("CheckBoxListPartial", Model, new ViewDataDictionary
+        {
+            { "Name", "StringValue2"},
+            { "Data", new ComboboxModel[] { 
+                new ComboboxModel { Id = 1, Name = "Посторонние предметы на холодильнике"},
+                new ComboboxModel { Id = 2, Name = "Имеется полный открытый доступ"},
+                new ComboboxModel { Id = 3, Name = "Заметен покупателю сразу со входа"}
+            }},
+            { "Value", (c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "StringValue2") : "") },
+            { "ColsCount", 1 },
+            { "Width", 250 }
+        }));
+        ViewContext.Writer.Write("</div>");
+
+        ViewContext.Writer.Write("</td></tr><tr><td colspan=\"2\">");
+        
+        Html.DevExpress().Label(s =>
+        {
+            s.Text = "Примечание: ";
+            s.Style.Add("float", "left");
+        }).Render();
+        ViewContext.Writer.Write("<br />");
+        Html.DevExpress().Memo(edtSettings =>
+        {
+            edtSettings.Name = GlobalPropertyNames.Memo;
+            edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        }
+        ).Bind(c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "Memo") : "").Render();
+        
+        ViewContext.Writer.Write("</td></tr></table>");
+    });
+}).Bind(Model.Analitics.Where(w => w.StateId != State.STATEDELETED && (w.Group2Id == 17 || w.Group2Id == 18 || w.Group2Id == 19))).GetHtml()

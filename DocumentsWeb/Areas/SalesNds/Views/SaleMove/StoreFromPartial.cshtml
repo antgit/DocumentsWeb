@@ -1,0 +1,21 @@
+﻿ @model DocumentsWeb.Areas.Sales.Models.DocumentSaleModel
+ @using DocumentsWeb.Areas.Agents.Models
+ @Html.DevExpress().ComboBox(settings =>{
+    settings.Name = "MainClientStoreId";
+    settings.CallbackRouteValues = new { Controller = "SaleMove", Action = "StoreFromPartial", modelId = Model.ModelId };
+    settings.Properties.EnableCallbackMode = true;
+    //settings.Properties.CallbackPageSize = 20;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    settings.Properties.ValueField = "Id";
+    settings.Properties.TextField = "Name";
+    settings.Properties.ValueType = typeof(int);
+    settings.Properties.NullDisplayText = "Выберите склад...";
+    //settings.ControlStyle.CssClass = "editor";
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.ClientEnabled = !Model.IsReadOnly;
+    settings.ShowModelErrors = true;
+    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+    settings.Properties.ClientSideEvents.BeginCallback = "function(s, e) { e.customArgs['MainCompanyDepatmentId'] = MainCompanyDepatmentId.GetValue();}";
+    settings.Properties.ClientSideEvents.EndCallback = "function(s, e) { s.SetSelectedIndex(-1);}";
+}).BindList(ClientModel.GetStores(Model.MainCompanyDepatmentId)).BindList(ClientModel.GetStoresByValue(Model.MainClientStoreId)).Bind(Model.MainClientStoreId).GetHtml()

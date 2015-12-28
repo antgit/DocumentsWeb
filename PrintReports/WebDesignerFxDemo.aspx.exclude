@@ -1,0 +1,27 @@
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="WebDesignerFxDemo.aspx.cs" Inherits="WebDesignerFxDemo" %>
+
+<%@ Register Assembly="Stimulsoft.Report.WebDesign, Version=2012.2.1304.0, Culture=neutral, PublicKeyToken=ebe6666cba19647a" Namespace="Stimulsoft.Report.Web" TagPrefix="cc1" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head runat="server">
+    <title>Untitled Page</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+    <div>
+        <asp:DropDownList ID="DropDownListReport" runat="server" Width="250px">
+            <asp:ListItem Value="SimpleList.mrt" />
+            <asp:ListItem Value="TwoSimpleLists.mrt" />
+            <asp:ListItem Value="Invoice.mrt" />
+        </asp:DropDownList>
+        
+        <asp:Button ID="Button1" runat="server" Text="Design Report" OnClick="Button1_Click" />&nbsp&nbsp&nbsp
+        <asp:Button ID="Button2" runat="server" Text="Create New Report" OnClick="Button2_Click" />
+        
+        <cc1:StiWebDesigner ID="StiWebDesigner1" runat="server" OnSaveReport="StiWebDesigner1_SaveReport" />
+    </div>
+    </form>
+</body>
+</html>

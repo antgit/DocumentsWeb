@@ -1,0 +1,124 @@
+﻿@using System.Globalization
+@using BusinessObjects
+@using BusinessObjects.Security
+
+@Html.DevExpress().GridView(settings=>{
+    settings.Name="gvReports";
+    settings.CallbackRouteValues = new { Controller = "Report", Action = "IndexPartial" };
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control; 
+    settings.SettingsBehavior.AllowFocusedRow = true;
+    settings.KeyFieldName = GlobalPropertyNames.Id;
+    settings.Settings.ShowGroupPanel = true;
+    settings.Settings.ShowFilterRow = true;
+    settings.Settings.ShowFilterRowMenu = true;
+    settings.Settings.ShowFilterBar = GridViewStatusBarMode.Visible;
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+    settings.SettingsPager.PageSize = Utils.GetPageSize(settings);
+    settings.SettingsPager.Position = System.Web.UI.WebControls.PagerPosition.Top;
+    settings.SettingsPager.AlwaysShowPager = true;
+    settings.Styles.AlternatingRow.Enabled = DefaultBoolean.True;
+    settings.SetPagerBarTemplateContent(c => Html.RenderPartial("TablePager", new ViewDataDictionary
+        {
+            { "ContentObject", c },
+            { "TableCaption", "<b>Отчеты</b>" }
+        }));
+    settings.Settings.ShowVerticalScrollBar = true;
+    settings.Settings.ShowHorizontalScrollBar = true;
+    settings.SettingsBehavior.EnableCustomizationWindow = true;
+    settings.SettingsPopup.CustomizationWindow.VerticalAlign = PopupVerticalAlign.Below;
+    settings.SettingsPopup.CustomizationWindow.HorizontalAlign = PopupHorizontalAlign.OutsideRight;
+    settings.Styles.Cell.Font.Size = System.Web.UI.WebControls.FontUnit.Point(11);
+    settings.Styles.Cell.Paddings.Padding = System.Web.UI.WebControls.Unit.Pixel(2);
+    settings.Styles.Cell.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+    
+    settings.Columns.Add(column =>
+                             {
+                                 column.CellStyle.Paddings.Padding = 0;
+                                 column.Caption = "";
+                                 
+                                 column.Name = "colImageAction";
+                                 column.Width = System.Web.UI.WebControls.Unit.Pixel(34);
+                                 column.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+                                 column.SetDataItemTemplateContent(c =>
+                                                                       {
+                                                                           string icon = (int)DataBinder.Eval(c.DataItem, "KindId") == Library.KINDID_WEBREPORT
+                                                                                             ? Url.Content("~/Images/stireportv4_x16.png")
+                                                                                             : Url.Content("~/Images/REPORT_X16.png");
+                                                                           ViewContext.Writer.Write("<img src=\"" + icon + "\" WIDTH=\"16\" HEIGHT=\"16\" />");
+                                                                           
+                                                                           //ViewContext.Writer.Write("<img src=\"" + icon + "\" WIDTH=\"16\" HEIGHT=\"16\" />");
+                                                                           Html.DevExpress().HyperLink(hl =>
+                                                                           {
+                                                                               hl.Name = "reportHelp_" + c.ItemIndex.ToString(CultureInfo.InvariantCulture);
+                                                                               hl.Properties.ImageUrl = Url.Content("~/Images/INFO_X16.png"); 
+                                                                               hl.ToolTip = "Просмотреть документацию по отчету";
+                                                                               hl.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Reports", Controller = "Report", Action = "GetHelp", Id = DataBinder.Eval(c.DataItem, "Id") });
+                                                                               hl.Properties.Target = "_blank";
+                                                                               hl.ClientEnabled = true;
+                                                                           }).Render();
+                                                                       });
+                                 
+                             });
+
+    MVCxGridViewColumn colReportName = settings.Columns.Add("Name", "Наименование");
+    colReportName.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+    colReportName.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+    colReportName.Width = 450;
+    colReportName.SetDataItemTemplateContent(c => Html.DevExpress().HyperLink(s =>
+        {
+            s.Properties.Text = (string)DataBinder.Eval(c.DataItem, "Name");
+            int id = (int)DataBinder.Eval(c.DataItem, "Id");
+            s.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "Report", Action = "Build", Area = "Reports" }) + "?id=" + id;
+            s.Properties.Target = "_blank";
+            s.ToolTip = "Построить отчет";
+            
+        }).Render());
+    colReportName.Settings.AllowAutoFilter = DefaultBoolean.True;
+
+    
+    settings.Columns.Add(GlobalPropertyNames.DisplayMemo, "Примечание").Width = System.Web.UI.WebControls.Unit.Point(600);
+    if (DocumentsWeb.Models.WADataProvider.CurrentUserCompanyMultyCount())
+    {
+        settings.Columns.Add(col =>
+        {
+            col.FieldName = GlobalPropertyNames.MyCompanyName;
+            col.Caption = "Компания";
+            col.Settings.AutoFilterCondition = AutoFilterCondition.BeginsWith;
+            col.Width = 200;
+        });
+    }
+    
+    settings.Columns.Add(col =>
+    {
+        col.FieldName = GlobalPropertyNames.StateName;
+        col.Caption = "Состояние";
+        col.Settings.AutoFilterCondition = AutoFilterCondition.BeginsWith;
+        col.Width = 75;
+    });
+    
+    settings.Columns.Add(col =>
+    {
+        col.FieldName = GlobalPropertyNames.StateId;
+        col.Caption = "Ид состояния";
+        col.Settings.AutoFilterCondition = AutoFilterCondition.BeginsWith;
+        col.Width = 75;
+        col.Visible = false;
+    });
+    
+    if (User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+    {
+        MVCxGridViewColumn colId = settings.Columns.Add(GlobalPropertyNames.Id, "Ид");
+        colId.Visible = false;
+        colId.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+        colId.Width = 100;
+    }
+    
+    settings.ClientVisible = false;
+    
+    settings.ClientSideEvents.BeginCallback = "function(s,e){ e.customArgs['folderId'] = gvReportsTree.GetRowKey(gvReportsTree.GetFocusedRowIndex());}";
+    settings.ClientSideEvents.Init = "function(s, e) { window.setTimeout(AdjustGridSize, 12);}";
+    settings.ClientSideEvents.ColumnResizing = "function (s, e) {if (e.column.name == 'colImageAction') {e.cancel = true;}}";
+    settings.ClientSideEvents.EndCallback = "function(s, e) { AdjustGridSize(); }";
+}).Bind(Model).GetHtml()
+

@@ -1,0 +1,25 @@
+﻿@Html.DevExpress().PopupControl(pc =>
+{
+
+    pc.Name = "pcShowNewUserMessages";
+    pc.PopupElementID = "hyperLinkShowNewMessage";
+    pc.Height = 250;
+    pc.Width = 600;
+
+    pc.ShowFooter = false;
+    pc.ShowHeader = true;
+    pc.ShowCloseButton = true;
+    pc.HeaderText = "Новые сообщения...";
+    pc.PopupHorizontalAlign = PopupHorizontalAlign.LeftSides;
+    pc.PopupVerticalAlign = PopupVerticalAlign.Below;
+    pc.EnableAnimation = true;
+    pc.AllowDragging = false;
+    pc.CloseAction = CloseAction.MouseOut;
+
+    pc.SetContent(() =>
+    {
+        ViewContext.Writer.Write("<table style=\"width:570px\"><tr><td>");
+        Html.RenderPartial("~/Areas/UserPersonal/Views/UserMessage/FastViewIncommingPartial.cshtml", new { area = "UserPersonal", controller = "UserMessage" });
+        ViewContext.Writer.Write("</td></tr></table>");
+    });    
+}).GetHtml()

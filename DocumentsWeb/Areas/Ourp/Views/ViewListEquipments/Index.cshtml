@@ -1,0 +1,175 @@
+﻿@using BusinessObjects;
+@using DevExpress.Web.Mvc.UI
+@using System.Web.UI.WebControls
+@using DocumentsWeb.Areas.Agents.Models;
+@using DevExpress.Utils;
+@using DevExpress.Web.Mvc;
+
+@{
+    ViewBag.Title = "Дерево оборудования";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script type="text/javascript">
+    _aspxAttachEventToElement(window, "load", function () {
+        timeoutId = setTimeout(RefreshAllGridView, 20);
+    });
+
+    function RefreshAllGridView() {
+        var a = nbFeatures.GetItemByName('mnuFilterActive');
+        if (a != null) nbFeatures.SetSelectedItem(a);
+        dxGridViewEquipments.SetVisible(true);
+    }
+
+    function ShowPopupEdit(id_) {
+        var id = $('#GroupId_' + dxGridViewEquipments.GetFocusedRowIndex()).val();
+        var kind = $('#GroupKind_' + dxGridViewEquipments.GetFocusedRowIndex()).val();
+        var level = $('#Level_' + dxGridViewEquipments.GetFocusedRowIndex()).val();
+        var workshoptype = $('#WorkShopType_' + dxGridViewEquipments.GetFocusedRowIndex()).val();
+        if (id_ == 0) {
+            switch (kind.toString()) {
+                case '@Depatment.KINDID_SHOP.ToString()':
+					if (workshoptype == 'EO') {
+						pcEdit.SetCaption('Единица оборудования');
+						pcEdit.Load('@DevExpressHelper.GetUrl(new { Controller = "Equipments", Action = "Edit" })/' + id_ + '?KindId=' + @Equipment.KINDID_EQUIPMENTUNIT.ToString() + '&ParentId=' + id.toString(), 550, 360);
+						}
+					else
+						if (workshoptype == 'AUTO') {
+							pcEdit.SetCaption('Транспортное средство');
+							pcEdit.Load('@DevExpressHelper.GetUrl(new { Controller = "Equipments", Action = "Edit" })/' + id_ + '?KindId=' + @Equipment.KINDID_EQUIPMENTAUTO.ToString() + '&ParentId=' + id.toString(), 550, 360);
+							}
+							else
+							if (workshoptype == 'GENERAL') {
+								pcEdit.SetCaption('Папка');
+								pcEdit.Load('@DevExpressHelper.GetUrl(new { Controller = "Equipments", Action = "Edit" })/' + id_ + '?KindId=' + @Equipment.KINDID_FOLDER.ToString() + '&ParentId=' + id.toString(), 550, 360);
+								}
+                    break;
+                case '@Equipment.KINDID_EQUIPMENTUNIT.ToString()':
+                    pcEdit.SetCaption('Узел');
+                    pcEdit.Load('@DevExpressHelper.GetUrl(new { Controller = "EquipmentNodes", Action = "Edit" })/' + id_ + '?KindId=' + @EquipmentNode.KINDID_EQUIPMENTNODE.ToString() + '&ParentId=' + id.toString(), 550, 400);
+                    break;
+                case '@Equipment.KINDID_EQUIPMENTAUTO.ToString()':
+                    pcEdit.SetCaption('Узел');
+                    pcEdit.Load('@DevExpressHelper.GetUrl(new { Controller = "EquipmentNodes", Action = "Edit" })/' + id_ + '?KindId=' + @EquipmentNode.KINDID_EQUIPMENTNODE.ToString() + '&ParentId=' + id.toString(), 550, 400);
+                    break;
+                case '@EquipmentNode.KINDID_EQUIPMENTNODE.ToString()':
+                    pcEdit.SetCaption('Подузел');
+                    pcEdit.Load('@DevExpressHelper.GetUrl(new { Controller = "EquipmentNodes", Action = "Edit" })/' + id_ + '?KindId=' + @EquipmentNode.KINDID_EQUIPMENTSUBNODE.ToString() + '&ParentId=' + id.toString(), 550, 400);
+                    break;
+                case '@EquipmentNode.KINDID_EQUIPMENTSUBNODE.ToString()':
+                    pcEdit.SetCaption('Деталь');
+                    pcEdit.Load('@DevExpressHelper.GetUrl(new { Controller = "EquipmentDetails", Action = "Edit" })/' + id_ + '?KindId=' + @EquipmentDetail.KINDID_DETAIL.ToString() + '&ParentId=' + id.toString(), 550, 400);
+                    break;
+                case '@Equipment.KINDID_FOLDER.ToString()':
+                    if (level < 3 && level > -1) {
+                       pcEdit.SetCaption('Папка');
+                       pcEdit.Load('@DevExpressHelper.GetUrl(new { Controller = "Equipments", Action = "Edit" })/' + id_ + '?KindId=' + @Equipment.KINDID_FOLDER.ToString() + '&ParentId=' + id.toString(), 450, 10);
+                       } 
+					else if (level == 3) {
+                             pcEdit.SetCaption('Запчасть');
+                             pcEdit.Load('@DevExpressHelper.GetUrl(new { Controller = "EquipmentDetails", Action = "Edit" })/' + id_ + '?KindId=' + @EquipmentDetail.KINDID_STDDETAIL.ToString() /*kind.toString()*/ + '&ParentId=' + id.toString(), 550, 400);
+							}
+                    break;
+            }
+        } else {
+            switch (kind.toString()) {
+            	case '@Depatment.KINDID_SHOP.ToString()':
+                    pcEdit.SetCaption('Цех');
+                    pcEdit.Load('@DevExpressHelper.GetUrl(new { Controller = "EquipmentWorkShops", Action = "Edit" })/' + id_ + '?KindId=' + kind.toString(), 450, 260);
+                    break;
+                case '@Equipment.KINDID_EQUIPMENTUNIT.ToString()':
+                    pcEdit.SetCaption('Единица оборудования');
+                    pcEdit.Load('@DevExpressHelper.GetUrl(new { Controller = "Equipments", Action = "Edit" })/' + id_ + '?KindId=' + kind.toString(), 550, 360);
+                    break;
+                case '@Equipment.KINDID_EQUIPMENTAUTO.ToString()':
+                    pcEdit.SetCaption('Транспортное средство');
+                    pcEdit.Load('@DevExpressHelper.GetUrl(new { Controller = "Equipments", Action = "Edit" })/' + id_ + '?KindId=' + kind.toString(), 550, 360);
+                    break;
+                case '@EquipmentNode.KINDID_EQUIPMENTNODE.ToString()':
+                    pcEdit.SetCaption('Узел');
+                    pcEdit.Load('@DevExpressHelper.GetUrl(new { Controller = "EquipmentNodes", Action = "Edit" })/' + id_ + '?KindId=' + kind.toString(), 550, 400);
+                    break;
+                case '@EquipmentNode.KINDID_EQUIPMENTSUBNODE.ToString()':
+                    pcEdit.SetCaption('Подузел');
+                    pcEdit.Load('@DevExpressHelper.GetUrl(new { Controller = "EquipmentNodes", Action = "Edit" })/' + id_ + '?KindId=' + kind.toString(), 550, 400);
+                    break;
+                case '@EquipmentDetail.KINDID_DETAIL.ToString()':
+                    pcEdit.SetCaption('Деталь');
+                    pcEdit.Load('@DevExpressHelper.GetUrl(new { Controller = "EquipmentDetails", Action = "Edit" })/' + id_ + '?KindId=' + kind.toString(), 550, 400);
+                    break;
+                case '@Equipment.KINDID_FOLDER.ToString()':
+                    pcEdit.SetCaption('Папка');
+                    pcEdit.Load('@DevExpressHelper.GetUrl(new { Controller = "Equipments", Action = "Edit" })/' + id_ + '?KindId=' + kind.toString(), 450, 160);
+                    break;
+                case '@EquipmentDetail.KINDID_STDDETAIL.ToString()':
+                    pcEdit.SetCaption('Запчасть');
+                    pcEdit.Load('@DevExpressHelper.GetUrl(new { Controller = "EquipmentDetails", Action = "Edit" })/' + id_ + '?KindId=' + kind.toString(), 550, 400);
+                    break;
+            }
+        }
+    }
+
+    function editEquipment() {
+        var id = $('#GroupId_' + dxGridViewEquipments.GetFocusedRowIndex()).val();
+        var kind = $('#GroupKind_' + dxGridViewEquipments.GetFocusedRowIndex()).val()
+        if (id != undefined && id != null && id > 0) {
+            ShowPopupEdit(id);
+        }
+    }
+
+    function AdjustGridSize() {
+        var height = splFullScreenMode.GetPaneByName('GridPane').GetClientHeight();
+        dxGridViewEquipments.SetHeight(height);
+        $('#divActions').height(height - $('#divHeader').height());
+    }
+
+</script>
+
+@Html.Partial("NavpanelPartial")
+@Html.DevExpress().Splitter(settings =>
+{
+    settings.Name = "splFullScreenMode";
+    settings.Orientation = Orientation.Vertical;
+    settings.Styles.Pane.Paddings.Padding = 0;
+    settings.FullscreenMode = true;
+    settings.ClientSideEvents.PaneResized = "function (s, e) { AdjustGridSize(); }";
+    settings.Panes.Add(contentPane =>
+    {
+        contentPane.Panes.Add(actionsPane =>
+        {
+            actionsPane.Name = "actionPane";
+            actionsPane.AllowResize = DefaultBoolean.True;
+            actionsPane.Size = 270;
+            actionsPane.MinSize = 270;
+            actionsPane.ShowCollapseBackwardButton = DefaultBoolean.True;
+            actionsPane.SetContent(() =>
+            {
+                Html.RenderPartial("ActionsPartial");
+            });
+        });
+        contentPane.Panes.Add(gridPane =>
+        {
+            gridPane.Name = "GridPane";
+            gridPane.SetContent(() =>
+            {
+                Html.RenderPartial("IndexPartial");
+            });
+        });
+    });
+
+    settings.Panes.Add(footerPane =>
+    {
+        footerPane.Size = 80;
+        footerPane.AllowResize = DefaultBoolean.False;
+        footerPane.ShowSeparatorImage = DefaultBoolean.False;
+        footerPane.SetContent(() =>
+        {
+            Html.RenderPartial("FooterPartial");
+        });
+    });
+}).GetHtml()
+
+@Html.Partial("PopupWindowPartial", new ViewDataDictionary { 
+    { "Title", "" },
+    { "AutoUpdateGrids", new string[] { "dxGridViewEquipments" } }
+})

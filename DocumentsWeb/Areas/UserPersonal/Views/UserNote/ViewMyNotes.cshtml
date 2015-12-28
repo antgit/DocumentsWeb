@@ -1,0 +1,103 @@
+﻿@using System.Globalization
+@using DocumentsWeb.Areas.UserPersonal.Controllers
+@using DocumentsWeb.Areas.UserPersonal.Models
+@Html.DevExpress().GridView(gs =>
+                                                                                        {
+                                                                                            gs.Name = "gvViewMyNotes";
+                                                                                            gs.KeyFieldName = "Id";
+                                                                                            gs.CallbackRouteValues = new { Controller = "UserNote", Action = "ViewMyNotes" };
+                                                                                            gs.SetTitlePanelTemplateContent(c =>
+                                                                                            {
+                                                                                                ViewContext.Writer.Write("<div style=\"width: 100%; text-align: center; font-size: 10pt;\">");
+                                                                                                Html.DevExpress().HyperLink(hl =>
+                                                                                                {
+                                                                                                    hl.Properties.ImageUrl = Url.Content("~/Images/edit10x10.png");
+                                                                                                    hl.ToolTip = "Добавить";
+                                                                                                    hl.Style.Add("float", "left");
+                                                                                                    hl.NavigateUrl = "javascript:ShowPopupEdit2(0);";
+                                                                                                }).Render();
+                                                                                                Html.DevExpress().Label(hl =>
+                                                                                                {
+                                                                                                    hl.Text = "Мои личные заметки...";
+                                                                                                }).Render();
+                                                                                                ViewContext.Writer.Write("</div>");
+                                                                                            });
+                                                                                            
+                                                                                            gs.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                                                                                            gs.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+                                                                                            gs.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+
+                                                                                            gs.Settings.ShowVerticalScrollBar = true;
+                                                                                            gs.Settings.VerticalScrollableHeight = 500;
+                                                                                            gs.CallbackRouteValues = new { area = "UserPersonal",  Controller = "UserNote", Action = "ViewMyNotes" };
+                                                                                            gs.SettingsBehavior.AllowFocusedRow = true;
+                                                                                            gs.Styles.Cell.Font.Size = System.Web.UI.WebControls.FontUnit.Point(11);
+                                                                                            gs.Styles.Cell.Paddings.Padding = System.Web.UI.WebControls.Unit.Pixel(2);
+                                                                                            gs.Styles.Cell.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+
+                                                                                            gs.Settings.ShowTitlePanel = true;
+                                                                                            
+                                                                                            gs.Settings.ShowFilterRow = false;
+                                                                                            gs.SettingsPager.AlwaysShowPager = true;
+                                                                                            gs.Settings.ShowColumnHeaders = false;
+                                                                                            gs.Settings.ShowHorizontalScrollBar = true;
+                                                                                            gs.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+                                                                                            gs.Styles.AlternatingRow.Enabled = DefaultBoolean.True;
+
+                                                                                            gs.Columns.Add(cc =>
+                                                                                            {
+                                                                                                cc.Name = "colImageNoteAction";
+                                                                                                cc.Width = System.Web.UI.WebControls.Unit.Pixel(25);
+                                                                                                cc.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+                                                                                                cc.Settings.AllowDragDrop = DefaultBoolean.False;
+                                                                                                cc.Settings.AllowSort = DefaultBoolean.False;
+                                                                                                cc.ShowInCustomizationForm = false;
+                                                                                                cc.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+                                                                                                cc.SetDataItemTemplateContent(c =>
+                                                                                                {
+                                                                                                    ViewContext.Writer.Write("<table><tr>");
+                                                                                                    ViewContext.Writer.Write("<td>");
+                                                                                                    Html.DevExpress().HyperLink(hl =>
+                                                                                                    {
+                                                                                                        hl.Properties.ImageUrl = Url.Content("~/Images/DELETEDELEMENT_X16.png");
+                                                                                                        hl.ToolTip = "Удалить";
+                                                                                                        hl.NavigateUrl = "javascript:deleteNoteRow(" + c.ItemIndex.ToString(CultureInfo.InvariantCulture) + ");";
+                                                                                                    }).Render();
+                                                                                                    ViewContext.Writer.Write("</td></tr></table>");
+                                                                                                });
+                                                                                            });
+                                                                                            
+                                                                                            gs.Columns.Add(cc =>
+                                                                                                               {
+                                                                                                                   cc.Name = "colName";
+                                                                                                                   cc.FieldName = "Name";
+                                                                                                                   cc.Caption = "Наименование";
+                                                                                                                   //cc.FixedStyle = GridViewColumnFixedStyle.Left;
+                                                                                                                   cc.Settings.AllowDragDrop = DefaultBoolean.False;
+                                                                                                                   cc.Settings.AllowSort = DefaultBoolean.False;
+                                                                                                                   cc.Width = 490;
+                                                                                                                   cc.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+                                                                                                                   cc.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+                                                                                                                   cc.SetDataItemTemplateContent(c =>
+                                                                                                                                                     {
+                                                                                                                                                         Html.DevExpress().HyperLink(linkSettings =>
+                                                                                                                                                                                         {
+                                                                                                                                                                                             linkSettings.NavigateUrl = "javascript:ShowPopupEdit2(" + DataBinder.Eval(c.DataItem, "Id") + ");";
+                                                                                                                                                                                             linkSettings.ToolTip = "Изменить...";
+                                                                                                                                                                                             linkSettings.Properties.Text = (string)DataBinder.Eval(c.DataItem, "Name");
+                                                                                                                                                                                                                                                                   }).Render();
+
+                                                                                                                                                     });
+                                                                                                               });
+                                                                                            gs.CustomCallback = (sender, e) =>
+                                                                                            {
+                                                                                                MVCxGridView grid = (MVCxGridView)sender;
+                                                                                                string refreshArg = e.Parameters.Split('&').FirstOrDefault(s => s.StartsWith("refresh"));
+                                                                                                bool refresh = (refreshArg != null) && (refreshArg.EndsWith("true"));
+                                                                                                if (refresh)
+                                                                                                {
+                                                                                                    grid.DataSource = UserNoteModel.GetMyNotes(true);
+                                                                                                    grid.DataBind();
+                                                                                                }
+                                                                                            };
+                                                                                        }).Bind(UserNoteModel.GetMyNotes()).GetHtml()

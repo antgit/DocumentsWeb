@@ -1,0 +1,30 @@
+﻿@Html.DevExpress().GridView(s => {
+    s.Name = "gvDeviceList";
+    s.CallbackRouteValues = new { Controller = "Sensors", Action = "DeviceListPartial" };
+    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    
+    s.Settings.ShowVerticalScrollBar = true;
+    s.Settings.VerticalScrollableHeight = 200;
+    s.Settings.ShowColumnHeaders = false;
+    s.Settings.ShowFilterRow = true;
+
+    //s.SettingsBehavior.AllowFocusedRow = true;
+    s.SettingsBehavior.AllowSelectByRowClick = true;
+    s.SettingsBehavior.AllowSelectSingleRowOnly = true;
+    
+    s.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+
+    s.KeyFieldName = "Id";
+
+    s.Columns.Add(cs =>
+    {
+        cs.Name = "colName";
+        cs.Settings.AllowAutoFilter = DefaultBoolean.True;
+        cs.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+        cs.FieldName = "Name";
+        cs.CellStyle.Paddings.Padding = 2;
+    });
+
+    s.ClientSideEvents.SelectionChanged = "SelectDevice";
+    s.ClientSideEvents.Init = "function(s, e) { s.SelectRowOnPage(0); }";
+}).Bind(DocumentsWeb.Areas.Routes.Models.DeviceModel.GetCollection().Where(w => w.KindId == 7274498)).GetHtml()

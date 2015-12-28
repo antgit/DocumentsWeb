@@ -1,0 +1,85 @@
+﻿@model DocumentsWeb.Areas.Kb.Models.TaskModel
+@{
+    string[] lbTo = string.IsNullOrEmpty(Model.FlagString) ? new string[0] : Model.FlagString.Split(',');
+    string[] lbfrom = DocumentsWeb.Models.WADataProvider.WA.Empty<BusinessObjects.Task>().GetFlagStringAll().Split(',').Where(s=>!lbTo.Contains(s)).ToArray();
+}
+<script type="text/javascript">
+    function MoveSelectedItems(srcListBox, dstListBox) {
+        srcListBox.BeginUpdate();
+        dstListBox.BeginUpdate();
+        var items = srcListBox.GetSelectedItems();
+        for (var i = items.length - 1; i >= 0; i = i - 1) {
+            dstListBox.AddItem(items[i].text, items[i].value);
+            srcListBox.RemoveItem(items[i].index);
+        }
+        srcListBox.EndUpdate();
+        dstListBox.EndUpdate();
+    }
+    function addStringFlag(s, e) {
+        MoveSelectedItems(lbFrom, lbTo);
+        updateFlagString();
+    }
+    function removeStringFlag(s, e) {
+        MoveSelectedItems(lbTo, lbFrom);
+        updateFlagString();
+    }
+    function txtNewFlag_ButtonClick(s, e) {
+        lbTo.AddItem(s.GetText());
+        updateFlagString();
+    }
+    function updateFlagString() {
+        var flagString = "";
+        for (var i = 0; i < lbTo.GetItemCount(); i = i + 1) {
+            if (flagString.length > 0)
+                flagString = flagString + ',';
+            flagString = flagString + lbTo.GetItem(i).text;
+        }
+        document.getElementById('@ViewData["UpdatingControlName"]').value = flagString;
+    }
+</script>
+<table style=" width:100%; height:350px">
+    <tr>
+        <td colspan="3" style="height:20px">
+            @Html.DevExpress().ButtonEdit(settings =>{
+                settings.Name = "txtNewFlag";
+                settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                settings.Properties.Buttons.Add("+");
+                settings.Properties.ClientSideEvents.ButtonClick = "txtNewFlag_ButtonClick";
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td style="width:50%; height:100%">
+            @Html.DevExpress().ListBox(settings=>{
+                settings.Name = "lbFrom";
+                settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                settings.Height = 325;
+                settings.Properties.SelectionMode = ListEditSelectionMode.Multiple;
+                settings.Properties.EnableClientSideAPI = true;
+            }).BindList(lbfrom).GetHtml()
+        </td>
+
+        <td style="width:20px">
+            @Html.DevExpress().Button(settings=>{
+                settings.Name = "btnAdd";
+                settings.Text=">>";
+                settings.ClientSideEvents.Click = "addStringFlag";
+            }).GetHtml()
+            @Html.DevExpress().Button(settings=>{
+                settings.Name = "btnRemove";
+                settings.Text = "<<";
+                settings.ClientSideEvents.Click = "removeStringFlag";
+            }).GetHtml()
+        </td>
+
+        <td style="width:50%">
+            @Html.DevExpress().ListBox(settings=>{
+                settings.Name = "lbTo";
+                settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                settings.Height = 325;
+                settings.Properties.SelectionMode = ListEditSelectionMode.Multiple;
+                settings.Properties.EnableClientSideAPI = true;
+            }).BindList(lbTo).GetHtml()
+        </td>
+    </tr>
+</table>

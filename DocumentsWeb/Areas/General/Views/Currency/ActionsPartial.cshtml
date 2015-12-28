@@ -1,0 +1,281 @@
+﻿@using System.Globalization
+@using DevExpress.Web.Mvc.UI
+
+@using BusinessObjects
+@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentsWeb.Areas.General.Models
+@using DocumentsWeb.Controllers
+@using DocumentsWeb.Models;
+
+@{
+    bool haveCreate = WADataProvider.LibrariesElementRightView.IsAllow(Right.UICREATE, WebModuleNames.WEB_CURRENCY) && !WADataProvider.CommonRightView.ReadOnly;
+    bool haveEdit = WADataProvider.LibrariesElementRightView.IsAllow(Right.UIEDIT, WebModuleNames.WEB_CURRENCY) && !WADataProvider.CommonRightView.ReadOnly;
+    bool haveDelete = WADataProvider.LibrariesElementRightView.IsAllow(Right.UITRASH, WebModuleNames.WEB_CURRENCY) && !WADataProvider.CommonRightView.ReadOnly;
+    bool haveView = WADataProvider.LibrariesElementRightView.IsAllow(Right.UIVIEW, WebModuleNames.WEB_CURRENCY);
+    string HelpDefaultLink = string.Empty;
+    if (ViewData.ContainsKey("HelpDefaultLink"))
+    {
+        HelpDefaultLink = ViewData["HelpDefaultLink"].ToString();
+    }
+}
+
+<script type="text/javascript">
+    var controllerName = 'Currency';
+
+    function createCopy() {
+        var url = controllerName + "/CreateCopy?Id=" + dxGridViewCurrency.GetRowKey(dxGridViewCurrency.GetFocusedRowIndex());
+        $.get(url, function (data) {
+        }).success(function () {
+            dxGridViewCurrency.PerformCallback('refresh=true');
+        });
+    }
+
+    function changeState(state) {
+        var url = controllerName + "/ChangeState?Id=" + dxGridViewCurrency.GetRowKey(dxGridViewCurrency.GetFocusedRowIndex()) + "&state=" + state.toString();
+        $.get(url, function (data) {
+        }).success(function () {
+            dxGridViewCurrency.PerformCallback('refresh=true');
+        });
+    }
+
+    function editRow() {
+        var id = dxGridViewCurrency.GetRowKey(dxGridViewCurrency.GetFocusedRowIndex());
+        if (id == null) {
+            return true;
+        }
+        ShowPopupEdit(id);
+    }
+
+    function deleteRow() {
+        if (dxGridViewCurrency.GetFocusedRowIndex() != 0 && confirm("Удалить?")) {
+            var url = controllerName + "/Delete?Id=" + dxGridViewCurrency.GetRowKey(dxGridViewCurrency.GetFocusedRowIndex());
+            $.get(url, function (data) {
+            }).success(function () {
+                dxGridViewCurrency.PerformCallback('refresh=true');
+            });
+        }
+    }
+
+    function showCustomizationWindow() {
+        if (dxGridViewCurrency.IsCustomizationWindowVisible())
+            dxGridViewCurrency.HideCustomizationWindow();
+        else {
+            dxGridViewCurrency.ShowCustomizationWindow(document.getElementById('mnuShowCustomizationLocation'));   
+        }
+    }
+    function CollapseActionsPane() {
+        splFullScreenMode.GetPaneByName('actionPane').Collapse(splFullScreenMode.GetPaneByName('GridPane'));
+    }
+    function exportTo(type) {
+        document.location = '@DevExpressHelper.GetUrl(new { Controller = "Currency", Action = "ExportTo", subtype = Url.RequestContext.RouteData.Values["action"] })&type=' + type;
+    }
+</script>
+<div id="divHeader" style="width: 100%;">
+    @Html.DevExpress().NavBar(settings =>
+    {
+        settings.Name = "nbFeaturesHeader";
+        settings.AllowExpanding = false;
+        settings.AllowSelectItem = false;
+        settings.AutoCollapse = false;
+        settings.EnableHotTrack = false;
+        settings.EnableAnimation = false;
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        settings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+        settings.EncodeHtml = false;
+        settings.SaveStateToCookies = true;
+        settings.SaveStateToCookiesID = Url.RequestContext.RouteData.Values["controller"] + "Nav";
+        settings.Groups.Add(group =>
+        {
+            group.ShowExpandButton = DefaultBoolean.False;
+            group.SetHeaderTemplateContent(head =>
+            {
+                ViewContext.Writer.Write("<table width=\"100%\"><tr><td>");
+                ViewContext.Writer.Write("<div style=\"width: 100%; text-align: center;\">");
+                Html.DevExpress().Label(lb =>
+                {
+                    lb.ControlStyle.Font.Bold = true;
+                    lb.ControlStyle.Font.Size = System.Web.UI.WebControls.FontUnit.Point(10);
+                    lb.Text = "Валюты";
+                }).Render();
+                ViewContext.Writer.Write("</div>");
+
+                ViewContext.Writer.Write("</td><td style=\"width:16px\">");
+                Html.DevExpress().HyperLink(s =>
+                {
+                    s.ToolTip = "Показать справочную информацию";
+                    s.Properties.ImageUrl = "~/Images/INFO_X16.png";
+                    if (string.IsNullOrEmpty(HelpDefaultLink))
+                        s.NavigateUrl = "javascript:alert('Справочная информация отсутствует!');";
+                    else
+                    {
+                        s.Properties.Target = "_blank";
+                        s.NavigateUrl = HelpDefaultLink.StartsWith("~/") ? Url.Content(HelpDefaultLink) : HelpDefaultLink;
+                    }
+                }).Render();
+
+                ViewContext.Writer.Write("</td><td style=\"width:16px\">");
+                Html.DevExpress().HyperLink(s =>
+                {
+                    s.Properties.Style.Font.Bold = true;
+                    s.Properties.Text = "<<";
+                    s.ToolTip = "Скрыть панель управления";
+                    //s.Properties.ImageUrl = "~/Images/collapse_arrow_x16.png";
+                    s.NavigateUrl = "javascript:CollapseActionsPane()";
+                }).Render();
+                ViewContext.Writer.Write("</tr></td></table>");
+            });
+        });
+    }).GetHtml()
+</div>
+
+<div id="divActions" style="width: 100%; height: 100%; overflow: auto;">
+    @Html.DevExpress().NavBar(settings =>
+    {
+        settings.Name = "nbFeatures";
+        settings.AllowExpanding = true;
+        settings.AllowSelectItem = true;
+        settings.AutoCollapse = false;
+        settings.EnableHotTrack = true;
+        settings.EnableAnimation = true;
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        //settings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+        settings.EncodeHtml = false;
+        settings.Groups.Add(group => {
+            group.Text = "Действия";
+            group.ItemStyle.CssClass = "navpanellink";
+            group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+            group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+            group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+            MVCxNavBarItem item = null;
+
+            item = group.Items.Add("Создать", "mnuAdd", "~/Images/new_x16.png");
+            item.NavigateUrl = "javascript:ShowPopupEdit(0);";
+            item.ClientEnabled = haveCreate;
+            item.ToolTip = "Создать новую валюту";
+            
+            item = group.Items.Add("Создать копию", "mnuAddCopy", "~/Images/copy_x16.png");
+            item.NavigateUrl = "javascript:createCopy();";
+            item.ClientEnabled = haveCreate;
+            item.ToolTip = "Создание копии текущей выделенной в списке валюты";
+            
+            item = group.Items.Add("Изменить", "mnuEdit", "~/Images/editdoc_x16.png");
+            item.NavigateUrl = "javascript:editRow();";
+            item.ClientEnabled = haveEdit;
+            item.ToolTip = "Изменить данные о текущей валюте";
+
+            item = group.Items.Add("Удалить", "mnuDelete", "~/Images/delete_x16.png");
+            item.NavigateUrl = "javascript:deleteRow();";
+            item.ClientEnabled = haveDelete;
+            item.ToolTip = "Удалить данные о текущей валюте";
+
+            item = group.Items.Add("Обновить", "mnuRefresh", "~/Images/refresh_x16.png");
+            item.NavigateUrl = "javascript:dxGridViewCurrency.PerformCallback('refresh=true');";
+            item.ToolTip = "Обновить данные в списке валют. Рекомендуемое действие вместо обновления страницы.";
+
+            if (haveEdit)
+            {
+                item = group.Items.Add();
+                item.SetTemplateContent(s => ViewContext.Writer.Write("<hr>"));
+
+                item = group.Items.Add("Установить состояние \"Активен\"", "mnuStateActive", "~/Images/state_active_x16.png");
+                item.NavigateUrl = "javascript:changeState(" + State.STATEACTIVE.ToString(CultureInfo.InvariantCulture) + ");";
+                item.ToolTip = "Установка данного состояния возможна только при текущем состоянии не соответствующего \"Активному\" - например данное действие имеет смысл для требующих корректировки, запрещенных или удаленных валют";
+                
+                item = group.Items.Add("Требовать корректировки", "mnuStateNeedCorrect", "~/Images/state_needcorrect_x16.png");
+                item.NavigateUrl = "javascript:changeState(" + State.STATENOTDONE.ToString(CultureInfo.InvariantCulture) + ");";
+                item.ToolTip = "Установка данного состояния возможна только при текущем состоянии не соответствующего \"Требовующего корректировки\" - например данное действие имеет смысл для активных валют, чтобы в дальшейшем откорректировать данные о валюте";
+                
+                item = group.Items.Add("\"Запрещен\"", "mnuStateBan", "~/Images/state_ban_x16.png");
+                item.NavigateUrl = "javascript:changeState(" + State.STATEDENY.ToString(CultureInfo.InvariantCulture) + ");";
+                item.ToolTip = "Установка данного состояния возможна только при текущем состоянии не соответствующего \"Запрещеному\" - например данное действие имеет смысл для для блокировки валюты по каким-либо причинам";
+            }
+        });
+
+        settings.Groups.Add(group =>
+        {
+            group.Text = "Иерархия";
+            group.Expanded = false;
+            group.HeaderImage.Url = Url.Content("~/Images/filter_nodes_x16.png");
+
+            group.SetContentTemplateContent(content =>
+            {
+                CoreController<Currency> controller = (CoreController<Currency>)ViewContext.Controller;
+                Html.RenderAction("GridFilterPartial", new
+                {
+                    Area = "General",
+                    Controller = "Hierarchy",
+                    RootList = HierarchyModel.GetLinkedHierarchies(controller.RootHierachy, HierarchyModel.FILTER_HIERARCHY_CHAIN).Select(s => s.Code).ToArray(),
+                    GridName = "dxGridViewCurrency",
+                    GridController = "Currency",
+                    GridAction = "IndexPartial",
+                    Model = Model
+                });
+            });
+        });
+        
+        settings.Groups.Add(group => {
+            group.Text = "Фильтр";
+            group.Expanded = false;
+            group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+            group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+            MVCxNavBarItem item = null;
+            group.ItemStyle.HoverStyle.Font.Bold = true;
+            group.ItemStyle.HoverStyle.Font.Underline = true;
+            group.ItemStyle.SelectedStyle.Font.Bold = true;
+            group.HeaderImage.Url = Url.Content("~/Images/filter_x16.png");
+
+            item = group.Items.Add("Только активные", "mnuFilterActive", "~/Images/filter_state_active_x16.png");
+            item.NavigateUrl = "javascript:dxGridViewCurrency.ApplyFilter('StateId = 1');";
+            item.ToolTip = "Отображать в списке только активные данные";
+            item.Selected = true;
+            
+            item = group.Items.Add("Требующие корректировки", "mnuFilterCorrect", "~/Images/filter_state_needcorrect_x16.png");
+            item.ToolTip = "Отображать в списке только требующие корректировки данные";
+            item.NavigateUrl = "javascript:dxGridViewCurrency.ApplyFilter('StateId = 2');";
+            
+            item = group.Items.Add("Только запрещенные", "mnuFilterBan", "~/Images/filter_state_ban_x16.png");
+            item.ToolTip = "Отображать в списке только требующие запрещенные данные";
+            item.NavigateUrl = "javascript:dxGridViewCurrency.ApplyFilter('StateId = 4');";
+            
+            item = group.Items.Add("Корзина", "mnuFilterDeleted", "~/Images/filter_state_deleted_x16.png");
+            item.ToolTip = "Отображать в списке только удаленные данные";
+            item.NavigateUrl = "javascript:dxGridViewCurrency.ApplyFilter('StateId = 5');";
+        });
+        settings.Groups.Add(group =>
+        {
+            group.Text = "Отчеты";
+            group.Expanded = false;
+            group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+            group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+            group.ItemStyle.CssClass = "navpanellink";
+            group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+            group.HeaderImage.Url = Url.Content("~/Images/REPORT_X16.png");
+            MVCxNavBarItem item = null;
+
+            item = group.Items.Add("Microsoft Excel", "mnuExportToXLSX", "~/Images/FILEEXCEL_X16.png");
+            item.NavigateUrl = "javascript:exportTo('XLSX');";
+            item = group.Items.Add("Adobe PDF", "mnuExportToPDF", "~/Images/FILEPDF_X16.png");
+            item.NavigateUrl = "javascript:exportTo('PDF');";
+
+            if (WADataProvider.HiearchyElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_REPORTS))
+            {
+                item = group.Items.Add("Перейти в отчеты...", "mnuReportNavToReportsMain", "~/Images/arrowgreen.png");
+                item.ToolTip = "Перейти в раздел отчетов...";
+                item.NavigateUrl = Url.Action("Index", new { area = "Reports", Controller = "Report" });
+            }
+        });
+        settings.Groups.Add(group =>
+        {
+            group.Text = "Сервис";
+            group.Name = "grpSettings";
+            group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+            group.Expanded = false;
+            group.HeaderImage.Url = Url.Content("~/Images/settings_x16.png");
+            group.SetContentTemplateContent(c =>
+            {
+                Html.RenderPartial("SettingsPartial", new ViewDataDictionary { { "GridName", "dxGridViewCurrency" } });
+            });
+        });
+    }).GetHtml()
+</div>

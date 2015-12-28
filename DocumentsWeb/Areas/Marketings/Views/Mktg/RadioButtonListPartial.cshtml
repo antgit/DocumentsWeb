@@ -1,0 +1,63 @@
+﻿@using BusinessObjects
+@using DocumentsWeb.Models
+@model DocumentsWeb.Areas.Marketings.Models.DocumentMktgModel
+
+@Html.Hidden(ViewData["Name"].ToString(), ViewData["Value"])
+@Html.DevExpress().RadioButtonList(
+    s => {
+        s.Name = "RadioButtonList_" + ViewData["Name"].ToString();
+        s.Properties.ValueField = GlobalPropertyNames.Id;
+        s.Properties.TextField = GlobalPropertyNames.Name;
+        s.Properties.RepeatLayout = System.Web.UI.WebControls.RepeatLayout.Table;
+        s.Properties.RepeatDirection = System.Web.UI.WebControls.RepeatDirection.Vertical;
+        s.ReadOnly = Model.IsReadOnly;
+        if (ViewData.ContainsKey("ColsCount"))
+        {
+            s.Properties.RepeatColumns = Convert.ToInt32(ViewData["ColsCount"]);
+        }
+        else
+        {
+            s.Properties.RepeatColumns = 3;
+        }
+        s.Style.Add("overflow", "auto");
+        s.PreRender = (sender, e) => {
+            ASPxRadioButtonList rbl = (ASPxRadioButtonList)sender;
+            string str = (string)ViewData["Value"];
+            if (str != null && str.Length > 0)
+            {
+                List<int> list = str.Split(',').Select(s_i => int.Parse(s_i)).ToList<int>();
+                foreach (ListEditItem item in rbl.Items)
+                {
+                    if (list.Contains(Convert.ToInt32(item.Value)))
+                    {
+                        item.Selected = true;
+                        break;
+                    }
+                }
+            }
+        };
+        s.Properties.ClientSideEvents.SelectedIndexChanged = "function (s, e) { var str = s.GetValue(); document.getElementById('" + ViewData["Name"].ToString() + "').value = str; ";
+        if (ViewData.ContainsKey("ValueChangedScript"))
+        {
+            s.Properties.ClientSideEvents.SelectedIndexChanged += ViewData["ValueChangedScript"].ToString();
+        }
+        s.Properties.ClientSideEvents.SelectedIndexChanged += "}";
+        if (ViewData.ContainsKey("InitScript"))
+        {
+            s.Properties.ClientSideEvents.Init = "function(s, e) {" + ViewData["InitScript"].ToString() + "}";
+        }
+        if (ViewData.ContainsKey("Width"))
+        {
+            s.Width = Convert.ToInt32(ViewData["Width"]);
+        }
+        else
+        {
+            s.Width = 640;
+        }
+        if (ViewData.ContainsKey("Visible"))
+        {
+            s.ClientVisible = Convert.ToBoolean(ViewData["Visible"]);
+        }
+    }
+).BindList(ViewData["Data"]).GetHtml()
+

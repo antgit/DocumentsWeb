@@ -1,0 +1,67 @@
+﻿@using DevExpress.Web.Mvc.UI
+@using System.Web.UI.WebControls
+
+@inherits WebViewPage
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Графики работы и перерывов...";
+}
+                                                                                            
+<script type="text/javascript">
+    _aspxAttachEventToElement(window, "load", function () {
+        dxGridViewTimePeriods.ApplyFilter('StateId = 1');
+        setTimeout(function () {
+            AdjustGridSize();
+            dxGridViewTimePeriods.SetVisible(true);
+        }, 100);
+    });
+
+    function ShowPopupEdit(id) {
+        pcEdit.Load('@DevExpressHelper.GetUrl(new { Area = "General", Controller = "TimePeriod", Action = "Edit" })?Id=' + id, 580, 550);
+    }
+
+    function AdjustGridSize() {
+        var height = splFullScreenMode.GetPaneByName('GridPane').GetClientHeight();
+        dxGridViewTimePeriods.SetHeight(height);
+    }
+</script>
+
+@Html.Partial("NavpanelPartial")
+@Html.DevExpress().Splitter(settings =>
+{
+    settings.Name = "splFullScreenMode";
+    settings.Orientation = Orientation.Vertical;
+    settings.Styles.Pane.Paddings.Padding = 0;
+    settings.FullscreenMode = true;
+
+    settings.Panes.Add(contentPane =>
+    {
+        contentPane.Panes.Add(actionsPane =>
+        {
+            actionsPane.Name = "actionPane";
+            actionsPane.Size = 270;
+            actionsPane.AllowResize = DefaultBoolean.False;
+            actionsPane.ShowCollapseBackwardButton = DefaultBoolean.True;
+            actionsPane.SetContent(() => Html.RenderPartial("ActionsPartial"));
+        });
+
+        contentPane.Panes.Add(gridPane =>
+        {
+            gridPane.Name = "GridPane";
+            gridPane.SetContent(() => Html.RenderPartial("IndexPartial"));
+        });
+    });
+
+    settings.Panes.Add(footerPane =>{
+        footerPane.Size = 80;
+        footerPane.AllowResize = DefaultBoolean.False;
+        footerPane.ShowSeparatorImage = DefaultBoolean.False;
+        footerPane.SetContent(() => @Html.RenderPartial("FooterPartial"));
+    });
+}).GetHtml()
+            
+@Html.Partial("PopupWindowPartial", new ViewDataDictionary { 
+    { "Title", "График работы/перерыва" },
+    { "AutoUpdateGrids", new string[] { "dxGridViewTimePeriods" } },
+    { "ShowFooter", true}
+})

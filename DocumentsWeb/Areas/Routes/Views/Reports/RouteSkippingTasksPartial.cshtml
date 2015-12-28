@@ -1,0 +1,34 @@
+﻿@using System.Web.UI.WebControls
+@using Stimulsoft.Report.Mvc
+
+@Html.StiMvcViewerFx(new StiMvcViewerFxOptions() {
+    ActionGetReportSnapshot = "RouteSkippingTasksSnapshot",
+    ActionGetLocalization = "GetLocalization",
+    ActionExportReport = "ExportReport",
+    Controller = "Routes/Reports",
+    Width = Unit.Percentage(100),
+    Height = Unit.Percentage(100),
+    Zoom = 100, 
+    ShowExportToBmp = false,
+    ShowExportToCsv = false,
+    ShowExportToDbf = false,
+    ShowExportToExcel = false,
+    ShowExportToExcelXml = false,
+    ShowExportToGif = false,
+    ShowExportToMetafile = false,
+    ShowExportToOpenDocumentCalc = false,
+    ShowExportToOpenDocumentWriter = false,
+    ShowExportToPcx = false,
+    ShowExportToPpt = false,
+    ShowExportToRtf = false,
+    ShowExportToSvg = false,
+    ShowExportToSylk = false,
+    ShowExportToText = false,
+    ShowExportToDocument = false,
+    ShowExportToDif = false,
+    ShowExportToSvgz = false,
+    ShowExportToXml = false,
+    ShowExportToTiff = false,
+    ShowButtonAbout = false,
+    ShowButtonOpen = false
+})

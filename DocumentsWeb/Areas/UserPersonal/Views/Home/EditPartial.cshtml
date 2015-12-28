@@ -1,0 +1,172 @@
+﻿@using BusinessObjects
+@using DocumentsWeb.Controllers
+@using DocumentsWeb.Areas.General.Models
+@model DocumentsWeb.Models.UserPersonalModel
+           
+@Html.DevExpress().PageControl(settings =>{
+        settings.Name = "tsEditUserModel";
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        settings.ClientSideEvents.Init = "OntsEditUserInfoInit";
+        settings.Styles.Content.CssClass = "tabcontent";    
+        MVCxTabPage pageMain = settings.TabPages.Add("Главная");
+        pageMain.SetContent(() =>
+        {
+            ViewContext.Writer.Write("<table style=\"width: 500px;\">");
+            ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>{
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Фамилия:";
+                s.AssociatedControlName = "WorkerFirstName";
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td>");
+            @Html.DevExpress().TextBox(s =>{
+                s.Name = "WorkerFirstName";
+                s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ShowModelErrors = true;
+                s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+                if(!s.ReadOnly)
+                    s.Properties.NullText = "Введите наименование категории...";
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.WorkerFirstName).GetHtml();
+            ViewContext.Writer.Write("</td></tr>");
+
+
+            ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Имя:";
+                s.AssociatedControlName = "WorkerLastName";
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td>");
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = "WorkerLastName";
+                s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ShowModelErrors = true;
+                s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+                if (!s.ReadOnly)
+                    s.Properties.NullText = "Введите наименование категории...";
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.WorkerLastName).GetHtml();
+            ViewContext.Writer.Write("</td></tr>");
+
+            ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Отчество:";
+                s.AssociatedControlName = "WorkerMidleName";
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td>");
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = "WorkerMidleName";
+                s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ShowModelErrors = true;
+                s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+                if (!s.ReadOnly)
+                    s.Properties.NullText = "Введите наименование категории...";
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.WorkerMidleName).GetHtml();
+            ViewContext.Writer.Write("</td></tr>");
+
+            ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "ИНН:";
+                s.AssociatedControlName = "Inn";
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td>");
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = "Inn";
+                s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ShowModelErrors = true;
+                s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+                if (!s.ReadOnly)
+                    s.Properties.NullText = "Введите наименование категории...";
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.Inn).GetHtml();
+            ViewContext.Writer.Write("</td></tr>");
+            
+            ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Email:";
+                s.AssociatedControlName = "Email";
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td>");
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = "Email";
+                s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ShowModelErrors = true;
+                s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+                if (!s.ReadOnly)
+                    s.Properties.NullText = "Введите email...";
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.Email).GetHtml();
+            ViewContext.Writer.Write("</td></tr>");
+
+
+            ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Новый пароль:";
+                s.AssociatedControlName = "NewPassword";
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td>");
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = "NewPassword";
+                s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ShowModelErrors = true;
+                s.Properties.Password = true;
+                s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+                if (!s.ReadOnly)
+                    s.Properties.NullText = "Введите новый пароль...";
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.NewPassword).GetHtml();
+            ViewContext.Writer.Write("</td></tr>");
+                                    
+            ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>{
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Описание:";
+                s.AssociatedControlName = GlobalPropertyNames.Memo;
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td>");
+            @Html.DevExpress().Memo(s =>{
+                s.Name = GlobalPropertyNames.Memo;
+                s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+                if (!s.ReadOnly)
+                    s.Properties.NullText = "Введите примечание или описание...";
+                s.Properties.ConvertEmptyStringToNull = true;
+                s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.Height = 75;
+                
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.Memo).GetHtml();
+            ViewContext.Writer.Write("</td></tr></table>");
+        });
+        
+    }).GetHtml()

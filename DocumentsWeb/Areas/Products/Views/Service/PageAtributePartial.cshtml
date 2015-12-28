@@ -1,0 +1,62 @@
+﻿@using BusinessObjects
+@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentsWeb.Models
+@using DocumentsWeb.Areas.Products.Models
+@using DocumentsWeb.Areas.Analitics.Models
+@using DocumentsWeb.Controllers
+@using DocumentsWeb.Areas.General.Models
+@model ProductModel
+@{
+    bool haveEdit = !Model.IsReadOnly && WADataProvider.LibrariesElementRightView.IsAllow(Right.UIEDIT, WebModuleNames.WEB_SERVICES) && !WADataProvider.CommonRightView.ReadOnly;
+}
+        <table style="width:600px;">
+        
+                <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Код:";
+            s.AssociatedControlName = GlobalPropertyNames.Code;
+            s.ToolTip = ProductData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Code);
+        }).GetHtml()
+        </td><td>
+        @Html.DevExpress().TextBox(s =>
+        {
+            s.Name = GlobalPropertyNames.Code;
+            s.ReadOnly = !haveEdit;
+            if (!s.ReadOnly)
+            {
+                s.Properties.NullText = "Введите код товара...";
+                s.ToolTip = ProductData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), GlobalPropertyNames.Code);
+            }
+            s.ControlStyle.CssClass = "editor";
+            s.ShowModelErrors = true;
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.Code).GetHtml()
+        </td></tr>
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Вид продукции:";
+            s.AssociatedControlName = GlobalPropertyNames.ProductTypeId;
+        }).GetHtml()
+        </td><td>
+        @Html.Partial("ProductTypePartial", Model)
+        </td></tr>
+        
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Товарная группа:";
+            s.AssociatedControlName = GlobalPropertyNames.TradeMarkId;
+        }).GetHtml()
+        </td><td>
+        @Html.Partial("TradeMarkPartial", Model)
+        </td></tr>
+        </table>

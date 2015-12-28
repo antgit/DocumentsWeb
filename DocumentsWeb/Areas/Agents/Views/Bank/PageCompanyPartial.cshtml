@@ -1,0 +1,255 @@
+﻿@using BusinessObjects
+@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentsWeb.Models
+@using DocumentsWeb.Areas.Agents.Models
+@using DocumentsWeb.Areas.Analitics.Models
+@using DocumentsWeb.Controllers
+@using DocumentsWeb.Areas.General.Models
+@model ClientModel
+@{
+    bool haveEdit = !Model.IsReadOnly && WADataProvider.LibrariesElementRightView.IsAllow(Right.UIEDIT, WebModuleNames.WEB_BANKS) && !WADataProvider.CommonRightView.ReadOnly;
+}
+        <table style="width:600px;">
+        
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Пенсионный фонд:";
+            s.AssociatedControlName = "RegPensionFund";
+        }).GetHtml()
+        </td><td>
+        @Html.DevExpress().TextBox(s =>
+        {
+            s.Name = "RegPensionFund";
+            s.ReadOnly = !haveEdit;
+            if (!s.ReadOnly)
+            {
+                s.Properties.NullText = "Регистрация в пенсионном фонде ...";
+            }
+            s.ControlStyle.CssClass = "editor";
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.ShowModelErrors = true;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.RegPensionFund).GetHtml()
+        </td>
+
+        <td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Служба занятости:";
+            s.AssociatedControlName = "RegEmploymentService";
+        }).GetHtml()
+        </td><td>
+        @Html.DevExpress().TextBox(s =>
+        {
+            s.Name = "RegEmploymentService";
+            s.ReadOnly = !haveEdit;
+            if (!s.ReadOnly)
+            {
+                s.Properties.NullText = "Регистрация в службе занятости ...";
+            }
+            s.ControlStyle.CssClass = "editor";
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.ShowModelErrors = true;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.RegEmploymentService).GetHtml()
+        </td></tr>
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Фонд соцстраха по временной потере трудоспособности:";
+            s.AssociatedControlName = "RegSocialInsuranceDisability";
+        }).GetHtml()
+        </td><td colspan="3">
+        @Html.DevExpress().TextBox(s =>
+        {
+            s.Name = "RegSocialInsuranceDisability";
+            s.ReadOnly = !haveEdit;
+            if (!s.ReadOnly)
+            {
+                s.Properties.NullText = "Соцстрах по временной потере трудоспособности ...";
+            }
+            s.ControlStyle.CssClass = "editor";
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.ShowModelErrors = true;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.RegSocialInsuranceDisability).GetHtml()
+        </td><tr>
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Фонд соцстраха по безработице:";
+            s.AssociatedControlName = "RegSocialInsuranceNesch";
+        }).GetHtml()
+        </td><td colspan="3">
+        @Html.DevExpress().TextBox(s =>
+        {
+            s.Name = "RegSocialInsuranceNesch";
+            s.ReadOnly = !haveEdit;
+            if (!s.ReadOnly)
+            {
+                s.Properties.NullText = "Соцстрах по безработице ...";
+            }
+            s.ControlStyle.CssClass = "editor";
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.ShowModelErrors = true;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.RegSocialInsuranceNesch).GetHtml()
+        </td><tr>
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "ПФУ:";
+            s.AssociatedControlName = "RegPfu";
+        }).GetHtml()
+        </td><td>
+        @Html.DevExpress().TextBox(s =>
+        {
+            s.Name = "RegPfu";
+            s.ReadOnly = !haveEdit;
+            if (!s.ReadOnly)
+            {
+                s.Properties.NullText = "ПФУ ...";
+            }
+            s.ControlStyle.CssClass = "editor";
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.ShowModelErrors = true;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.RegPfu).GetHtml()
+        </td>
+
+        <td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "ОПФГ:";
+            s.AssociatedControlName = "RegOpfg";
+        }).GetHtml()
+        </td><td>
+        @Html.DevExpress().TextBox(s =>
+        {
+            s.Name = "RegOpfg";
+            s.ReadOnly = !haveEdit;
+            if (!s.ReadOnly)
+            {
+                s.Properties.NullText = "ОПФГ ...";
+            }
+            s.ControlStyle.CssClass = "editor";
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.ShowModelErrors = true;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.RegOpfg).GetHtml()
+        </td></tr>
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "КОАТУ:";
+            s.AssociatedControlName = "RegKoatu";
+        }).GetHtml()
+        </td><td>
+        @Html.DevExpress().TextBox(s =>
+        {
+            s.Name = "RegKoatu";
+            s.ReadOnly = !haveEdit;
+            if (!s.ReadOnly)
+            {
+                s.Properties.NullText = "КОАТУ ...";
+            }
+            s.ControlStyle.CssClass = "editor";
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.ShowModelErrors = true;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.RegKoatu).GetHtml()
+        </td>
+
+        <td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "КФВ:";
+            s.AssociatedControlName = "RegKfv";
+        }).GetHtml()
+        </td><td>
+        @Html.DevExpress().TextBox(s =>
+        {
+            s.Name = "RegKfv";
+            s.ReadOnly = !haveEdit;
+            if (!s.ReadOnly)
+            {
+                s.Properties.NullText = "КФВ ...";
+            }
+            s.ControlStyle.CssClass = "editor";
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.ShowModelErrors = true;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.RegKfv).GetHtml()
+        </td></tr>
+
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "ЗКГНГ:";
+            s.AssociatedControlName = "RegZkgng";
+        }).GetHtml()
+        </td><td>
+        @Html.DevExpress().TextBox(s =>
+        {
+            s.Name = "RegZkgng";
+            s.ReadOnly = !haveEdit;
+            if (!s.ReadOnly)
+            {
+                s.Properties.NullText = "ЗКГНГ ...";
+            }
+            s.ControlStyle.CssClass = "editor";
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.ShowModelErrors = true;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.RegZkgng).GetHtml()
+        </td>
+
+        <td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "КВЕД:";
+            s.AssociatedControlName = "RegKved";
+        }).GetHtml()
+        </td><td>
+        @Html.DevExpress().TextBox(s =>
+        {
+            s.Name = "RegKved";
+            s.ReadOnly = !haveEdit;
+            if (!s.ReadOnly)
+            {
+                s.Properties.NullText = "КВЕД ...";
+            }
+            s.ControlStyle.CssClass = "editor";
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.ShowModelErrors = true;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.RegKved).GetHtml()
+        </td></tr>
+        </table>

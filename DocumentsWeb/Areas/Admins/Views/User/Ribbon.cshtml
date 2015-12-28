@@ -1,0 +1,90 @@
+﻿@using BusinessObjects.Security
+<script type="text/javascript">
+    function OnMenuItemClick(s, e) {
+        switch (e.item.name) {
+            case "mnuAdd":
+                ShowPopupEdit(0);
+                break;
+            case "mnuEdit":
+                var id = dxGridViewUsers.GetRowKey(dxGridViewUsers.GetFocusedRowIndex());
+                if (id == null)
+                    break;
+                ShowPopupEdit(id);
+                break;
+            case "mnuDelete":
+                if (confirm("Удалить?"))
+                    document.location = '@DevExpressHelper.GetUrl(new { Controller = "Unit", Action = "Delete" })?Id=' + dxGridViewUsers.GetRowKey(dxGridViewUsers.GetFocusedRowIndex());
+                break;
+            case "mnuShowCustomizationWindow":
+                if (dxGridViewUsers.IsCustomizationWindowVisible())
+                    dxGridViewUsers.HideCustomizationWindow();
+                else
+                    dxGridViewUsers.ShowCustomizationWindow();
+                break;
+            case "mnuExport":
+                break;
+            case "mnuExportToXLSX":
+                document.location = '@DevExpressHelper.GetUrl(new { Controller = "User", Action = "ExportTo", type="XLSX"})';
+                break;
+            case "mnuExportToPDF":
+                document.location = '@DevExpressHelper.GetUrl(new { Controller = "User", Action = "ExportTo", type="PDF"})';
+                break;
+            default:
+                alert(e.item.name);
+                break;
+        }
+    }
+</script>
+
+@Html.DevExpress().Menu(settings =>
+{
+    settings.EnableHotTrack = true;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Name = "mFeatures";
+    settings.ClientSideEvents.ItemClick = "OnMenuItemClick";
+    if (Context.User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+    {
+        settings.Items.Add(item =>
+        {
+            item.Name = "mnuAdd";
+            item.Text = "Добавить";
+            item.Image.Url = @Url.Content("~/Images/WIZARD_X16.png");
+        });
+        settings.Items.Add(item =>
+        {
+            item.Name = "mnuEdit";
+            item.Text = "Изменить";
+            item.Image.Url = @Url.Content("~/Images/PROPERTIES_X16.png");
+        });
+        settings.Items.Add(item =>
+        {
+            item.Name = "mnuDelete";
+            item.Text = "Удалить";
+            item.Image.Url = @Url.Content("~/Images/DELETEDELEMENT_X16.png");
+        });
+        settings.Items.Add(item =>
+        {
+            item.Name = "mnuShowCustomizationWindow";
+            item.Text = "Выбор колонок";
+            item.Image.Url = @Url.Content("~/Images/gear.png");
+        });
+        settings.Items.Add(item =>
+        {
+            item.Name = "mnuExport";
+            item.Text = "Экспорт";
+            item.Image.Url = @Url.Content("~/Images/SAVE_X16.png");
+            item.Items.Add(subItem =>
+            {
+                subItem.Name = "mnuExportToXLSX";
+                subItem.Text = "XLSX";
+                subItem.Image.Url = @Url.Content("~/Images/FILEEXCEL_X16.png");
+            });
+            item.Items.Add(subItem =>
+            {
+                subItem.Name = "mnuExportToPDF";
+                subItem.Text = "PDF";
+                subItem.Image.Url = @Url.Content("~/Images/FILEPDF_X16.png");
+            });
+        });
+    }
+}).GetHtml()

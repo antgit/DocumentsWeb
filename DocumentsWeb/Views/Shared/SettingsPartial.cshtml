@@ -1,0 +1,153 @@
+﻿@using DocumentsWeb.Code;
+@using DocumentsWeb.Models;
+
+@{
+    string GridController = ViewData["GridController"] != null ? ViewData["GridController"].ToString() : "";
+    string GridAction = ViewData["GridAction"] != null ? ViewData["GridAction"].ToString() : "";
+    TableColumnModel[] cols = ViewData["Columns"] != null ? (TableColumnModel[])ViewData["Columns"] : new TableColumnModel[0];
+    bool ColumnsConfig = false;
+    
+    try { ColumnsConfig = bool.Parse(ViewData["ColumnsConfig"].ToString()); }
+    catch { }
+}
+
+<script type="text/javascript">
+    function saveLayout() {
+        if (@ViewData["GridName"]@Html.Raw(".InCallback()) {")
+            setTimeout(saveLayout, 1000);
+        }
+        else {
+            $.post('@Url.Action("SaveLayout")/' + cmbLayout.GetValue() + "?time=" + new Date().getTime(),
+                {chkGroupPanel:chkGroupPanel.GetChecked(), chkFilterPanel:chkFilterPanel.GetChecked(), chkLinkName:chkLinkName.GetChecked()
+                    @if(ViewData["ShowMemoCheckBox"] != null && (bool)ViewData["ShowMemoCheckBox"])
+                    {
+                        @Html.Raw(",chkPreview:chkPreview.GetChecked()");
+                    }
+                }
+            ).success(function () {
+                window.location.reload();
+            });
+        }
+    }
+    function onSaveButtonClick() {
+        nbFeatures.GetGroupByName("grpSettings").SetExpanded(false);
+        @ViewData["GridName"]@Html.Raw(".PerformCallback();")
+        saveLayout();
+    }
+    function cmbLayoutSelectedIndexChanged() {
+        $.post('@Url.Action("LoadLayout")/' + cmbLayout.GetValue() + "?time=" + new Date().getTime()).success(function () {
+            window.location.reload();
+        });
+    }
+</script>
+
+<div style="padding: 5px;">
+    <table style="width: 100%; border-collapse: collapse;">
+        <tr>
+            <td style="width: 1px;">
+                @Html.DevExpress().HyperLink(hlSettings =>
+                {
+                    hlSettings.NavigateUrl = "javascript:if (" + ViewData["GridName"] + ".IsCustomizationWindowVisible()) " + ViewData["GridName"] + ".HideCustomizationWindow(); else { " + ViewData["GridName"] + ".ShowCustomizationWindow(document.getElementById('mnuShowCustomizationLocation'));  };";
+                    hlSettings.Properties.ImageUrl = "~/Images/settings_x16.png";
+                    hlSettings.Properties.Style.Border.BorderColor = System.Drawing.Color.White;
+                    hlSettings.ToolTip = "Добавление и удаленое колонок из таблицы";
+                }).GetHtml()
+            </td>
+            <td style="padding-left: 4px;">
+                @Html.DevExpress().HyperLink(hlSettings =>
+                {
+                    hlSettings.Properties.Text = "Выбор колонок";
+                    hlSettings.Properties.Style.Font.Size = 10;
+                    hlSettings.Properties.Style.Font.Underline = true;
+                    hlSettings.NavigateUrl = "javascript:if (" + ViewData["GridName"] + ".IsCustomizationWindowVisible()) " + ViewData["GridName"] + ".HideCustomizationWindow(); else { " + ViewData["GridName"] + ".ShowCustomizationWindow(document.getElementById('mnuShowCustomizationLocation'));  };";
+                    hlSettings.ToolTip = "Добавление и удаленое колонок из таблицы";
+                }).GetHtml()
+                <div id="mnuShowCustomizationLocation">
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" style="padding-top: 5px;">
+                <hr />
+                @Html.DevExpress().Label(s => s.Text = "Выбрать внешний вид: ").GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" style="padding-top: 2px;">
+                @Html.DevExpress().ComboBox(cmbSettings =>
+                {
+                    cmbSettings.Name = "cmbLayout";
+                    cmbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    cmbSettings.Properties.Items.Add("Первое представление", 0);
+                    cmbSettings.Properties.Items.Add("Второе представление", 1);
+                    cmbSettings.Properties.Items.Add("Третье представление", 2);
+                    cmbSettings.SelectedIndex = LayoutHelper.GetCurrentSetting(Url.RequestContext.RouteData.Values["controller"].ToString()).SelectedSettingIndex;
+                    cmbSettings.ToolTip = "Выберите представление для загрузки или сохранения внешнего вида";
+                    EditButton b = cmbSettings.Properties.Buttons.Add();
+                    b.ToolTip = "Сохранить";
+                    b.Image.Url = Url.Content("~/Images/save_x12.png");
+                    cmbSettings.Properties.ClientSideEvents.SelectedIndexChanged = "cmbLayoutSelectedIndexChanged";
+                    cmbSettings.Properties.ClientSideEvents.ButtonClick = "function(s, e) { onSaveButtonClick(); }";
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @Html.DevExpress().CheckBox(settings=>{
+                    settings.Name = "chkGroupPanel";
+                    settings.Text = "Панель группировки";
+                    settings.Checked = LayoutHelper.GetCurrentSetting(Url.RequestContext.RouteData.Values["controller"].ToString()).Current.ShowGroupPanel;
+                    settings.ToolTip = "Отображает панель группировки в таблице";
+                    settings.Properties.ClientSideEvents.CheckedChanged = "function(s,e){ if(chkGroupPanel.GetChecked()){" + ViewData["GridName"] + ".PerformCallback('ShowGroupPanel=true');}else{" + ViewData["GridName"] + ".PerformCallback('ShowGroupPanel=false');}}";
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @Html.DevExpress().CheckBox(settings=>{
+                    settings.Name = "chkFilterPanel";
+                    settings.Text = "Фильтры";
+                    settings.Checked = LayoutHelper.GetCurrentSetting(Url.RequestContext.RouteData.Values["controller"].ToString()).Current.ShowFilterPanel;
+                    settings.ToolTip = "Отображает фильтры для колонок в таблице";
+                    settings.Properties.ClientSideEvents.CheckedChanged = "function(s,e){ if(chkFilterPanel.GetChecked()){" + ViewData["GridName"] + ".PerformCallback('ShowFilterRow=true');}else{" + ViewData["GridName"] + ".PerformCallback('ShowFilterRow=false');}}";
+               
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @Html.DevExpress().CheckBox(settings=>{
+                    settings.Name = "chkLinkName";
+                    settings.Text = "Ссылки в именах";
+                    settings.Checked = LayoutHelper.GetCurrentSetting(Url.RequestContext.RouteData.Values["controller"].ToString()).Current.ShowLinkInName;
+                    settings.ToolTip = "Позволяет редактировать элемент путем нажатия левой кнопки мышки на его имени";
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @Html.DevExpress().CheckBox(settings=>{
+                    settings.Name = "chkCommandColumn";
+                    settings.Text = "Командная колонка";
+                    settings.Properties.ClientSideEvents.Init = "function(s,e){chkCommandColumn.SetChecked(" + ViewData["GridName"] + ".GetColumnById('colImageAction').visible);}";
+                    settings.Properties.ClientSideEvents.CheckedChanged = "function(s,e){ if(chkCommandColumn.GetChecked()){" + ViewData["GridName"] + ".MoveColumn('colImageAction',0);}else{" + ViewData["GridName"] + ".MoveColumn('colImageAction');}}";
+                    settings.ToolTip = "Отображает колонку с ссылками для удаления и редактирования для каждого элемента в таблице";
+                }).GetHtml()
+            </td>
+        </tr>
+        @if (ViewData["ShowMemoCheckBox"] != null && (bool)ViewData["ShowMemoCheckBox"])
+        {
+            <tr>
+            <td colspan="2">
+                @Html.DevExpress().CheckBox(settings =>
+                {
+                    settings.Name = "chkPreview";
+                    settings.Text = "Примечание";
+                    settings.Checked = LayoutHelper.GetCurrentSetting(Url.RequestContext.RouteData.Values["controller"].ToString()).Current.ShowPreview;                    
+                }).GetHtml()
+            </td>
+        </tr>
+        }
+    </table>
+</div>
+

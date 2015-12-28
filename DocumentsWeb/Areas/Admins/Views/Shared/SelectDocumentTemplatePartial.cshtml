@@ -1,0 +1,26 @@
+﻿@using DocumentsWeb.Code;
+
+@Html.DevExpress().PopupControl(pc =>
+{
+    pc.Name = "SelectDocumentTemplate";
+    //pc.PopupElementID = popupAt;
+    pc.Height = 250;
+    pc.Width = 520;
+
+    pc.ShowFooter = false;
+    pc.ShowHeader = false;
+    pc.PopupHorizontalAlign = PopupHorizontalAlign.LeftSides;
+    pc.PopupVerticalAlign = PopupVerticalAlign.Below;
+    pc.EnableAnimation = true;
+    pc.AllowDragging = false;
+    pc.CloseAction = CloseAction.OuterMouseClick;
+
+    
+    pc.SetContent(() =>
+    {
+        ViewContext.Writer.Write("<table style=\"width: 100%;\"><tr><td>");
+        Html.RenderPartial("SelectDocumentTemplateGridPartial");
+        ViewContext.Writer.Write("</td></tr><tr><td><table style=\"float:right;\"><tr><td>");
+        ViewContext.Writer.Write("</td></tr></table></td></tr></table>");
+    });    
+}).GetHtml()

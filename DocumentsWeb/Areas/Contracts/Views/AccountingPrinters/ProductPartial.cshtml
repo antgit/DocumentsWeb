@@ -1,0 +1,44 @@
+﻿@using DocumentsWeb.Models
+@using DocumentsWeb.Areas.Products.Models
+@using BusinessObjects
+
+@model DocumentsWeb.Areas.Contracts.Models.DocumentContractModel
+<table style="width: 100%; border-collapse: collapse; border-spacing: 0px;">
+<tr>
+<td style="width: 50px;">
+@Html.DevExpress().ComboBox(settings =>{
+    settings.Name = "ProductNumber";
+    settings.Properties.TextField = "Nomenclature";
+    settings.Properties.ValueField = "Id";
+    settings.Properties.ValueType = typeof(int);
+    settings.Properties.TextFormatString = "{0}";
+    settings.EncodeHtml = false;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.ShowModelErrors = true;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = "ProductNumberSelect";
+}).BindList(ProductModel.GetCollection(Hierarchy.SYSTEM_PRODUCT_ORGTEX)).Bind(ViewData["ProductId"]).GetHtml()
+</td>
+
+<td>
+@Html.DevExpress().ComboBox(settings =>{
+    settings.Name = "ProductId";
+    settings.Properties.TextField = "Name";
+    settings.Properties.ValueField = "Id";
+    settings.Properties.ValueType = typeof(int);
+    settings.Properties.TextFormatString = "{0}";
+    settings.EncodeHtml = false;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.ShowModelErrors = true;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+    ListBoxColumn colName = settings.Properties.Columns.Add("Name", "Имя");
+    settings.Properties.Columns.Add("Nomenclature", "Инв. номер").Width = 20;
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = "ProductSelect";
+}).BindList(ProductModel.GetCollection(Hierarchy.SYSTEM_PRODUCT_ORGTEX)).Bind(ViewData["ProductId"]).GetHtml()
+</td>
+</tr>
+</table>

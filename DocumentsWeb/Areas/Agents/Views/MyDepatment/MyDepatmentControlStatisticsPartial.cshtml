@@ -1,0 +1,29 @@
+﻿@using DocumentsWeb.Models
+@using System.Web.UI.WebControls
+@using DocumentsWeb.Areas.Agents.Models
+@model ClientModel
+
+@Html.DevExpress().Label(s =>
+{
+    s.Text = "<b>Статистика:</b>";
+    s.EncodeHtml = false;
+}).GetHtml()
+<table style="width: 100%;">
+@foreach (BusinessObjects.Web.Core.ReportInfoData d in BusinessObjects.Web.Core.ReportInfoData.GetView(DocumentsWeb.Models.WADataProvider.WA, Model.Id))
+{
+    <tr>
+        <td style="width: 190px;">
+           @Html.DevExpress().Label(s =>
+           {
+               s.Text = d.Name + ":";
+           }).GetHtml()
+        </td>
+        <td>
+           @Html.DevExpress().Label(s =>
+           {
+               s.Text = d.Value.ToString();
+           }).GetHtml()
+        </td>
+    </tr>
+}    
+</table>         

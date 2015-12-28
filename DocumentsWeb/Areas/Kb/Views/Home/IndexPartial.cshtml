@@ -1,0 +1,57 @@
+﻿@using BusinessObjects.Security
+@using DocumentsWeb.Models
+<h1 style=" font-size:24px">Информация - информационные данные используемые в системе и все что с ними связано...</h1>
+<hr />
+@if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_KNOWLEDGES) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+{
+    @Html.DevExpress().HyperLink(s =>
+                                           {
+                                               s.Properties.ImageUrl = Url.Content("~/Images/MISCCUSTOM12_X16.png");
+                                               s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Kb", Controller = "Kb", Action = "Index" });
+                                           }).GetHtml()
+    
+    @Html.DevExpress().HyperLink(s =>
+    {
+        s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Kb", Controller = "KbBase", Action = "Index" });
+        s.Properties.Text = "База знаний";
+        s.ControlStyle.Font.Bold = true;
+    }).GetHtml()
+        ViewContext.Writer.Write(" - информационный справочник. <br />");
+}
+
+@if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_TASKS) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+{
+    @Html.DevExpress().HyperLink(s =>
+{
+    s.Properties.ImageUrl = Url.Content("~/Images/MISCCUSTOM13_X16.png");
+    s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Kb", Controller = "Task", Action = "Index" });
+}).GetHtml()
+    
+    @Html.DevExpress().HyperLink(s =>
+{
+    s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Kb", Controller = "Task", Action = "ViewListTask" });
+    s.Properties.Text = "Задачи";
+    s.ControlStyle.Font.Bold = true;
+}).GetHtml()
+    ViewContext.Writer.Write(" - постановка и контроль выполнения задач. <br />");
+}
+
+@if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_MODULE_NEWS) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+{
+    @Html.DevExpress().HyperLink(s =>
+{
+    s.Properties.ImageUrl = Url.Content("~/Images/MESSAGEBALLOON_X16.png");
+    s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Kb", Controller = "ViewListNews", Action = "Index" });
+}).GetHtml()
+    
+    @Html.DevExpress().HyperLink(s =>
+{
+    s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Kb", Controller = "ViewListNews", Action = "ViewListTask" });
+    s.Properties.Text = "Новости";
+    s.ControlStyle.Font.Bold = true;
+}).GetHtml()
+    ViewContext.Writer.Write(" - просмотр и создание новостей. <br />");
+}
+
+<hr />
+

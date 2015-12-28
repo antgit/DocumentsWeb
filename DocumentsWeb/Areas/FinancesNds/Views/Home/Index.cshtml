@@ -1,0 +1,44 @@
+﻿@using DevExpress.Web.Mvc.UI
+@using System.Web.UI.WebControls
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Управление Финансами";
+}
+
+@Html.Partial("NavpanelPartial")
+@Html.DevExpress().Splitter(settings =>
+{
+    settings.Name = "splFullScreenMode";
+    settings.Orientation = Orientation.Vertical;
+    settings.Styles.Pane.Paddings.Padding = 0;
+    settings.FullscreenMode = true;
+
+    settings.Panes.Add(contentPane =>
+    {
+        contentPane.ScrollBars = ScrollBars.Auto;
+        contentPane.SetContent(() => @Html.RenderPartial("IndexPartial"));
+    });
+
+    settings.Panes.Add(footerPane =>
+    {
+        footerPane.Size = 80;
+        footerPane.AllowResize = DefaultBoolean.False;
+        footerPane.ShowSeparatorImage = DefaultBoolean.False;
+        footerPane.SetContent(() => @Html.RenderPartial("FooterPartial"));
+    });
+}).GetHtml()
+
+<script type="text/javascript">
+    _aspxAttachEventToElement(window, "load", function () {
+        timeoutId = setTimeout(RefreshAllGridView, 500);
+    });
+    function RefreshAllGridView() {
+        if (typeof gvFinanceInDocuments != "undefined")
+            gvFinanceInDocuments.PerformCallback();
+        if (typeof gvFinanceOutDocuments != "undefined")
+            gvFinanceOutDocuments.PerformCallback();
+    }
+    
+</script>
+

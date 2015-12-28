@@ -1,0 +1,86 @@
+﻿@using DevExpress.Web.Mvc.UI
+@using System.Web.UI.WebControls
+@inherits WebViewPage
+@{
+    ViewBag.Title = "Банки...";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    
+    bool isEdit = ViewContext.HttpContext.Request.Params.AllKeys.Contains("Edit");
+    int EditId = 0;
+    if (isEdit)
+    {
+        EditId = int.Parse(ViewContext.HttpContext.Request.Params["Edit"]);
+    }
+}
+<script type="text/javascript">
+    _aspxAttachEventToElement(window, "load", function () {
+        timeoutId = setTimeout(RefreshAllGridView, 20);
+    });
+    function RefreshAllGridView() {
+        dxGridViewAgents.ApplyFilter('StateId = 1');
+        var a = nbFeatures.GetItemByName('mnuFilterActive');
+        if (a != null) nbFeatures.SetSelectedItem(a);
+        ShowOnlyActive();
+        dxGridViewAgents.SetVisible(true);
+        @if (isEdit & EditId > 0) {
+            ViewContext.Writer.Write("pcEdit.Load('" + DevExpressHelper.GetUrl(new { Controller = "MyDepatment", Action = "Edit" }) + "/" + EditId.ToString() + "', 700, 520);");
+        }
+    }
+    function ShowPopupEdit(id) {
+        pcEdit.Load('@DevExpressHelper.GetUrl(new { Controller = "Bank", Action = "Edit" })/' + id, 650, 400);
+    }
+
+    function AdjustGridSize() {
+        var height = splFullScreenMode.GetPaneByName('GridPane').GetClientHeight();
+        dxGridViewAgents.SetHeight(height);
+        //$('#divActions').height(height - $('#divHeader').height());
+    }
+    function ControlBank() {
+        if (dxGridViewAgents.GetFocusedRowIndex() != -1) {
+            var id = dxGridViewAgents.GetRowKey(dxGridViewAgents.GetFocusedRowIndex());
+            window.open('@DevExpressHelper.GetUrl(new { Controller = "Bank", Action = "ControlView"})/' + id.toString(), '_blank');
+        }
+    }
+</script>
+
+    
+@Html.Partial("NavpanelPartial")
+@Html.DevExpress().Splitter(settings =>
+{
+    settings.Name = "splFullScreenMode";
+    settings.Orientation = Orientation.Vertical;
+    settings.Styles.Pane.Paddings.Padding = 0;
+    settings.FullscreenMode = true;
+    settings.ClientSideEvents.PaneResized = "function (s, e) { AdjustGridSize(); }";
+    settings.Panes.Add(contentPane =>
+    {
+        contentPane.Panes.Add(actionsPane =>
+        {
+            actionsPane.Name = "actionPane";
+            actionsPane.AllowResize = DefaultBoolean.True;
+            actionsPane.Size = 270;
+            actionsPane.MinSize = 270;
+            actionsPane.ShowCollapseBackwardButton = DefaultBoolean.True;
+            actionsPane.SetContent(() => Html.RenderPartial("ActionsPartial"));
+        });
+        contentPane.Panes.Add(gridPane =>
+        {
+            gridPane.Name = "GridPane";
+            gridPane.SetContent(() => Html.RenderPartial("IndexPartial", Model));
+        });
+    });
+
+    settings.Panes.Add(footerPane =>
+    {
+        footerPane.Size = 80;
+        footerPane.AllowResize = DefaultBoolean.False;
+        footerPane.ShowSeparatorImage = DefaultBoolean.False;
+        footerPane.SetContent(() => @Html.RenderPartial("FooterPartial"));
+    });
+}).GetHtml()
+
+@Html.Partial("PopupWindowPartial", new ViewDataDictionary { 
+    { "Title", "Банк" },
+    { "AutoUpdateGrids", new[] { "dxGridViewAgents" } },
+    { "ShowFooter", true}
+})

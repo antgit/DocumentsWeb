@@ -1,0 +1,228 @@
+﻿@using BusinessObjects
+@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentWeb.Extentions
+@using DocumentsWeb.Models
+
+@Html.DevExpress().NavBar(
+nbActionSettings =>
+{
+    nbActionSettings.Name = "nbActions";
+    nbActionSettings.AllowExpanding = true;
+    nbActionSettings.AllowSelectItem = true;
+    nbActionSettings.AutoCollapse = false;
+    nbActionSettings.EnableHotTrack = true;
+    nbActionSettings.EnableAnimation = true;
+    nbActionSettings.Width = System.Web.UI.WebControls.Unit.Pixel(250);
+    nbActionSettings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+    nbActionSettings.EncodeHtml = false;
+    
+    nbActionSettings.Groups.Add(group =>
+    {
+        group.Text = "Создать документ";
+        group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+        group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.HeaderStyle.Font.Bold = true;
+        group.ItemStyle.CssClass = "navpanellink";
+        group.Expanded = true;
+        MVCxNavBarItem item = null;
+
+        item = group.Items.Add("Прайс-лист...", "lnkPriceSales", "~/Images/new_x16.png");
+        item.ToolTip = "Создание нового документа \"Прайс лист\"";
+        item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "PriceList", Action = "Create" });
+        item.Enabled = WADataProvider.FolderElementRightView.IsAllow(Right.DOCCREATE, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_PRICES_DEAULT).Id);
+        item.ClientVisible = item.Enabled;
+        item.Target = "_blank";
+
+        item = group.Items.Add("Индивидуальный прайс...", "lnkPriceSalesInd", "~/Images/new_x16.png");
+        item.ToolTip = "Создание нового документа \"Индивидуальный прайс лист\"";
+        item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "PriceListInd", Action = "Create" });
+        item.Enabled = WADataProvider.FolderElementRightView.IsAllow(Right.DOCCREATE, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_PRICES_IND).Id);
+        item.ClientVisible = item.Enabled;
+        item.Target = "_blank";
+
+        item = group.Items.Add();
+        item.SetTemplateContent(s => { ViewContext.Writer.Write("<hr>"); });
+
+        item = group.Items.Add("Прайс поставщика...", "lnkPriceSupplyer", "~/Images/new_x16.png");
+        item.ToolTip = "Создание нового документа \"Прайс лист поставщика\"";
+        item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "PriceListSupplier", Action = "Create" });
+        item.Enabled = WADataProvider.FolderElementRightView.IsAllow(Right.DOCCREATE, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_PRICES_SYPPLYER).Id);
+        item.ClientVisible = item.Enabled;
+        item.Target = "_blank";
+
+        item = group.Items.Add("Прайс конкурента...", "lnkPriceCompetitor", "~/Images/new_x16.png");
+        item.ToolTip = "Создание нового документа \"Прайс лист конкурента\"";
+        item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "PriceListCompetitor", Action = "Create" });
+        item.Enabled = WADataProvider.FolderElementRightView.IsAllow(Right.DOCCREATE, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_PRICES_COMPETITOR).Id);
+        item.ClientVisible = item.Enabled;
+        item.Target = "_blank";
+
+        item = group.Items.Add("Индивидуальный конкурента...", "lnkPriceCompetitorInd", "~/Images/new_x16.png");
+        item.ToolTip = "Создание нового документа \"Прайс лист конкурента индивидуальный\"";
+        item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "PriceListCompetitorInd", Action = "Create" });
+        item.Enabled = WADataProvider.FolderElementRightView.IsAllow(Right.DOCCREATE, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_PRICES_COMPETITORIND).Id);
+        item.ClientVisible = item.Enabled;
+        item.Target = "_blank";
+
+        item = group.Items.Add();
+        item.SetTemplateContent(s => { ViewContext.Writer.Write("<hr>"); });
+        
+        item = group.Items.Add("Приказ...", "lnkPriceCommand", "~/Images/new_x16.png");
+        item.ToolTip = "Создание нового документа \"Приказ на изменение цен на предприятии\"";
+        item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "PriceListCommand", Action = "Create" });
+        item.Enabled = WADataProvider.FolderElementRightView.IsAllow(Right.DOCCREATE, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_PRICES_COMMAND).Id);
+        item.ClientVisible = item.Enabled;
+        item.Target = "_blank";
+
+        item = group.Items.Add("Приказ индивидуальный...", "lnkPriceCommmandInd", "~/Images/new_x16.png");
+        item.ToolTip = "Создание нового документа \"Приказ на изменение цен для конкретного покупателя\"";
+        item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "PriceListCommandInd", Action = "Create" });
+        item.Enabled = WADataProvider.FolderElementRightView.IsAllow(Right.DOCCREATE, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_PRICES_COMMANDIND).Id);
+        item.ClientVisible = item.Enabled;
+        item.Target = "_blank";
+    });
+
+    nbActionSettings.Groups.Add(group =>
+    {
+        group.Text = "Просмотр документов списком";
+        group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+        group.Expanded = true;
+        group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.HeaderStyle.Font.Bold = true;
+        group.ItemStyle.CssClass = "navpanellink";
+
+        group.Items.Add(item =>
+        {
+            item.Name = "lnkPricesListOut";
+            item.Text = "Прайс-листы...";
+            item.Image.Url = "~/Images/DOCUMENTDONE_X16.png";
+            item.NavigateUrl = Url.Action("Index", "ViewListPriceList");
+            //item.Target = "_blank";
+            item.ToolTip = "Перейти в список всех прайс-листов...";
+            item.Enabled = WADataProvider.FolderElementRightView.IsAllow(Right.DOCCREATE, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_PRICES_DEAULT).Id);
+            item.ClientVisible = item.Enabled;
+        });
+
+        group.Items.Add(item =>
+        {
+            item.Name = "lnkPricesListOutInd";
+            item.Text = "Индивидуальные прайсы...";
+            item.Image.Url = "~/Images/DOCUMENTDONE_X16.png";
+            item.NavigateUrl = Url.Action("Index", "ViewListPriceListInd");
+            //item.Target = "_blank";
+            item.ToolTip = "Перейти в список всех индивидуальных прайс-листов...";
+            item.Enabled = WADataProvider.FolderElementRightView.IsAllow(Right.DOCCREATE, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_PRICES_IND).Id);
+            item.ClientVisible = item.Enabled;
+        });
+        group.Items.Add(item => { item.SetTemplateContent(s => { ViewContext.Writer.Write("<hr>"); }); });
+        group.Items.Add(item =>
+        {
+            item.Name = "ViewListPriceListSupplier";
+            item.Text = "Прайс-листы поставщика...";
+            item.Image.Url = "~/Images/DOCUMENTDONE_X16.png";
+            item.NavigateUrl = Url.Action("Index", "ViewListPriceListSupplier");
+            //item.Target = "_blank";
+            item.ToolTip = "Перейти в список всех прайс-листов поставщика...";
+            item.Enabled = WADataProvider.FolderElementRightView.IsAllow(Right.DOCCREATE, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_PRICES_SYPPLYER).Id);
+            item.ClientVisible = item.Enabled;
+        });
+
+        group.Items.Add(item =>
+        {
+            item.Name = "lnkPricesListCompetiror";
+            item.Text = "Прайс-листы конкурентов...";
+            item.Image.Url = "~/Images/DOCUMENTDONE_X16.png";
+            item.NavigateUrl = Url.Action("Index", "ViewListPriceListCompetitor");
+            //item.Target = "_blank";
+            item.ToolTip = "Перейти в список всех прайс-листов конкурента...";
+            item.Enabled = WADataProvider.FolderElementRightView.IsAllow(Right.DOCCREATE, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_PRICES_COMPETITOR).Id);
+            item.ClientVisible = item.Enabled;
+        });
+
+        group.Items.Add(item =>
+        {
+            item.Name = "lnkPricesListCompetirorInd";
+            item.Text = "Индивидуальные конкурентов...";
+            item.Image.Url = "~/Images/DOCUMENTDONE_X16.png";
+            item.NavigateUrl = Url.Action("Index", "ViewListPriceListCompetitorInd");
+            //item.Target = "_blank";
+            item.ToolTip = "Перейти в список всех индивидуальных прайс-листов конкурентов...";
+            item.Enabled = WADataProvider.FolderElementRightView.IsAllow(Right.DOCCREATE, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_PRICES_COMPETITORIND).Id);
+            item.ClientVisible = item.Enabled;
+        });
+
+        group.Items.Add(item => { item.SetTemplateContent(s => { ViewContext.Writer.Write("<hr>"); }); });
+        
+        group.Items.Add(item =>
+        {
+            item.Name = "lnkPricesListCommmand";
+            item.Text = "Приказы...";
+            item.Image.Url = "~/Images/DOCUMENTDONE_X16.png";
+            item.NavigateUrl = Url.Action("Index", "ViewListPriceListCommand");
+            //item.Target = "_blank";
+            item.ToolTip = "Перейти в список всех приказов...";
+            item.Enabled = WADataProvider.FolderElementRightView.IsAllow(Right.DOCCREATE, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_PRICES_COMMAND).Id);
+            item.ClientVisible = item.Enabled;
+        });
+
+        group.Items.Add(item =>
+        {
+            item.Name = "lnkPricesListCommandInd";
+            item.Text = "Индивидуальные приказы...";
+            item.Image.Url = "~/Images/DOCUMENTDONE_X16.png";
+            item.NavigateUrl = Url.Action("Index", "ViewListPriceListCommandInd");
+            //item.Target = "_blank";
+            item.ToolTip = "Перейти в список всех индивидуальных приказов...";
+            item.Enabled = WADataProvider.FolderElementRightView.IsAllow(Right.DOCCREATE, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_PRICES_COMMAND).Id);
+            item.ClientVisible = item.Enabled;
+        });
+    });
+    
+    nbActionSettings.Groups.Add(group =>
+    {
+        group.Name = "gpPrices";
+        group.Expanded = true;
+        group.AllowExpanding = false;
+        group.ShowExpandButton = DefaultBoolean.False;
+        group.HeaderStyle.Font.Bold = true;
+        group.SetHeaderTemplateContent(sc =>
+        {
+            ViewContext.Writer.Write("<lable>Виды цен ...</label>");
+            ViewContext.Writer.Write("<img style=\"cursor: pointer; float: right; \" src=\"" + Url.Content("~/Images/edit_x16.png") + "\" id=\"imgButton\" />");
+        });
+        group.SetContentTemplateContent(c =>
+        {
+            string gridStyle = "dxgvControl_" + Utils.CurrentTheme;
+            ViewContext.Writer.Write("<div class=\"" + @gridStyle + " \">");
+            Html.RenderPartial("PriceKindListPartial");
+            ViewContext.Writer.Write("</div>");
+        });
+    });
+
+}).GetHtml()
+
+@Html.DevExpress().PopupControl(set =>
+{
+    set.Name = "pcFeatures";
+    set.PopupElementID = "imgButton";
+
+    set.Width = 450;
+    set.Height = 250;
+
+    set.ShowCloseButton = true;
+    set.ShowShadow = true;
+    set.ShowFooter = false;
+    set.ShowHeader = true;
+    set.EnableAnimation = true;
+    set.AllowDragging = false;
+    set.CloseAction = CloseAction.CloseButton;
+    set.HeaderText = "Виды цен";
+    set.SetContent(() =>
+    {
+        @Html.RenderPartial("ViewBoardPriceKindPartial");
+    });
+    set.ClientSideEvents.Closing = "function (s, e) { CallbackPricesKinds.PerformCallback(); }";
+}).GetHtml()

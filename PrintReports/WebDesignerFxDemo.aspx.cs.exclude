@@ -1,0 +1,61 @@
+using System;
+using System.Data;
+using System.Configuration;
+using System.Collections;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Web.UI.HtmlControls;
+using Stimulsoft.Report.Dictionary;
+using Stimulsoft.Report;
+using Stimulsoft.Report.Web;
+
+public partial class WebDesignerFxDemo : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+
+    }
+
+
+    // Design Report
+    protected void Button1_Click(object sender, EventArgs e)
+    {
+        string appDirectory = HttpContext.Current.Server.MapPath(string.Empty);
+
+        // Load report
+        StiReport report = new StiReport();
+        string reportPath = string.Format("{0}\\Reports\\{1}", appDirectory, DropDownListReport.Text);
+        report.Load(reportPath);
+
+        // Assign data
+        StiXmlDatabase database = new StiXmlDatabase("Demo", appDirectory + "\\Data\\Demo.xsd", appDirectory + "\\Data\\Demo.xml");
+        report.Dictionary.Databases.Add(database);
+        report.Dictionary.Synchronize();
+
+        // Design report
+        StiWebDesigner1.Design(report);
+    }
+
+
+    // Create New Report
+    protected void Button2_Click(object sender, EventArgs e)
+    {
+        StiWebDesigner1.Design();
+    }
+
+
+    // Save Report
+    protected void StiWebDesigner1_SaveReport(object sender, StiWebDesigner.StiSaveReportEventArgs e)
+    {
+        // Web Designer return StiReport class in e.Report
+
+        // You can set an error code which will be displayed by the designer after saving
+        // e.ErrorCode = 1;
+
+        // -1: default value, the message is not displayed
+        // 0: display 'Report is successfully saved' message
+    }
+}

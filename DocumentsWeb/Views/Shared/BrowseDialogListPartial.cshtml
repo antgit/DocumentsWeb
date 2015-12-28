@@ -1,0 +1,16 @@
+﻿@using BusinessObjects
+@Html.DevExpress().GridView(settings=>{
+    settings.Name = ViewData["ModelName"]+"List";
+    settings.CallbackRouteValues = new { Area = "", Controller = "BrowseDialog", Action = "BrowseDialogListPartial" };
+    settings.Columns.Add("Name", "Имя");
+    settings.Columns.Add("Code", "Код");
+    settings.KeyFieldName = GlobalPropertyNames.Id;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control; 
+    settings.SettingsBehavior.AllowFocusedRow = true;
+    //settings.SettingsPager.PageSize = 10;
+    settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+    settings.Settings.ShowFilterRow = true;
+    settings.Settings.ShowFilterRowMenu = true;
+    settings.ClientSideEvents.BeginCallback = "function(s,e){e.customArgs['ModelName'] = '" + ViewData["ModelName"] + "';}";
+}).Bind(Model).GetHtml()

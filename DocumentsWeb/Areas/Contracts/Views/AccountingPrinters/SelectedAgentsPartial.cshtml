@@ -1,0 +1,116 @@
+﻿@using DocumentsWeb.Areas.Contracts.Models;
+@using DocumentsWeb.Models;
+
+@{
+    string modelId = (string)ViewData["ModelId"];
+    List<DocumentSignModel> signs = (List<DocumentSignModel>)WADataProvider.ModelsCache.Get(modelId);
+    int count = 0;
+    try{
+        count = signs.Where(w => w.StateId != BusinessObjects.State.STATEDELETED).ToList().Count;
+    } catch {}
+}
+
+@Html.DevExpress().CallbackPanel(s => {
+    s.Name = "SelectorUpdate";
+    s.CallbackRouteValues = new { Controller = "AccountingPrinters", Action = "SelectedAgentsPartial" };
+    s.ClientSideEvents.BeginCallback = "function(s, e) { e.customArgs['modelId'] = '" + modelId + "'; }";
+    s.SetContent (() => {
+        ViewContext.Writer.Write("<input type=\"hidden\" id=\"RowsCount\" name=\"RowsCount\" value=\"" + count.ToString() + "\" />");
+        ViewContext.Writer.Write("<table style=\"width: 100%;\" border=\"0\">");
+        ViewContext.Writer.Write("<tr>");
+            ViewContext.Writer.Write("<th>");
+            ViewContext.Writer.Write("</th>");
+            ViewContext.Writer.Write("<th>");
+                Html.DevExpress().Label(ss => { ss.Text = "Порядок"; }).Render();
+            ViewContext.Writer.Write("</th>");
+            ViewContext.Writer.Write("<th>");
+                Html.DevExpress().Label(ss => { ss.Text = "Ответственный"; }).Render();
+            ViewContext.Writer.Write("</th>");
+            ViewContext.Writer.Write("<th>");
+                Html.DevExpress().Label(ss => { ss.Text = "Заместитель"; }).Render();
+            ViewContext.Writer.Write("</th>");
+            ViewContext.Writer.Write("<th>");
+                Html.DevExpress().Label(ss => { ss.Text = "Подписать до"; }).Render();
+            ViewContext.Writer.Write("</th>");
+            ViewContext.Writer.Write("<th>");
+                Html.DevExpress().Label(ss => { ss.Text = "Оповестить"; }).Render();
+            ViewContext.Writer.Write("</th>");
+            ViewContext.Writer.Write("<th>");
+                Html.DevExpress().Label(ss => { ss.Text = "Задача"; }).Render();
+            ViewContext.Writer.Write("</th>");
+        ViewContext.Writer.Write("</tr>");
+        int p = 0;
+        for (int i = 0; i < signs.Count; i++)
+        {
+            if (signs[i].StateId != BusinessObjects.State.STATEDELETED)
+            {
+                ViewContext.Writer.Write("<tr>");
+                ViewContext.Writer.Write("<td>");
+                ViewContext.Writer.Write("<input type=\"hidden\" id=\"RowId_" + p.ToString() + "\" name=\"RowId_" + p.ToString() + "\" value=\"" + signs[i].RowId + "\" />");
+                Html.DevExpress().CheckBox(ss =>
+                {
+                    ss.Name = "Row_" + p.ToString();
+                }).Render();
+                ViewContext.Writer.Write("</td>");
+
+                ViewContext.Writer.Write("<td>");
+                Html.DevExpress().SpinEdit(edtSettings =>
+                {
+                    edtSettings.Name = "OrderNo_" + p.ToString();
+                    edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    edtSettings.Properties.MinValue = 0;
+                    edtSettings.Properties.MaxValue = 9999;
+                    edtSettings.Properties.ClientSideEvents.ValueChanged = "function (s, e) { updateAgent(" + i.ToString() + "); }";
+                }).Bind(signs[i].OrderNo).Render();
+                ViewContext.Writer.Write("</td>");
+
+                ViewContext.Writer.Write("<td>");
+                Html.RenderPartial("WorkerPartial", new ViewDataDictionary
+                    {
+                        { "WorkerId", signs[i].AgentId },
+                        { "GridName", "AgentId_" + p.ToString() },
+                        { "ReadOnly", true },
+                        { "SelectedItemChanged", "function (s, e) { updateAgent(" + i.ToString() + "); }" }
+                    });
+                ViewContext.Writer.Write("</td>");
+
+                ViewContext.Writer.Write("<td>");
+                Html.RenderPartial("WorkerPartial", new ViewDataDictionary
+                    {
+                        { "WorkerId", signs[i].AgentSubId == 0 ? null : (int?)signs[i].AgentSubId },
+                        { "GridName", "AgentSubId_" + p.ToString() },
+                        { "SelectedItemChanged", "function (s, e) { updateAgent(" + i.ToString() + "); }" }
+                    });
+                ViewContext.Writer.Write("</td>");
+
+                ViewContext.Writer.Write("<td>");
+                Html.DevExpress().DateEdit(edtSettings =>
+                {
+                    edtSettings.Name = "DateTo_" + p.ToString();
+                    edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    edtSettings.Properties.ClientSideEvents.DateChanged = "function (s, e) { updateAgent(" + i.ToString() + "); }";
+                }).Bind(signs[i].DateTo == DateTime.MinValue ? null : (DateTime?)signs[i].DateTo).Render();
+                ViewContext.Writer.Write("</td>");
+
+                ViewContext.Writer.Write("<td style=\"text-align: center;\">");
+                Html.DevExpress().CheckBox(ss =>
+                {
+                    ss.Name = "CreateMessage_" + p.ToString();
+                    ss.Properties.ClientSideEvents.CheckedChanged = "function (s, e) { updateAgent(" + i.ToString() + "); }";
+                }).Bind(signs[i].MessageNeed).Render();
+                ViewContext.Writer.Write("</td>");
+
+                ViewContext.Writer.Write("<td style=\"text-align: center;\">");
+                Html.DevExpress().CheckBox(ss =>
+                {
+                    ss.Name = "CreateTask_" + p.ToString();
+                    ss.Properties.ClientSideEvents.CheckedChanged = "function (s, e) { updateAgent(" + i.ToString() + "); }";
+                }).Bind(signs[i].TaskNeed).Render();
+                ViewContext.Writer.Write("</td>");
+                ViewContext.Writer.Write("</tr>");
+                p++;
+            }
+        }
+        ViewContext.Writer.Write("</table>");
+    });
+}).GetHtml()

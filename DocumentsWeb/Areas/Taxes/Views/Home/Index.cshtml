@@ -1,0 +1,61 @@
+﻿@using DevExpress.Web.Mvc.UI
+@using System.Web.UI.WebControls
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Налоговые документы";
+}
+
+@Html.Partial("NavpanelPartial")
+@Html.DevExpress().Splitter(settings =>
+{
+    settings.Name = "splFullScreenMode";
+    settings.Orientation = Orientation.Vertical;
+    settings.Styles.Pane.Paddings.Padding = 0;
+    settings.FullscreenMode = true;
+    
+    settings.Panes.Add(contentPane =>
+    {
+        contentPane.Name = "paneRoot";
+        contentPane.ScrollBars = ScrollBars.Auto;
+        contentPane.SetContent(() => @Html.RenderPartial("IndexPartial"));
+    });
+
+    settings.Panes.Add(footerPane =>
+    {
+        footerPane.Size = 80;
+        footerPane.Name = "footerPane";
+        footerPane.AllowResize = DefaultBoolean.False;
+        footerPane.ShowSeparatorImage = DefaultBoolean.False;
+        footerPane.SetContent(() => @Html.RenderPartial("FooterPartial"));
+    });
+}).GetHtml()
+<script type="text/javascript">
+    _aspxAttachEventToElement(window, "load", function () {
+        timeoutId = setTimeout(RefreshAllGridView, 500);
+        //SetSizeForBoards();
+    });
+
+//    $(window).bind('resize', function () {
+//        window.setTimeout(function () {
+//            SetSizeForBoards();
+//        }, 50);
+//    });
+//    $(window).trigger('resize');
+
+    function RefreshAllGridView() {
+        gvTaxDocumentsOut.PerformCallback();
+        gvTaxDocumentsCorOut.PerformCallback();
+        gvTaxDocumentsIn.PerformCallback();
+        gvTaxDocumentsCorIn.PerformCallback();
+    }
+
+//    function SetSizeForBoards() {
+//        var height = (splFullScreenMode.GetPaneByName('paneRoot').GetClientHeight() - splFullScreenMode.GetPaneByName('footerPane').GetClientHeight() - $('topHeader').height() - $('topComment').height() - 25) / 2;
+//        gvTaxDocumentsIn.SetHeight(height);
+//        gvTaxDocumentsCorIn.SetHeight(height);
+//        gvTaxDocumentsCorOut.SetHeight(height);
+//        gvTaxDocumentsOut.SetHeight(height);
+//    }
+</script>
+

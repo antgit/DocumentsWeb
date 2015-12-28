@@ -1,0 +1,14 @@
+﻿@model DocumentsWeb.Areas.UserPersonal.Models.WebMessageModel
+@{
+    //Сообщение можно редактировать только если оно отправленное и не посланное или если это собственное сообщение
+    bool enabled = Model.IsOutcomminMessage && !Model.IsSend || Model.IsSelfMessage;
+}
+@Html.DevExpress().HtmlEditor(settings =>
+{
+    settings.Name = "NameFull";
+    settings.CallbackRouteValues = new { Controller = "UserMessage", Action = "NameFullPartial", modelId = Model.ModelId };
+    //settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Width = 800;
+    settings.Settings.AllowDesignView = enabled;
+    settings.Settings.AllowHtmlView = enabled;
+}).Bind(Model.NameFull).GetHtml() 

@@ -1,0 +1,138 @@
+﻿@using DevExpress.Web.Mvc.UI
+@using DocumentsWeb.Areas.General.Models;
+@using DocumentsWeb.Areas.Analitics.Models;
+
+@{
+    //string[] RootList = (string[])ViewContext.RequestContext.RouteData.Values["RootList"];
+    string GridController = (string)ViewContext.RequestContext.RouteData.Values["GridController"];
+    string GridAction = (string)ViewContext.RequestContext.RouteData.Values["GridAction"];
+    string GridName = (string)ViewContext.RequestContext.RouteData.Values["GridName"];
+    /*List<HierarchyModel> _RootList = new List<HierarchyModel>();
+    foreach (string r in RootList) 
+    {
+        _RootList.Add(HierarchyModel.GetObject(r));
+    }*/
+    
+    int[] roots = DocumentsWeb.Utils.GetHieRoots(GridController, GridAction);
+    bool view_all_nodes = false;
+    if (roots.Contains(0)) {
+        view_all_nodes = true;
+    }
+}
+
+<script type="text/javascript">
+    function HierarchyFilter_CheckedChanged(s, e) {
+        if (@(GridName).InCallback()) {
+            e.node.SetChecked(!e.node.GetChecked());
+        }
+        if (e.node.GetChecked()) {
+            $.get('@Url.Action("AddFilterRoot", new { Area = "General", Controller = "Hierarchy" })?c=@(GridController)&a=@(GridAction)&r=' + e.node.name + '&time=' + new Date().getTime()).success(function () {
+                @(GridName).PerformCallback('refresh=true');
+            });
+        } else {
+            $.get('@Url.Action("DelFilterRoot", new { Area = "General", Controller = "Hierarchy" })?c=@(GridController)&a=@(GridAction)&r=' + e.node.name + '&time=' + new Date().getTime()).success(function () {
+                @(GridName).PerformCallback('refresh=true');
+            });
+        }
+    }
+
+    function view_all_nodes() {
+        $('#filter_nodes').show();
+        $('#all_nodes').hide();
+        $('#TreePartial').hide();
+        $('#expande_all').hide();
+        $('#collapse_all').hide();
+        $('#lnkOnFilter').show();
+        $.get('@Url.Action("AddFilterRoot", new { Area = "General", Controller = "Hierarchy" })?c=@(GridController)&a=@(GridAction)&r=0&time=' + new Date().getTime()).success(function () {
+            @(GridName).PerformCallback('refresh=true');
+        });
+    }
+
+    function view_filter_nodes() {
+        $('#filter_nodes').hide();
+        $('#all_nodes').show();
+        $('#TreePartial').show();
+        $('#expande_all').show();
+        $('#collapse_all').show();
+        $('#lnkOnFilter').hide();
+        $.get('@Url.Action("DelFilterRoot", new { Area = "General", Controller = "Hierarchy" })?c=@(GridController)&a=@(GridAction)&r=0&time=' + new Date().getTime()).success(function () {
+            @(GridName).PerformCallback('refresh=true');
+        });
+    }
+
+    function expand_all() {
+        //TODO: Баг Devexpress [Expand all in the virual mode] http://www.devexpress.com/Support/Center/p/B204984.aspx
+        tvHierarchiesFilter.ExpandAll();
+        window.setTimeout(function() { $('#TreePartial').height(s.GetHeight() + 3); }, 400);
+    }
+    
+    function collapse_all() {
+        tvHierarchiesFilter.CollapseAll();
+        window.setTimeout(function() { $('#TreePartial').height(s.GetHeight() + 3); }, 400);
+    }
+</script>
+
+<div style="padding: 5px;">
+    <div style="width: 100%; margin-top: 3px;">
+        <table style="width: 100%; border-collapse: collapse; border-spacing: 0px;">
+            <tr>
+                <td id="all_nodes" @if(view_all_nodes) { ViewContext.Writer.Write("style=\"display: none;\""); }>
+                    @Html.DevExpress().HyperLink(settings =>
+                    {
+                        settings.Properties.ImageUrl = Url.Content("~/Images/all_nodes_x16.png");
+                        settings.ToolTip = "Показать все";
+                        settings.NavigateUrl = "javascript:view_all_nodes();";
+                    }).GetHtml()
+                </td>
+                <td id="filter_nodes" @if(!view_all_nodes) { ViewContext.Writer.Write("style=\"display: none;\""); }>
+                    @Html.DevExpress().HyperLink(settings =>       
+                    {
+                        settings.Properties.ImageUrl = Url.Content("~/Images/filter_nodes_x16.png");
+                        settings.ToolTip = "Использовать фильтр";
+                        settings.NavigateUrl = "javascript:view_filter_nodes();";
+                    }).GetHtml()
+                </td>
+                <td id="expande_all" style="padding-left: 3px; @if(view_all_nodes) { ViewContext.Writer.Write("display: none;"); }">
+                    @Html.DevExpress().HyperLink(settings =>       
+                    {
+                        settings.Properties.ImageUrl = Url.Content("~/Images/expand_all_x16.png");
+                        settings.ToolTip = "Развернуть все";
+                        settings.NavigateUrl = "javascript:expand_all();";
+                    }).GetHtml()
+                </td>
+                <td id="collapse_all" style="padding-left: 3px; @if(view_all_nodes) { ViewContext.Writer.Write("display: none;"); }">
+                    @Html.DevExpress().HyperLink(settings =>       
+                    {
+                        settings.Name = "lnkView_all_nodesImg";
+                        settings.Properties.ImageUrl = Url.Content("~/Images/collapse_all_x16.png");
+                        settings.ToolTip = "Свернуть все";
+                        settings.NavigateUrl = "javascript:collapse_all();";
+                    }).GetHtml()
+                </td>
+                <td id="lnkOnFilter" style="width: 100%;">
+                    @Html.DevExpress().HyperLink(hlSettings =>
+                    {
+                        hlSettings.Name = "lnkView_all_nodes";
+                        hlSettings.ClientVisible = view_all_nodes;
+                        hlSettings.Properties.Text = "Включить фильтр";
+                        hlSettings.Properties.Style.Font.Size = 10;
+                        hlSettings.Properties.Style.Font.Underline = true;
+                        hlSettings.Style.Add("padding-left", "4px");
+                        hlSettings.NavigateUrl = "javascript:view_filter_nodes();";
+                    }).GetHtml()
+                </td>
+                <td style="width: 100%;">
+                    
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div id="TreePartial" style="width: 100%; max-height: 300px; overflow: auto; margin-top: 3px; @if(view_all_nodes) { ViewContext.Writer.Write("display: none;"); }">
+        @Html.Partial("FilterTreeViewPartial", new ViewDataDictionary
+        {
+            { "GridController", GridController},
+            { "GridAction", GridAction }
+        })
+    </div>
+</div>

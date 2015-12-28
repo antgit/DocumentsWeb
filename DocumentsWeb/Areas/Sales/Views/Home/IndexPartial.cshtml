@@ -1,0 +1,169 @@
+﻿@using System.Web.UI.WebControls;
+@using BusinessObjects
+@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DevExpress.Web.ASPxDocking
+@using DocumentsWeb.Models
+@using Unit = System.Web.UI.WebControls.Unit
+@{
+    string gridStyle = "dxgvControl_" + Utils.CurrentTheme;
+    bool IsNdsAllow = WADataProvider.IsUserCompanyHasNds();
+    string helpDefaultLink = string.Empty;
+    if (ViewData.ContainsKey("HelpDefaultLink"))
+    {
+        helpDefaultLink = ViewData["HelpDefaultLink"].ToString();
+    }
+}
+@Html.DevExpress().DockManager(
+    settings => {
+        settings.Name = "dockManager";
+        //settings.ClientSideEvents.PanelShown = "function(s, e) { SetWidgetButtonVisible(e.panel.panelUID, false) }";
+        //settings.ClientSideEvents.PanelCloseUp = "function(s, e) { SetWidgetButtonVisible(e.panel.panelUID, true) }";
+        //settings.SaveStateToCookies = true;
+        //settings.SaveStateToCookiesID = "ServiceArea_Home";
+    }
+).GetHtml()
+<table style="height: 100%;width:100%; border:0; border-spacing:0;">
+    <tr>
+        @*<td align ="left" valign ="top" style="border-right: 3px solid #FFF; width:250px;">*@
+        <td align ="left" valign ="top" style="border-right: 3px solid @gridStyle; width:250px;" class="@gridStyle">
+            @Html.Partial("ActionsPartial", DocumentsWeb.Code.HomePageSection.GetCollectionSales(false), new ViewDataDictionary { {"SettingsName", "SalesHome"}, {"GroupNumber", 6} })
+        </td>
+
+        <td align ="left" valign ="top" >
+            <table style="width: 100%;">
+                <tr>
+                    <td valign="middle" align="center" style="font-size: 14pt;">
+                        <b>Управление продажами без НДС</b>
+                        @Html.DevExpress().HyperLink(s =>
+                            {
+                                s.ToolTip = "Показать справочную информацию";
+                                s.Properties.ImageUrl = "~/Images/INFO_X16.png";
+                                if (string.IsNullOrEmpty(helpDefaultLink))
+                                    s.NavigateUrl = "javascript:alert('Справочная информация отсутствует!');";
+                                else
+                                {
+                                    s.Properties.Target = "_blank";
+                                    s.NavigateUrl = helpDefaultLink.StartsWith("~/") ? Url.Content(helpDefaultLink) : helpDefaultLink;
+                                }
+                            }).GetHtml()
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <p>Cоздание документов предприятия связянные с нашей торговой деятельностью. В данном разделе вы можете быстро искать документы, 
+                            <br/>создавать документы. Набор документов позволяет выполнять операции прихода, расход товара, внутренее перемещение товара, 
+                            <br/>инвентаризации и т.д.</p> <p>Раздел предназначен <b>для предприятий не являющихся плательщиками НДС</b> 
+                                                               <br/>Если Ваше предприятие является плательшиком НДС используйте раздел"
+                                                               @Html.DevExpress().HyperLink(s =>
+                                                                   {
+                                                                       s.Name = "lnkSale";
+                                                                       s.NavigateUrl = "~/SalesNds/Home/";
+                                                                       s.Properties.Text = "\"Управление продажами плательщиками НДС\"";
+                                                                       s.ToolTip = "Перейти в раздел \"Управление продажами плательщиками НДС\"";
+                                                                       s.Enabled = (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCSALENDS) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN)) & IsNdsAllow;
+                                                                       s.ClientEnabled = s.Enabled;
+                                                                   }).GetHtml()</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width:100%">
+                        @Html.DevExpress().DockZone(
+                            settings => {
+                                            settings.Name = "dockZone1";
+                                            settings.ZoneUID = "leftZone";
+                                            settings.ControlStyle.CssClass = "leftZone";
+                                            settings.Width = Unit.Percentage(49);
+                                            settings.PanelSpacing = 3;
+                            }
+                             ).GetHtml()
+
+                        @Html.DevExpress().DockZone(
+                            settings => {
+                                            settings.Name = "dockZone2";
+                                            settings.ZoneUID = "rightZone";
+                                            settings.ControlStyle.CssClass = "rightZone";
+                                            settings.Width = Unit.Percentage(49); 
+                                            settings.PanelSpacing = 3;
+                            }
+                             ).GetHtml() 
+                    </td>
+                </tr>
+            </table>
+        </td>
+
+        <td valign="top" style="border-left: 3px solid @gridStyle; width:250px;" class="@gridStyle" >
+            @Html.Partial("ReportsPartial")
+        </td>
+    </tr>
+</table>
+@Html.DevExpress().DockPanel(
+    settings => {
+        settings.Name = "rpSalesAccountOut";
+        settings.PanelUID = "UIDSalesAccountOut";
+        settings.CallbackRouteValues = new { Controller = "Home", Action = "ViewBoardAccountOutPartial" };
+        settings.OwnerZoneUID = "leftZone";
+        settings.HeaderText = "Исходящие счета";
+        settings.VisibleIndex = 0;
+        settings.ShowCloseButton = false;
+        settings.SaveStateToCookies = true;
+        settings.SaveStateToCookiesID = "HomePageSalesCoocies" + settings.PanelUID;
+        settings.LoadContentViaCallback = LoadPanelContentViaCallback.None;
+        settings.ShowOnPageLoad = WADataProvider.FolderElementRightView.IsAllow(Right.DOCVIEW, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_SALES_ACCOUNT_OUT).Id);
+        settings.Enabled = WADataProvider.FolderElementRightView.IsAllow(Right.DOCVIEW, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_SALES_ACCOUNT_OUT).Id);
+        settings.SetContent(() => ViewContext.Writer.Write(Html.Partial("ViewBoardAccountOutPartial")));
+        settings.Styles.Content.Paddings.Padding = 0;
+    }
+).GetHtml()
+
+@Html.DevExpress().DockPanel(
+settings => {
+    settings.Name = "rpSalesAccountIn";
+    settings.PanelUID = "UIDSalesAccountIn";
+    settings.OwnerZoneUID = "rightZone";
+    settings.HeaderText = "Входящие счета";
+    settings.VisibleIndex = 0;
+    settings.ShowCloseButton = false;
+    settings.SaveStateToCookies = true;
+    settings.SaveStateToCookiesID = "HomePageSalesCoocies" + settings.PanelUID;
+    settings.ShowOnPageLoad = WADataProvider.FolderElementRightView.IsAllow(Right.DOCVIEW, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_SALES_ACCOUNT_IN).Id);
+    settings.Enabled = WADataProvider.FolderElementRightView.IsAllow(Right.DOCVIEW, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_SALES_ACCOUNT_IN).Id);
+    settings.SetContent(() => @Html.RenderPartial("ViewBoardAccountInPartial"));
+    settings.Styles.Content.Paddings.Padding = 0;
+}
+).GetHtml()
+
+@Html.DevExpress().DockPanel(
+settings => {
+    settings.Name = "rpSalesIn";
+    settings.PanelUID = "UIDSalesIn";
+    settings.OwnerZoneUID = "leftZone";
+    settings.HeaderText = "Приходные накладные";
+    settings.AllowResize = true;
+    settings.VisibleIndex = 1;
+    settings.ShowCloseButton = false;
+    settings.SaveStateToCookies = true;
+    settings.SaveStateToCookiesID = "HomePageSalesCoocies" + settings.PanelUID;
+    settings.ShowOnPageLoad = WADataProvider.FolderElementRightView.IsAllow(Right.DOCVIEW, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_SALES_IN).Id);
+    settings.Enabled = WADataProvider.FolderElementRightView.IsAllow(Right.DOCVIEW, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_SALES_IN).Id);
+    settings.SetContent(() => @Html.RenderPartial("ViewBoardInPartial"));
+    settings.Styles.Content.Paddings.Padding = 0;
+}
+).GetHtml()
+
+@Html.DevExpress().DockPanel(
+settings => {
+    settings.Name = "rpSalesOut";
+    settings.PanelUID = "UIDSalesOut";
+    settings.OwnerZoneUID = "rightZone";
+    settings.HeaderText = "Расходные накладные";
+    settings.VisibleIndex = 1;
+    settings.ShowCloseButton = false;
+    settings.SaveStateToCookies = true;
+    settings.SaveStateToCookiesID = "HomePageSalesCoocies" + settings.PanelUID;
+    settings.ShowOnPageLoad = WADataProvider.FolderElementRightView.IsAllow(Right.DOCVIEW, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_SALES_OUT).Id);
+    settings.Enabled = WADataProvider.FolderElementRightView.IsAllow(Right.DOCVIEW, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_SALES_OUT).Id);
+    settings.SetContent(() => @Html.RenderPartial("ViewBoardOutPartial"));
+    settings.Styles.Content.Paddings.Padding = 0;
+}
+).GetHtml()

@@ -1,0 +1,131 @@
+﻿@using BusinessObjects
+@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentWeb.Extentions
+@using DocumentsWeb.Areas.Reports.Models
+@using DocumentsWeb.Models
+
+@Html.DevExpress().NavBar(
+nbrSettings =>
+{
+    nbrSettings.Name = "nbReports";
+    nbrSettings.AllowExpanding = true;
+    nbrSettings.AllowSelectItem = true;
+    nbrSettings.AutoCollapse = false;
+    nbrSettings.EnableHotTrack = true;
+    nbrSettings.EnableAnimation = true;
+    nbrSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    nbrSettings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+    nbrSettings.EncodeHtml = false;
+    
+    nbrSettings.Groups.Add(group => {
+        group.Text = "Основные отчеты";
+        group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+        group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.CssClass = "navpanellink";
+        group.Expanded = true;
+        group.HeaderStyle.Font.Bold = true;
+        MVCxNavBarItem item = null;
+        Library report = null;
+        if (WebReportModel.IsReportAllow("WEBREPORT_TASK_DEVWHATSNEWS"))
+        {
+            item = group.Items.Add("Что нового в системе?", "mnuReportWEBREPORT_TASK_DEVWHATSNEWS", "~/Images/STIREPORT_X16.png");
+            report = WADataProvider.WA.Cashe.GetCasheData<Library>().ItemCode<Library>("WEBREPORT_TASK_DEVWHATSNEWS");
+            item.ToolTip = report.Memo;
+            item.Target = "_blank";
+            if (report != null)
+            {
+                //item.NavigateUrl = ReportHelper.GetPrintReportNavigateUrlInternal(report);
+                item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "Report", Action = "Build", Area = "Reports" }) + "?id=" + report.Id;
+            }
+        }
+        
+        if (WebReportModel.IsReportAllow("WEBREPORT_TASK_INPROGRESS"))
+        {
+            item = group.Items.Add("Задачи на исполнении", "mnuReportWEBREPORT_TASK_INPROGRESS", "~/Images/STIREPORT_X16.png");
+            item.ToolTip = "Отчет \"Задачи на исполнении\" содержит данные о задачах находящихся в состоянии исполнения";
+            item.Target = "_blank";
+            report = WADataProvider.WA.Cashe.GetCasheData<Library>().ItemCode<Library>("WEBREPORT_TASK_INPROGRESS");
+            if (report != null)
+            {
+                //item.NavigateUrl = ReportHelper.GetPrintReportNavigateUrlInternal(report);
+                item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "Report", Action = "Build", Area = "Reports" }) + "?id=" + report.Id;
+            }
+
+            /*
+             item.Text = "Печать (кратко)";
+                    item.Image.Url = "~/Images/STIREPORT_X16.png";
+                    item.ToolTip = "Печатное представление задачи в кратком представлении";
+                    item.Target = "_blank";
+                    Library report = WADataProvider.WA.Cashe.GetCasheData<Library>().ItemCode<Library>("WEBREP_TASK_INFOV2");
+                    if (report != null)
+                    {
+                        item.NavigateUrl = ReportHelper.GetPrintFormNavigateUrlInternal(report, "TASK", Model.Id);
+                    }
+             */
+        }
+        
+        if (WebReportModel.IsReportAllow("WEBREPORT_TASK_DEVNEW_INPROGRESSV2"))
+        {
+            item = group.Items.Add("Будущие изменения в системе", "mnuReportWEBREPORT_TASK_DEVNEW_INPROGRESSV2", "~/Images/STIREPORT_X16.png");
+            item.ToolTip = "Отчет \"Будущие изменения в системе\" содержит данные о задачах разработчикам системы";
+            item.Target = "_blank";
+            report = WADataProvider.WA.Cashe.GetCasheData<Library>().ItemCode<Library>("WEBREPORT_TASK_DEVNEW_INPROGRESSV2");
+            if (report != null)
+            {
+                //item.NavigateUrl = ReportHelper.GetPrintReportNavigateUrlInternal(report);
+                item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "Report", Action = "Build", Area = "Reports" }) + "?id=" + report.Id;
+            }
+        }
+        
+        if (WebReportModel.IsReportAllow("WEBREPORT_TASK_DEVNEW_INPROGRESS"))
+        {
+            item = group.Items.Add("Задачи разработчикам", "mnuReportWEBREPORT_TASK_DEVNEW_INPROGRESS", "~/Images/STIREPORT_X16.png");
+            item.ToolTip = "Отчет \"Задачи разработчикам\" содержит данные о задачах разработчикам системы";
+            item.Target = "_blank";
+            report = WADataProvider.WA.Cashe.GetCasheData<Library>().ItemCode<Library>("WEBREPORT_TASK_DEVNEW_INPROGRESS");
+            if (report != null)
+            {
+                //item.NavigateUrl = ReportHelper.GetPrintReportNavigateUrlInternal(report);
+                item.NavigateUrl = DevExpressHelper.GetUrl(new {Controller = "Report", Action = "Build", Area = "Reports"}) + "?id=" + report.Id;
+            }
+        }                           
+
+        item = group.Items.Add("Перейти в отчеты...", "mnuReportNavToReportsMain", "~/Images/arrowgreen.png");
+        item.ToolTip = "Перейти в раздел отчетов...";
+        
+        item.NavigateUrl = Url.Action("Index", new { area = "Reports", Controller = "Report" });
+        
+    });
+    nbrSettings.Groups.Add(group =>
+    {
+        group.Text = "Реестры документов";
+        group.Expanded = true;
+        group.HeaderStyle.Font.Bold = true;
+        group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+        group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.CssClass = "navpanellink";
+        MVCxNavBarItem item = null;
+
+        item = group.Items.Add("Перейти в отчеты...", "mnuReportNavToReports", "~/Images/arrowgreen.png");
+        item.ToolTip = "Перейти в раздел отчетов...";
+        item.NavigateUrl = Url.Action("Index", new {area = "Reports", Controller = "Report"});
+    });
+
+    nbrSettings.Groups.Add(group =>
+    {
+        group.Text = "Избранное";
+        group.Expanded = false;
+        group.HeaderStyle.Font.Bold = true;
+        group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+        MVCxNavBarItem item = null;
+
+
+        item = group.Items.Add("Перейти в отчеты...", "mnuReportNavToReports", "~/Images/arrowgreen.png");
+        item.ToolTip = "Перейти в раздел отчетов...";
+        item.NavigateUrl = Url.Action("Index", new { area = "Reports", Controller = "Report" });
+    });
+
+}).GetHtml()

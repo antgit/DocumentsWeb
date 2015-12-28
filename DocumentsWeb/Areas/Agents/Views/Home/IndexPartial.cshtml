@@ -1,0 +1,167 @@
+﻿@using BusinessObjects.Security
+@using DocumentsWeb.Models
+<h1 style=" font-size:24px">Корреспонденты</h1>
+<hr />
+@if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_MYCOMPANY))
+{
+    @Html.DevExpress().HyperLink(s =>
+                                           {
+                                               s.Name = "lnkMyDepatmentImage";
+                                               s.Properties.ImageUrl = Url.Content("~/Images/building.png");
+                                               s.NavigateUrl = DevExpressHelper.GetUrl(new {Area = "Agents", Controller = "MyDepatment", Action = "Index"});
+                                           }).GetHtml()
+    
+    @Html.DevExpress().HyperLink(s =>
+                                           {
+                                               s.Name = "lnkMyDepatment";
+                                               s.NavigateUrl = DevExpressHelper.GetUrl(new {Area = "Agents", Controller = "MyDepatment", Action = "Index"});
+                                               s.Properties.Text = "Наши предприятия";
+                                               s.ControlStyle.Font.Bold = true;
+                                           }).GetHtml()
+    ViewContext.Writer.Write("- список наших компаний. В разделе Вы можете изменять свойства доступных Вам компаний и просматривать другие компании(разрешенные к просмотру). <hr />");
+}
+
+@if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_STORES))
+{
+ 
+    @Html.DevExpress().HyperLink(s =>
+    {
+        s.Name = "lnkStoreImage";
+        s.Properties.ImageUrl = Url.Content("~/Images/AGENTSTORE_X16.png");
+        s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Agents", Controller = "Store", Action = "Index" });
+    }).GetHtml()
+       
+    @Html.DevExpress().HyperLink(s =>
+    {
+        s.Name = "lnkStore";
+        s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Agents", Controller = "Store", Action = "Index" });
+        s.Properties.Text = "Склады";
+        s.ControlStyle.Font.Bold = true;
+    }).GetHtml()
+
+    ViewContext.Writer.Write(" - данные о складах наших предприятий, представленые в виде списка. В разделе Вы можете просматривать только разрешенные Вам склады.<hr />");
+}
+                                      
+
+@if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_EMPLOERS))
+{
+    @Html.DevExpress().HyperLink(s =>
+    {
+        s.Name = "lnkWorkerImage";
+        s.Properties.ImageUrl = Url.Content("~/Images/users.png");
+        s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Agents", Controller = "Worker", Action = "Index" });
+    }).GetHtml()
+    
+    @Html.DevExpress().HyperLink(s =>
+    {
+        s.Name = "lnkWorker";
+        s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Agents", Controller = "Worker", Action = "Index" });
+        s.Properties.Text = "Сотрудники";
+        s.ControlStyle.Font.Bold = true;
+    }).GetHtml() 
+    ViewContext.Writer.Write(" - данные о сотрудниках наших предприятий, представленые в виде списка. В разделе Вы можете просматривать только собственных сотрудников. <hr />");
+}
+
+@if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_DEPATMENTS))
+{
+    @Html.DevExpress().HyperLink(s =>
+    {
+        s.Name = "lnkDepatmentImage";
+        s.Properties.ImageUrl = Url.Content("~/Images/building.png");
+        s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Agents", Controller = "Depatment", Action = "Index" });
+    }).GetHtml()
+    
+    @Html.DevExpress().HyperLink(s =>
+    {
+        s.Name = "lnkDepatment";
+        s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Agents", Controller = "Depatment", Action = "Index" });
+        s.Properties.Text = "Подразделения и отделы";
+        s.ControlStyle.Font.Bold = true;
+    }).GetHtml() 
+    ViewContext.Writer.Write(" - данные о подразделения и отделах наших предприятий, представленые в виде списка. В разделе Вы можете просматривать только собственные данные. <hr />");
+}
+
+@if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_SUPPLYER))
+{
+    @Html.DevExpress().HyperLink(s =>
+    {
+        s.Name = "lnkSupplyerImage";
+        s.Properties.ImageUrl = Url.Content("~/Images/TRUCKYELLOW_X16.png");
+        s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Agents", Controller = "Supplyer", Action = "Index" });
+    }).GetHtml()
+    @Html.DevExpress().HyperLink(s =>
+    {
+        s.Name = "lnkSupplyer";
+        s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Agents", Controller = "Supplyer", Action = "Index" });
+        s.Properties.Text = "Поставщики";
+        s.ControlStyle.Font.Bold = true;
+    }).GetHtml()
+    ViewContext.Writer.Write(" - данные о наших поставщиках, представленые в виде списка. В разделе Вы можете просматривать только собственных поставщиков <hr />");
+}
+
+@if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_CLIENTS))
+{
+    @Html.DevExpress().HyperLink(s =>
+    {
+        s.Name = "lnkByerImage";
+        s.Properties.ImageUrl = Url.Content("~/Images/AGENTFIRM_X16.png");
+        s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Agents", Controller = "Byer", Action = "Index" });
+    }).GetHtml()
+    @Html.DevExpress().HyperLink(s =>
+    {
+        s.Name = "lnkByer";
+        s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Agents", Controller = "Byer", Action = "Index" });
+        s.Properties.Text = "Покупатели";
+        s.ControlStyle.Font.Bold = true;
+
+    }).GetHtml()    
+    ViewContext.Writer.Write(" - данные о наших клиентах, представленые в виде списка. В разделе Вы можете просматривать только клиентов доступных Вам компаний. <hr />");
+}
+
+@if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_MODULE_DICTIONARY_COMPETITORS))
+{
+    @Html.DevExpress().HyperLink(s =>
+    {
+        s.Name = "lnkCompetitorImage";
+        s.Properties.ImageUrl = Url.Content("~/Images/AGENTFIRM_X16.png");
+        s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Agents", Controller = "Competitor", Action = "Index" });
+    }).GetHtml()
+    @Html.DevExpress().HyperLink(s =>
+    {
+        s.Name = "lnkCompetitor";
+        s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Agents", Controller = "Competitor", Action = "Index" });
+        s.Properties.Text = "Конкуренты";
+        s.ControlStyle.Font.Bold = true;
+
+    }).GetHtml()    
+    ViewContext.Writer.Write(" - данные о наших конкурентах, представленые в виде списка. В разделе Вы можете просматривать только клиентов доступных Вам компаний. " 
+        +"На всех этапах развития предприятия, необходимо мониторить и определять опасных конкурентов. Пять составляющих деловой конкуренции:"
+        +"<br/>1.Конкуренция между уже существующими участниками или игроками на рынке"
+        + "<br/>2.Конкуренция между потенциальными участниками рынка"
+        + "<br/>3.Конкуренция со стороны суррогатов какого-либо товара или услуги; (например, конкуренция продавцов кожзаменителя и кожи)"
+        + "<br/>4.Рыночное давление со стороны покупателей направленное на занижение цены"
+        + "<br/>5.Рыночное давление со стороны поставщиков сырья, направленное, естественно, на завышение цены" +
+                             "<hr />");
+}
+
+@if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_BANKS))
+{
+    @Html.DevExpress().HyperLink(s =>
+{
+    s.Name = "lnkBankImage";
+    s.Properties.ImageUrl = Url.Content("~/Images/bank.png");
+    s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Agents", Controller = "Bank", Action = "Index" });
+}).GetHtml()
+    
+    @Html.DevExpress().HyperLink(s =>
+{
+    s.Name = "lnkBank";
+    s.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Agents", Controller = "Bank", Action = "Index" });
+    s.Properties.Text = "Банки";
+    s.ControlStyle.Font.Bold = true;
+}).GetHtml()    
+    ViewContext.Writer.Write(" - справочник банков содержит всю необходимую информацию о банках действующих на территории Украины. <hr />");
+}
+
+
+                                      

@@ -1,0 +1,178 @@
+﻿@using BusinessObjects
+@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentWeb.Extentions
+@using DocumentsWeb.Models
+@using DocumentsWeb.Code
+@model List<HomePageSection>
+
+@*
+    Панель действий домашней страницы. Строится на основе коллекции коллекции разделов домашней страницы.
+    Представление является общим для всех домашних страниц.
+    Антон Ильин, 21.06.12
+*@
+
+@{   
+    //Формирование аргументов для post-запроса сохранения состояния чекбоксов
+    string queryArgs = string.Empty;
+    int index = 0;
+    foreach (HomePageSection docType in Model)
+    {
+        if (index > 0)
+        {
+            queryArgs += ", ";
+        }
+        queryArgs += string.Format("chk{0}:chk{0}.GetChecked()", docType.ControllerName);
+        index++;
+    }
+
+    HomePageLayoutSettings salesHomeLayoutSettings = HomePageLayoutSettings.LoadLayoutFromDatabase(WADataProvider.CurrentUser.Id, (string)ViewData["SettingsName"]);
+}
+
+<script type="text/javascript">
+    function onBtnSaveSettings(s, e) {
+        $.post('@Url.Action("SaveLayout")/' + "?time=" + new Date().getTime(), {
+         @queryArgs     
+            }).success(function () {
+                alert("Настройки сохранены");
+            });
+    }
+</script>
+
+@Html.DevExpress().NavBar(
+nbActionSettings =>
+{
+    nbActionSettings.Name = "nbActions";
+    nbActionSettings.AllowExpanding = true;
+    nbActionSettings.AllowSelectItem = true;
+    nbActionSettings.AutoCollapse = false;
+    nbActionSettings.EnableHotTrack = true;
+    nbActionSettings.EnableAnimation = true;
+    nbActionSettings.Width = System.Web.UI.WebControls.Unit.Pixel(260);
+    nbActionSettings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+    nbActionSettings.EncodeHtml = false;
+
+    //nbActionSettings.SaveStateToCookies = true;
+    //nbActionSettings.SaveStateToCookiesID = "Sales" + Url.RequestContext.RouteData.Values["controller"] + "Nav";
+    
+    nbActionSettings.Groups.Add(group =>
+    {
+        group.Name = "gpCreateDoc";
+        group.Text = "Создать документ";
+        group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+        group.Expanded = true;
+        group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.HeaderStyle.Font.Bold = true;
+
+        int i = 0;
+        foreach (HomePageSection docType in Model)
+        {
+            if(string.IsNullOrEmpty(docType.FolderCode) || WADataProvider.FolderElementRightView.IsAllow(Right.DOCCREATE, WADataProvider.WA.GetFolderByCodeFind(docType.FolderCode).Id))
+            {
+                group.Items.Add(item =>
+                {
+                    item.Name = "lnk" + docType.ControllerName;
+                    item.Text = docType.DocumentName + "...";
+                    item.Image.Url = "~/Images/new_x16.png";
+                    item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = docType.ControllerName, Action = "Create" });
+                    item.Target = "_blank";
+                    item.ClientVisible = salesHomeLayoutSettings.IsNew || salesHomeLayoutSettings.Checked("chk" + docType.ControllerName);
+                });
+            }
+            //Линия разделения групп чекбоксов
+            if (ViewData["GroupNumber"] != null && i % (int)ViewData["GroupNumber"] == (int)ViewData["GroupNumber"] - 1 && i != Model.Count-1)
+            {
+                if (salesHomeLayoutSettings.FindBefore("chk" + docType.ControllerName) && salesHomeLayoutSettings.FindAfter("chk" + docType.ControllerName))
+                    group.Items.Add(item => { item.SetTemplateContent(s => { ViewContext.Writer.Write("<hr>"); }); });
+            }
+
+            i++;
+        }
+        
+    });
+
+    nbActionSettings.Groups.Add(group =>
+    {
+        group.Name = "gpViewDoc";
+        group.Text = "Просмотр документов списком";
+        group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+        group.Expanded = true;
+        group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.HeaderStyle.Font.Bold = true;
+
+        int i=0;
+        foreach (HomePageSection docType in Model)
+        {
+            if (string.IsNullOrEmpty(docType.FolderCode) || WADataProvider.FolderElementRightView.IsAllow(Right.DOCVIEW, WADataProvider.WA.GetFolderByCodeFind(docType.FolderCode).Id))
+            {
+                group.Items.Add(item =>
+                {
+                    item.Name = "lnkList" + docType.ControllerName;
+                    item.Text = docType.ViewListName + "...";
+                    item.Image.Url = "~/Images/DOCUMENTDONE_X16.png";
+                    item.NavigateUrl = Url.Action("Index", docType.ViewListControllerName);
+                    item.ToolTip = docType.ViewListToolTip + "...";
+                    item.ClientVisible = salesHomeLayoutSettings.IsNew || salesHomeLayoutSettings.Checked("chk" + docType.ControllerName);
+                });
+            }
+
+            //Линия разделения групп чекбоксов
+            if (ViewData["GroupNumber"] != null && i % (int)ViewData["GroupNumber"] == (int)ViewData["GroupNumber"] - 1 && i != Model.Count - 1)
+            {
+                if (salesHomeLayoutSettings.FindBefore("chk" + docType.ControllerName) && salesHomeLayoutSettings.FindAfter("chk" + docType.ControllerName))
+                    group.Items.Add(item => { item.SetTemplateContent(s => { ViewContext.Writer.Write("<hr>"); }); });
+            }
+
+            i++;
+        }
+    });
+    
+    nbActionSettings.Groups.Add(group =>
+    {
+        group.Text = "Видимость";
+        group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+        group.Expanded = false;
+        group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.HeaderStyle.Font.Bold = true;
+
+        group.SetContentTemplateContent(c =>
+        {
+            int i = 0;
+
+            foreach (HomePageSection docType in Model)
+            {
+                if (docType.ShowInView)
+                {
+                    Html.DevExpress().CheckBox(chk =>
+                    {
+                        chk.Name = "chk" + docType.ControllerName;
+                        chk.Text = docType.DocumentName;
+                        chk.Checked = salesHomeLayoutSettings.IsNew || salesHomeLayoutSettings.Checked("chk" + docType.ControllerName);
+                        chk.Properties.ClientSideEvents.CheckedChanged = "function(s,e){" +
+                            "nbActions.GetGroupByName('gpCreateDoc').GetItemByName('lnk" + docType.ControllerName + "').SetVisible(s.GetChecked());" +
+                            "nbActions.GetGroupByName('gpViewDoc').GetItemByName('lnkList" + docType.ControllerName + "').SetVisible(s.GetChecked());" +
+                            "}";
+                    }).Render();
+
+                    //Линия разделения групп чекбоксов
+                    if (ViewData["GroupNumber"] != null && i % (int)ViewData["GroupNumber"] == (int)ViewData["GroupNumber"] - 1 && i != Model.Count - 1)
+                    {
+                        ViewContext.Writer.Write("<hr>");
+                    }
+
+                    i++;
+                }
+            }            
+
+            Html.DevExpress().Button(btnSave =>
+            {
+                btnSave.Name = "btnSaveSettings";
+                btnSave.Text = "Сохранить";
+                btnSave.ClientSideEvents.Click = "onBtnSaveSettings";
+            }).Render();
+        });
+    });
+}).GetHtml()

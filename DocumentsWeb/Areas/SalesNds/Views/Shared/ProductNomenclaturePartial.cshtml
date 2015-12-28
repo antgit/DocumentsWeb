@@ -1,0 +1,26 @@
+﻿@using DocumentsWeb.Models
+@using DocumentsWeb.Areas.Products.Models
+@using BusinessObjects
+@using DocumentsWeb.Areas.Products.Models
+@model DocumentsWeb.Areas.Sales.Models.DocumentSaleModel
+@Html.DevExpress().ComboBox(settings =>{
+    settings.Name = "ProductNomenclatureId";
+
+    settings.CallbackRouteValues = new { Controller = Url.RequestContext.RouteData.Values["controller"], Action = "ProductNomenclaturePartial", modelId = Model.ModelId };
+    settings.Properties.EnableCallbackMode = true;
+    settings.Properties.CallbackPageSize = 15;
+
+    settings.Properties.TextField = "Nomenclature";
+    settings.Properties.ValueField = "Id";
+    settings.Properties.ValueType = typeof(int);
+
+    settings.Properties.TextFormatString = "{0}";
+    settings.EncodeHtml = false;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.ShowModelErrors = true;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    settings.Properties.FilterMinLength = 3;
+    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = "ProductNomenclatureId_SelectedIndexChanged";
+}).BindList(ProductModel.GetProductNomenclatureRange,ProductModel.GetProductByID).BindList(ProductModel.GetProductsByValue(ViewData["ProductId"])).Bind(ViewData["ProductId"]).GetHtml()

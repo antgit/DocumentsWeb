@@ -1,0 +1,216 @@
+﻿@using BusinessObjects
+@using BusinessObjects.Security
+@using DevExpress.Web.ASPxDocking
+@using DocumentsWeb.Models
+@using Unit = System.Web.UI.WebControls.Unit
+@{
+    string gridStyle = "dxgvControl_" + Utils.CurrentTheme;
+    string helpDefaultLink = string.Empty;
+    if (ViewData.ContainsKey("HelpDefaultLink"))
+    {
+        helpDefaultLink = ViewData["HelpDefaultLink"].ToString();
+    }
+}
+@Html.DevExpress().DockManager(
+    settings => {
+        settings.Name = "dockManager";
+        //settings.ClientSideEvents.PanelShown = "function(s, e) { SetWidgetButtonVisible(e.panel.panelUID, false) }";
+        //settings.ClientSideEvents.PanelCloseUp = "function(s, e) { SetWidgetButtonVisible(e.panel.panelUID, true) }";
+        //settings.SaveStateToCookies = true;
+        //settings.SaveStateToCookiesID = "ServiceArea_Home";
+    }
+).GetHtml()
+<table style="height: 100%;width:100%; border:0; border-spacing:0;">
+    <tr>
+        @*<td align ="left" valign ="top" style="border-right: 3px solid #FFF; width:250px;">*@
+            <td align ="left" valign ="top" style="border-right: 3px solid @gridStyle; width:250px;" class="@gridStyle">
+            @Html.Partial("ActionsPartial")
+        </td>
+
+        <td align ="left" valign ="top" >
+            <table style="width: 100%;">
+                <tr>
+                    <td valign="middle" align="center" style="font-size: 14pt;">
+                        <b>Управление ценами, прайс-листами и ценовой политикой</b>
+                             @Html.DevExpress().HyperLink(s =>
+                                       {
+                                           s.ToolTip = "Показать справочную информацию";
+                                           s.Properties.ImageUrl = "~/Images/INFO_X16.png";
+                                           if (string.IsNullOrEmpty(helpDefaultLink))
+                                               s.NavigateUrl = "javascript:alert('Справочная информация отсутствует!');";
+                                           else
+                                           {
+                                               s.Properties.Target = "_blank";
+                                               s.NavigateUrl = helpDefaultLink.StartsWith("~/") ? Url.Content(helpDefaultLink) : helpDefaultLink;
+                                           }
+                                       }).GetHtml()
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <p>Cоздание документов предприятия связянные с регулированием цен и ценовой политики нашего предприятий.
+                        В данном разделе вы можете быстро искать документы, создавать документы.
+                        Набор документов позволяет создавать прайс-листы, прайс-листы поставщика, прайс-листы конкурентов</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width:100%">
+                        @Html.DevExpress().DockZone(
+                            settings => {
+                                            settings.Name = "dockZone1";
+                                            settings.ZoneUID = "leftZone";
+                                            settings.ControlStyle.CssClass = "leftZone";
+                                            settings.Width = Unit.Percentage(50);
+                                            settings.Height = 140;
+                                            settings.PanelSpacing = 3;
+                            }).GetHtml()
+
+                        @Html.DevExpress().DockZone(
+                            settings => {
+                                            settings.Name = "dockZone2";
+                                            settings.ZoneUID = "rightZone";
+                                            settings.ControlStyle.CssClass = "rightZone";
+                                            settings.Width = Unit.Percentage(49);
+                                            settings.Height = 140;
+                                            settings.PanelSpacing = 3;
+                            }).GetHtml() 
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width:100%">
+                        @Html.DevExpress().DockZone(
+                            settings => {
+                                            settings.Name = "dockZone3";
+                                            settings.ZoneUID = "bottomZone";
+                                            settings.ControlStyle.CssClass = "leftZone";
+                                            settings.Width = Unit.Percentage(99);
+                                            settings.PanelSpacing = 3;
+                            }).GetHtml()
+                    </td>
+                 </tr>
+            </table>
+        </td>
+
+        <td valign="top" style="border-left: 3px solid @gridStyle; width:250px;" class="@gridStyle" >
+            @Html.Partial("ReportsPartial")
+        </td>
+    </tr>
+</table>     
+@Html.DevExpress().DockPanel(
+    settings => {
+        settings.Name = "rpPriceList";
+        settings.PanelUID = "UIDPriceList";
+        settings.CallbackRouteValues = new { Controller = "Home", Action = "ViewBoardPriceListPartial" };
+        settings.OwnerZoneUID = "leftZone";
+        settings.HeaderText = "Прайс-листы";
+        settings.VisibleIndex = 0;
+        //settings.Height = Unit.Pixel(140);
+        settings.ShowCloseButton = false;
+        settings.LoadContentViaCallback = LoadPanelContentViaCallback.None;
+        settings.ShowOnPageLoad = WADataProvider.FolderElementRightView.IsAllow(Right.DOCVIEW, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_PRICES_DEAULT).Id);
+        settings.Enabled = WADataProvider.FolderElementRightView.IsAllow(Right.DOCVIEW, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_PRICES_DEAULT).Id);
+        settings.SetContent(() => @Html.RenderPartial("ViewBoardPriceListPartial"));
+        settings.Styles.Content.Paddings.Padding = 0;
+    }).GetHtml()
+
+@Html.DevExpress().DockPanel(
+settings => {
+    settings.Name = "rpPriceListInd";
+    settings.PanelUID = "UIDPriceListInd";
+    settings.CallbackRouteValues = new { Controller = "Home", Action = "ViewBoardPriceListIndPartial" };
+    settings.OwnerZoneUID = "bottomZone";
+    settings.HeaderText = "Индивидуальные прайс-листы";
+    settings.VisibleIndex = 0;
+    //settings.Height = Unit.Pixel(140);
+    settings.ShowCloseButton = false;
+    settings.ShowOnPageLoad = WADataProvider.FolderElementRightView.IsAllow(Right.DOCVIEW, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_PRICES_IND).Id);
+    settings.Enabled = WADataProvider.FolderElementRightView.IsAllow(Right.DOCVIEW, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_PRICES_IND).Id);
+    settings.SetContent(() => @Html.RenderPartial("ViewBoardPriceListIndPartial"));
+                settings.Styles.Content.Paddings.Padding = 0;
+}).GetHtml() 
+
+@Html.DevExpress().DockPanel(
+    settings => {
+        settings.Name = "rpPriceListCommand";
+        settings.PanelUID = "UIDPriceListCommand";
+        settings.CallbackRouteValues = new { Controller = "Home", Action = "ViewBoardPriceListCommandPartial" };
+        settings.OwnerZoneUID = "rightZone";
+        settings.HeaderText = "Приказы на изменение цен";
+        settings.VisibleIndex = 0;
+        //settings.Height = Unit.Pixel(140);
+        settings.ShowCloseButton = false;
+        settings.LoadContentViaCallback = LoadPanelContentViaCallback.None;
+        settings.ShowOnPageLoad = WADataProvider.FolderElementRightView.IsAllow(Right.DOCVIEW, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_PRICES_COMMAND).Id);
+        settings.Enabled = WADataProvider.FolderElementRightView.IsAllow(Right.DOCVIEW, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_PRICES_COMMAND).Id);
+        settings.SetContent(() => Html.RenderPartial("ViewBoardPriceListCommandPartial"));
+        settings.Styles.Content.Paddings.Padding = 0;
+    }
+).GetHtml()
+
+@Html.DevExpress().DockPanel(
+    settings => {
+        settings.Name = "rpPriceListCommandInd";
+        settings.PanelUID = "UIDPriceListCommandInd";
+        settings.CallbackRouteValues = new { Controller = "Home", Action = "ViewBoardPriceListCommandIndPartial" };
+        settings.OwnerZoneUID = "bottomZone";
+        settings.HeaderText = "Приказы на изменение индивидуальных цен";
+        settings.VisibleIndex = 1;
+        settings.ShowCloseButton = false;
+        settings.LoadContentViaCallback = LoadPanelContentViaCallback.None;
+        settings.ShowOnPageLoad = WADataProvider.FolderElementRightView.IsAllow(Right.DOCVIEW, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_PRICES_COMMANDIND).Id);
+        settings.Enabled = WADataProvider.FolderElementRightView.IsAllow(Right.DOCVIEW, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_PRICES_COMMANDIND).Id);
+        settings.SetContent(() => Html.RenderPartial("ViewBoardPriceListCommandIndPartial"));
+        settings.Styles.Content.Paddings.Padding = 0;
+    }
+).GetHtml()
+
+@Html.DevExpress().DockPanel(
+    settings => {
+        settings.Name = "rpPriceListSupplier";
+        settings.PanelUID = "UIDPriceListSupplier";
+        settings.CallbackRouteValues = new { Controller = "Home", Action = "ViewBoardPriceListSupplierPartial" };
+        settings.OwnerZoneUID = "bottomZone";
+        settings.HeaderText = "Прайс листы поставщиков";
+        settings.VisibleIndex = 2;
+        settings.ShowCloseButton = false;
+        settings.LoadContentViaCallback = LoadPanelContentViaCallback.None;
+        settings.ShowOnPageLoad = WADataProvider.FolderElementRightView.IsAllow(Right.DOCVIEW, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_PRICES_SYPPLYER).Id);
+        settings.Enabled = WADataProvider.FolderElementRightView.IsAllow(Right.DOCVIEW, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_PRICES_SYPPLYER).Id);
+        settings.SetContent(() => Html.RenderPartial("ViewBoardPriceListSupplierPartial"));
+        settings.Styles.Content.Paddings.Padding = 0;
+    }
+).GetHtml()
+
+@Html.DevExpress().DockPanel(
+    settings => {
+        settings.Name = "rpPriceListCompetitor";
+        settings.PanelUID = "UIDPriceListCompetitor";
+        settings.CallbackRouteValues = new { Controller = "Home", Action = "ViewBoardPriceListCompetitorPartial" };
+        settings.OwnerZoneUID = "bottomZone";
+        settings.HeaderText = "Прайс листы конкурентов";
+        settings.VisibleIndex = 3;
+        settings.ShowCloseButton = false;
+        settings.LoadContentViaCallback = LoadPanelContentViaCallback.None;
+        settings.ShowOnPageLoad = WADataProvider.FolderElementRightView.IsAllow(Right.DOCVIEW, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_PRICES_COMPETITOR).Id);
+        settings.Enabled = WADataProvider.FolderElementRightView.IsAllow(Right.DOCVIEW, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_PRICES_COMPETITOR).Id);
+        settings.SetContent(() => Html.RenderPartial("ViewBoardPriceListCompetitorPartial"));
+        settings.Styles.Content.Paddings.Padding = 0;
+    }
+).GetHtml()
+
+@Html.DevExpress().DockPanel(
+    settings => {
+        settings.Name = "rpPriceListCompetitorInd";
+        settings.PanelUID = "UIDPriceListCompetitorInd";
+        settings.CallbackRouteValues = new { Controller = "Home", Action = "ViewBoardPriceListCompetitorIndPartial" };
+        settings.OwnerZoneUID = "bottomZone";
+        settings.HeaderText = "Индивидуальные прайс листы конкурентов";
+        settings.VisibleIndex = 4;
+        settings.ShowCloseButton = false;
+        settings.LoadContentViaCallback = LoadPanelContentViaCallback.None;
+        settings.ShowOnPageLoad = WADataProvider.FolderElementRightView.IsAllow(Right.DOCVIEW, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_PRICES_COMPETITOR).Id);
+        settings.Enabled = WADataProvider.FolderElementRightView.IsAllow(Right.DOCVIEW, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_PRICES_COMPETITOR).Id);
+        settings.SetContent(() => Html.RenderPartial("ViewBoardPriceListCompetitorIndPartial"));
+        settings.Styles.Content.Paddings.Padding = 0;
+    }
+).GetHtml()

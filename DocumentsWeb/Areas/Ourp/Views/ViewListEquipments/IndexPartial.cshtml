@@ -1,0 +1,327 @@
+﻿@using BusinessObjects.Web.Core
+@using DevExpress.Web.Mvc.UI;
+@using DevExpress.Web.Mvc;
+@using DocumentsWeb.Areas.Agents.Models;
+@using BusinessObjects.Security
+@using DocumentsWeb.Models
+@using DocumentsWeb.Controllers;
+@using BusinessObjects;
+@using DevExpress.Web.ASPxGridView;
+@using DocumentsWeb.Areas.General.Models
+@using DevExpress.Utils;
+@using DocumentsWeb;
+@using DevExpress.Web.ASPxClasses;
+
+@{   
+    bool haveCreate = true;//WADataProvider.LibrariesElementRightView.IsAllow(Right.UICREATE, WebModuleNames.WEB_BANKS) && !WADataProvider.CommonRightView.ReadOnly;
+    bool haveEdit = true;//WADataProvider.LibrariesElementRightView.IsAllow(Right.UIEDIT, WebModuleNames.WEB_BANKS) && !WADataProvider.CommonRightView.ReadOnly;
+    bool haveDelete = true;//WADataProvider.LibrariesElementRightView.IsAllow(Right.UITRASH, WebModuleNames.WEB_BANKS) && !WADataProvider.CommonRightView.ReadOnly;
+    bool haveView = true;//WADataProvider.LibrariesElementRightView.IsAllow(Right.UIVIEW, WebModuleNames.WEB_BANKS);
+    
+}
+
+@Html.DevExpress().GridView( settings => {
+    settings.Name = "dxGridViewEquipments";
+	settings.CallbackRouteValues = new { Controller = "ViewListEquipments", Action = "IndexPartial" };
+    
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+    settings.KeyFieldName = "Id5";
+
+    settings.SettingsBehavior.AutoExpandAllGroups = true;
+    settings.Settings.ShowGroupedColumns = true;
+    
+    settings.SetGroupRowContentTemplateContent(gc =>
+    {
+        if (gc.Column.Name == "colLevel1")
+        {
+            int Id = (int)DataBinder.Eval(gc.DataItem, "Id1");
+            int KindId = (int)DataBinder.Eval(gc.DataItem, "KindId1");
+			string WorkShopType = (string)DataBinder.Eval(gc.DataItem, "WorkShopType");
+			ViewContext.Writer.Write("<input type=\"hidden\" id=\"GroupId_" + gc.VisibleIndex.ToString() + "\" value=\"" + Id.ToString() + "\" />");
+            ViewContext.Writer.Write("<input type=\"hidden\" id=\"GroupKind_" + gc.VisibleIndex.ToString() + "\" value=\"" + KindId.ToString() + "\" />");
+			ViewContext.Writer.Write("<input type=\"hidden\" id=\"WorkShopType_" + gc.VisibleIndex.ToString() + "\" value=\"" + WorkShopType + "\" />");
+			ViewContext.Writer.Write("<input type=\"hidden\" id=\"Level_" + gc.VisibleIndex.ToString() + "\" value=\"0\" />");
+            
+            ViewContext.Writer.Write("<table><tr><td>");
+            Html.DevExpress().Image(img =>
+            {
+				//TODO: поменять id отдела на константу
+                if (KindId == Depatment.KINDID_SHOP)
+                {
+                    img.ImageUrl = Url.Content("~/Images/Ourp/factory_x16.png");
+                }
+				else if (KindId == Equipment.KINDID_FOLDER)
+                {
+                    img.ImageUrl = Url.Content("~/Images/Ourp/folder_x16.png");
+                }
+            }).Render();
+            ViewContext.Writer.Write("</td><td>");
+            Html.DevExpress().Label(lb =>
+            {
+                lb.Text = gc.GroupText != null ? gc.GroupText : string.Empty;
+            }).Render();
+            ViewContext.Writer.Write("</td></tr></table>");
+        }
+        else if (gc.Column.Name == "colLevel2")
+        {
+            int Id = (int)DataBinder.Eval(gc.DataItem, "Id2");
+            int KindId = (int)DataBinder.Eval(gc.DataItem, "KindId2");
+            ViewContext.Writer.Write("<input type=\"hidden\" id=\"GroupId_" + gc.VisibleIndex.ToString() + "\" value=\"" + Id.ToString() + "\" />");
+			ViewContext.Writer.Write("<input type=\"hidden\" id=\"GroupKind_" + gc.VisibleIndex.ToString() + "\" value=\"" + KindId.ToString() + "\" />");
+            ViewContext.Writer.Write("<input type=\"hidden\" id=\"Level_" + gc.VisibleIndex.ToString() + "\" value=\"1\" />");
+            
+            ViewContext.Writer.Write("<table><tr><td>");
+            Html.DevExpress().Image(img =>
+            {
+                if (KindId == Equipment.KINDID_EQUIPMENTUNIT)
+                {
+                    img.ImageUrl = Url.Content("~/Images/Ourp/device_x16.png");
+                }
+                else if (KindId == Equipment.KINDID_FOLDER)
+                {
+                    img.ImageUrl = Url.Content("~/Images/Ourp/folder_x16.png");
+                }
+				else if (KindId == Equipment.KINDID_EQUIPMENTAUTO)
+				{
+                    img.ImageUrl = Url.Content("~/Images/Ourp/truck_x16.png");
+				}
+            }).Render();
+            ViewContext.Writer.Write("</td><td>");
+            Html.DevExpress().Label(lb =>
+            {
+                lb.Text = gc.GroupText != null ? gc.GroupText : string.Empty;
+            }).Render();
+            ViewContext.Writer.Write("</td></tr></table>");
+        }
+        else if (gc.Column.Name == "colLevel3")
+        {
+            int Id = (int)DataBinder.Eval(gc.DataItem, "Id3");
+            int  KindId = (int)DataBinder.Eval(gc.DataItem, "KindId3");
+            ViewContext.Writer.Write("<input type=\"hidden\" id=\"GroupId_" + gc.VisibleIndex.ToString() + "\" value=\"" + Id.ToString() + "\" />");
+            ViewContext.Writer.Write("<input type=\"hidden\" id=\"GroupKind_" + gc.VisibleIndex.ToString() + "\" value=\"" + KindId.ToString() + "\" />");
+            ViewContext.Writer.Write("<input type=\"hidden\" id=\"Level_" + gc.VisibleIndex.ToString() + "\" value=\"2\" />");
+            
+            ViewContext.Writer.Write("<table><tr><td>");
+            Html.DevExpress().Image(img =>
+            {
+                if (KindId == EquipmentNode.KINDID_EQUIPMENTNODE)
+                {
+                    img.ImageUrl = Url.Content("~/Images/Ourp/node_x16.png");
+                }
+                else if (KindId == Equipment.KINDID_FOLDER)
+                {
+                    img.ImageUrl = Url.Content("~/Images/Ourp/folder_x16.png");
+                }
+            }).Render();
+            ViewContext.Writer.Write("</td><td>");
+            Html.DevExpress().Label(lb =>
+            {
+                lb.Text = gc.GroupText != null ? gc.GroupText : string.Empty;
+            }).Render();
+            ViewContext.Writer.Write("</td></tr></table>");
+        }
+        else if (gc.Column.Name == "colLevel4")
+        {
+            int Id = (int)DataBinder.Eval(gc.DataItem, "Id4");
+            int KindId = (int)DataBinder.Eval(gc.DataItem, "KindId4");
+            ViewContext.Writer.Write("<input type=\"hidden\" id=\"GroupId_" + gc.VisibleIndex.ToString() + "\" value=\"" + Id.ToString() + "\" />");
+            ViewContext.Writer.Write("<input type=\"hidden\" id=\"GroupKind_" + gc.VisibleIndex.ToString() + "\" value=\"" + KindId.ToString() + "\" />");
+            ViewContext.Writer.Write("<input type=\"hidden\" id=\"Level_" + gc.VisibleIndex.ToString() + "\" value=\"3\" />");
+
+            ViewContext.Writer.Write("<table><tr><td>");
+            Html.DevExpress().Image(img =>
+            {
+                if (KindId == EquipmentNode.KINDID_EQUIPMENTSUBNODE)
+                {
+                    img.ImageUrl = Url.Content("~/Images/Ourp/node_x16.png");
+                }
+                else if (KindId == Equipment.KINDID_FOLDER)
+                {
+                    img.ImageUrl = Url.Content("~/Images/Ourp/folder_x16.png");
+                }
+            }).Render();
+            ViewContext.Writer.Write("</td><td>");
+            Html.DevExpress().Label(lb =>
+            {
+                lb.Text = gc.GroupText != null ? gc.GroupText : string.Empty;
+            }).Render();
+            ViewContext.Writer.Write("</td></tr></table>");
+        }
+		else
+		{
+			Html.DevExpress().Label(lb =>
+			{
+				//lb.Text = gc.Column.Caption + ": " + gc.GroupText;
+			}).Render();
+		}
+        
+    });
+
+    settings.SetDataRowTemplateContent(rc => {
+        int Id = (int)DataBinder.Eval(rc.DataItem, "Id5");
+        int KindId = (int)DataBinder.Eval(rc.DataItem, "KindId5");
+        ViewContext.Writer.Write("<input type=\"hidden\" id=\"GroupId_" + rc.VisibleIndex.ToString() + "\" value=\"" + Id.ToString() + "\" />");
+        ViewContext.Writer.Write("<input type=\"hidden\" id=\"GroupKind_" + rc.VisibleIndex.ToString() + "\" value=\"" + KindId.ToString() + "\" />");
+        ViewContext.Writer.Write("<input type=\"hidden\" id=\"Level_" + rc.VisibleIndex.ToString() + "\" value=\"4\" />");
+            
+        ViewContext.Writer.Write("<table><tr><td>");
+        Html.DevExpress().Image(img =>
+        {
+            if (KindId == EquipmentDetail.KINDID_DETAIL)
+            {
+                img.ImageUrl = Url.Content("~/Images/Ourp/detail_x16.png");
+            }
+            else if (KindId == EquipmentDetail.KINDID_STDDETAIL)
+            {
+                img.ImageUrl = Url.Content("~/Images/Ourp/stddetail_x16.png");
+            }
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().Label(lb =>
+        {
+            lb.Text = (string)DataBinder.Eval(rc.DataItem, "Name5") + " [" + (string)DataBinder.Eval(rc.DataItem, "Nomenclature") + "]";
+        }).Render();
+        ViewContext.Writer.Write("</td></tr></table>");
+    });
+
+	settings.Columns.Add(col =>
+	{
+		col.Name = "colLevel1";
+		col.FieldName = "Name1";
+		col.Caption = "Уровень1";
+		col.GroupIndex = 0;
+		col.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+		col.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+		//col.Width = 350;
+	});
+
+    settings.Columns.Add(col =>
+    {
+        col.Name = "colLevel2";
+        col.FieldName = "Name2";
+        col.Caption = "Уровень2";
+        col.GroupIndex = 1;
+        col.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+        col.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+        //col.Width = 350;
+    });
+
+    settings.Columns.Add(col =>
+    {
+        col.Name = "colLevel3";
+        col.FieldName = "Name3";
+        col.Caption = "Уровень3";
+        col.GroupIndex = 2;
+        col.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+        col.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+        //col.Width = 350;
+    });
+
+    settings.Columns.Add(col =>
+    {
+        col.Name = "colLevel4";
+        col.FieldName = "Name4";
+        col.Caption = "Уровень4";
+        col.GroupIndex = 3;
+        col.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+        col.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+        //col.Width = 350;
+    });
+
+    settings.Columns.Add(col =>
+    {
+        col.Name = "colLevel5";
+        col.FieldName = "Name5";
+        col.Caption = "Уровень5";
+		//col.GroupIndex = 4;
+        col.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+        col.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+        //col.Width = 350;
+    });
+
+    settings.Columns.Add(col =>
+    {
+        col.Name = "colNomenclature";
+        col.FieldName = "Nomenclature";
+        col.Caption = "Номенклатурный номер";
+        //col.GroupIndex = 5;
+        col.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+        col.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+        col.Width = 450;//System.Web.UI.WebControls.Unit.Pixel(300);
+    });
+    
+    settings.ClientVisible = false;
+    settings.Settings.ShowGroupPanel = false;//DocumentsWeb.Code.LayoutHelper.GetCurrentSetting(Url.RequestContext.RouteData.Values["controller"].ToString()).Current.ShowGroupPanel;
+    settings.Settings.ShowFooter = true;
+    settings.Settings.ShowFilterRow = DocumentsWeb.Code.LayoutHelper.GetCurrentSetting(Url.RequestContext.RouteData.Values["controller"].ToString()).Current.ShowFilterPanel;
+    settings.Settings.ShowFilterRowMenu = true;
+    settings.Settings.ShowFilterBar = GridViewStatusBarMode.Visible;
+    settings.SettingsPager.PageSize = Utils.GetPageSize(settings);
+    settings.SettingsPager.Position = System.Web.UI.WebControls.PagerPosition.Top;
+    settings.SettingsPager.AlwaysShowPager = true;
+    settings.SettingsBehavior.AllowFocusedRow = true;
+    settings.SettingsBehavior.EnableCustomizationWindow = true;
+    settings.SettingsPopup.CustomizationWindow.VerticalAlign = PopupVerticalAlign.Below;
+    settings.SettingsPopup.CustomizationWindow.HorizontalAlign = PopupHorizontalAlign.OutsideRight;
+
+    settings.KeyboardSupport = true;
+    settings.Styles.Cell.Paddings.Padding = System.Web.UI.WebControls.Unit.Pixel(2);
+
+	settings.SetPagerBarTemplateContent(c =>
+	{
+		Html.RenderPartial("TablePager", new ViewDataDictionary
+	    {
+	        { "ContentObject", c },
+	        { "TableCaption", "<b><a href=\"" + Url.Action("Index", new { area = "Ourp", controller = "Home", action = "Index" }) + "\">Управление ремонтами</a>\\Образ оборудования</b>" }
+	    });
+	});
+
+	settings.ClientSideEvents.Init = "function(s, e) { window.setTimeout(AdjustGridSize, 12);}";
+    settings.ClientSideEvents.EndCallback = "function(s, e) { AdjustGridSize(); }";
+    settings.ClientSideEvents.ColumnResizing = "function (s, e) {if (e.column.name == 'colImageAction') {e.cancel = true;}}";
+    settings.Settings.ShowVerticalScrollBar = true;
+    settings.Settings.ShowHorizontalScrollBar = true;
+
+    settings.SettingsCookies.Enabled = true;
+    settings.SettingsCookies.CookiesID = Url.RequestContext.RouteData.Values["controller"] + "Grid";
+
+	settings.HtmlRowPrepared = (sender, e) =>
+	{
+		if (e.RowType == GridViewRowType.Group)
+		{
+			var groupValue = Convert.ToString(e.GetValue(""));
+			if (String.IsNullOrEmpty(groupValue))
+				e.Row.Style["display"] = "none";
+		}
+		else
+			if (e.RowType == GridViewRowType.Data)
+			{
+				var rowValue = Convert.ToString(e.GetValue("Name5"));
+				if (String.IsNullOrEmpty(rowValue))
+					e.Row.Style["display"] = "none";
+			}
+	};
+    
+    settings.CustomCallback = (sender, e) =>
+    {
+        MVCxGridView grid = (MVCxGridView)sender;
+        string refreshArg = e.Parameters.Split('&').FirstOrDefault(s => s.StartsWith("refresh"));
+        bool refresh = (refreshArg != null) && (refreshArg.EndsWith("true"));
+        if (refresh)
+        {
+            /*int[] roots = Utils.GetHieRoots(settings);
+            if (roots.Contains(0))
+            {
+                CoreController<Agent> c = (CoreController<Agent>)ViewContext.Controller;
+                //grid.DataSource = ClientModel.GetCollection(HierarchyModel.GetLinkedHierarchies(c.RootHierachy, HierarchyModel.FILTER_HIERARCHY_CHAIN).Select(s => s.Code).ToArray<string>(), true);
+                grid.DataSource = ClientModel.GetCollection(c.RootHierachy, false);
+            }
+            else
+            {
+                grid.DataSource = ClientModel.GetCollectionWONested(roots);
+            }
+            grid.DataBind();*/
+        }
+    };
+}).Bind(BusinessObjects.Web.Core.EquimpmentWebView.GetView(WADataProvider.WA)).GetHtml()

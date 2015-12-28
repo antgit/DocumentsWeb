@@ -1,0 +1,44 @@
+﻿@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentsWeb.Models
+@using DevExpress.Web.Mvc
+@using DevExpress.Web.Mvc.UI
+@using DocumentsWeb.Areas.Ourp.Models
+@using BusinessObjects;
+@model EquipmentDetailModel
+           
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{
+    Html.EnableClientValidation();
+    bool haveEdit = true;//WADataProvider.LibrariesElementRightView.IsAllow(Right.UIEDIT, WebModuleNames.WEB_BANKS) && !WADataProvider.CommonRightView.ReadOnly;
+}
+
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+<script type="text/javascript">
+    @if(Model.IsSystem | Model.IsReadOnly | !haveEdit) { ViewContext.Writer.Write("if (typeof parent.pcEdit != 'undefined') { parent.pcEdit.SetVisibleSaveButton(false); }"); }
+
+    function OntsEditAgentInit(s, e) {
+        s.SetHeight($(window).height());
+    }
+
+</script>
+
+@using (Html.BeginForm("Edit", "EquipmentDetails", FormMethod.Post, new { @class = "edit_form", @id = "editForm" }))
+{
+    ViewContext.Writer.Write("<input type=\"hidden\" id=\"Id\" name=\"Id\" value=\"" + Model.Id.ToString() + "\" />");
+    ViewContext.Writer.Write("<input type=\"hidden\" id=\"KindId\" name=\"KindId\" value=\"" + Model.KindId.ToString() + "\" />");
+    ViewContext.Writer.Write("<input type=\"hidden\" id=\"ParentId\" name=\"ParentId\" value=\"" + Model.ParentId.ToString() + "\" />");
+    switch(Model.KindId) 
+    {
+        case EquipmentDetail.KINDID_DETAIL:
+            @Html.Partial("EditDetailPartial", Model);
+            break;
+        case EquipmentDetail.KINDID_STDDETAIL:
+            @Html.Partial("EditStdDetailPartial", Model);
+            break;
+    }
+}

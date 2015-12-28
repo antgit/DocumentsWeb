@@ -1,0 +1,102 @@
+﻿@Html.DevExpress().GridView(s => {
+    s.Name = "gvZonesList";
+    s.CallbackRouteValues = new { Controller = "Map", Action = "ZonesListPartial" };
+    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    
+    s.Settings.ShowVerticalScrollBar = true;
+    s.Settings.VerticalScrollableHeight = 200;
+    s.Settings.ShowColumnHeaders = false;
+    s.Settings.ShowFilterRow = true;
+    
+    s.SettingsPager.Visible = true;
+    s.SettingsPager.NumericButtonCount = 4;
+    s.SettingsPager.Summary.Visible = false;
+    s.SettingsPager.PageSize = 50;
+
+    //s.SettingsBehavior.AllowSelectByRowClick = true;
+    //s.SettingsBehavior.AllowSelectSingleRowOnly = false;
+    
+    s.CommandColumn.Visible = true;
+    s.CommandColumn.ShowSelectCheckbox = true;
+    s.CommandColumn.Width = 20;
+    s.CommandColumn.CellStyle.Paddings.Padding = 2;
+    @*s.CommandColumn.(c =>
+    {
+        Html.DevExpress().Image(imgs =>
+        {
+            imgs.ImageUrl = Url.Content("~/Images/trash_x16.png");
+        }).Render();
+    });*@
+
+    s.KeyFieldName = "AgentId";
+
+    @*s.Columns.Add(cs =>
+    {
+        cs.Name = "colImageAction";
+        cs.Width = System.Web.UI.WebControls.Unit.Pixel(35);
+        cs.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+        cs.Settings.AllowDragDrop = DefaultBoolean.False;
+        cs.Settings.AllowSort = DefaultBoolean.False;
+        cs.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+        cs.SetDataItemTemplateContent(c =>
+        {
+            Html.DevExpress().HyperLink(hl =>
+            {
+                hl.Properties.ImageUrl = Url.Content("~/Images/edit10x10.png");
+                hl.ToolTip = "Изменить";
+                //hl.NavigateUrl = "javascript:ShowPopupEdit(" + DataBinder.Eval(c.DataItem, "Id") + ");";
+            }).Render();
+            Html.DevExpress().HyperLink(hl =>
+            {
+                hl.Properties.ImageUrl = Url.Content("~/Images/DELETEDELEMENT_X16.png");
+                hl.ToolTip = "Удалить";
+                //hl.NavigateUrl = "javascript:deleteRow(" + c.ItemIndex.ToString(CultureInfo.InvariantCulture) + ");";
+            }).Render();
+        });
+    });*@
+    
+    @*s.Columns.Add(cs => 
+    {
+        cs.Name = "colCompany";
+        cs.Caption = "Филиал";
+        cs.FieldName = "CompanyName";
+        cs.GroupIndex = 0;
+    });*@
+    
+    s.Columns.Add(cs =>
+    {
+        cs.Name = "colZoneName";
+        cs.Caption = "Зона";
+        cs.Settings.AllowAutoFilter = DefaultBoolean.True;
+        cs.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+        cs.FieldName = "Name";
+        cs.CellStyle.Paddings.Padding = 2;
+        cs.SetDataItemTemplateContent(tm => {
+            string link = "<a href=\"javascript:editAgent(" + DataBinder.Eval(tm.DataItem, "AgentId").ToString() + ");\">" + tm.Text + "</a>";
+            if ((int)DataBinder.Eval(tm.DataItem, "AddressId") == 0 || 
+                (decimal)DataBinder.Eval(tm.DataItem, "X") == 0 || 
+                (decimal)DataBinder.Eval(tm.DataItem, "Y") == 0 || 
+                (int)DataBinder.Eval(tm.DataItem, "Radius") == 0)
+            {
+                if ((int)DataBinder.Eval(tm.DataItem, "AddressId") == 0)
+                {
+                    ViewContext.Writer.Write("<img src=\"" + Url.Content("~/Images/warning_x16.png") + "\" style=\"vertical-align: middle;\" title=\"Адрес не задан\"  />");
+                    ViewContext.Writer.Write(link);
+                }
+                else
+                {
+                    ViewContext.Writer.Write("<img onclick=\"javascript:find_address(" + DataBinder.Eval(tm.DataItem, "AddressId").ToString() + ");\" src=\"" + Url.Content("~/Images/search_x16.png") + "\" style=\"vertical-align: middle; cursor: pointer;\" title=\"Поиск по адресу\" />&nbsp;");
+                    ViewContext.Writer.Write("<img onclick=\"javascript:put_zone_to_center(" + DataBinder.Eval(tm.DataItem, "AddressId").ToString() + ");\" src=\"" + Url.Content("~/Images/Routes/pin_x16.png") + "\" style=\"vertical-align: middle; cursor: pointer;\" title=\"Вставить в центр карты\" />&nbsp;" + link);
+                    ViewContext.Writer.Write("<input type=\"hidden\" id=\"addr" + DataBinder.Eval(tm.DataItem, "AddressId").ToString() + "\" value=\"" + (string)DataBinder.Eval(tm.DataItem, "Country") + " " + (string)DataBinder.Eval(tm.DataItem, "Territory") + " " + (string)DataBinder.Eval(tm.DataItem, "Town") + " " + (string)DataBinder.Eval(tm.DataItem, "Street") + " " + (string)DataBinder.Eval(tm.DataItem, "HouseNumber") + "\" />");
+                    ViewContext.Writer.Write("<input type=\"hidden\" id=\"name" + DataBinder.Eval(tm.DataItem, "AddressId").ToString() + "\" value=\"" + ((string)DataBinder.Eval(tm.DataItem, "Name")).Replace("\"", "&quot;") + "\" />");
+                }
+            }
+            else
+            {
+                ViewContext.Writer.Write(link);
+            }
+        });
+    });
+
+    s.ClientSideEvents.SelectionChanged = "SelectZone";
+}).Bind(DocumentsWeb.Areas.Routes.Models.ZoneModel.GetZonesList()).GetHtml()

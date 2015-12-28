@@ -1,0 +1,500 @@
+﻿@using BusinessObjects
+@using DevExpress
+@using DevExpress.Web
+@using DevExpress.Utils
+@using DevExpress.Web.Mvc
+@using DevExpress.Web.Mvc.UI
+@using Unit = System.Web.UI.WebControls.Unit
+@model DocumentsWeb.Areas.Ourp.Models.AutoModel
+
+<script type="text/javascript">
+//	$(document).ready(function () {
+//		Name.Focus();
+	//	});
+//	$(doc.getelementbyid('EquipmentId').change(function () {
+//		alert(1);
+//		//TypeTS.value = "";
+//	}).change();
+</script>
+
+@{
+	Model.MyCompanyId = Model.MyCompanyId == 0 ? DocumentsWeb.Models.WADataProvider.CurrentUser.MyCompanyId : Model.MyCompanyId;
+}
+
+@Html.DevExpress().PageControl(settings =>
+{
+	settings.Name = "tsEditAuto";
+	settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+	settings.ClientSideEvents.Init = "OntsEditAgentInit";
+	settings.EnableTabScrolling = true;
+	settings.Styles.Content.CssClass = "tabcontent";
+	MVCxTabPage pageMain = settings.TabPages.Add("Главная");
+	
+	pageMain.SetContent(() =>
+	{
+		ViewContext.Writer.Write("<table style=\"width: 100%; height: 100%;\">");
+		
+		ViewContext.Writer.Write("<tr><td style=\"width: 100px;\">");
+		@Html.DevExpress().Label(s =>
+		{
+			s.ControlStyle.CssClass = "label";
+			s.Text = "Гос. номер:";
+			s.AssociatedControlName = GlobalPropertyNames.GosNumber;
+		}).GetHtml();
+		ViewContext.Writer.Write("</td>");
+		ViewContext.Writer.Write("<td>");
+		@Html.DevExpress().TextBox(s =>
+		{
+			s.Name = GlobalPropertyNames.GosNumber;
+			s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+			s.ControlStyle.CssClass = "editor";
+		}).Bind(Model.GosNumber).GetHtml();
+		ViewContext.Writer.Write("</td></tr>");
+
+		ViewContext.Writer.Write("<tr><td style=\"width: 100px;\">");
+		@Html.DevExpress().Label(s =>
+		{
+			s.ControlStyle.CssClass = "label";
+			s.Text = "Марка:";
+			s.AssociatedControlName = GlobalPropertyNames.EquipmentId;
+		}).GetHtml();
+		ViewContext.Writer.Write("</td>");
+		ViewContext.Writer.Write("<td>");
+		@Html.DevExpress().ComboBox(s =>
+		{
+			s.Name = GlobalPropertyNames.EquipmentId;
+			//settings.CallbackRouteValues = new { Area="Marketings", Controller = "Mktg", Action = "ManagerPartial", mId = Model.ModelId };
+			//settings.Properties.EnableCallbackMode = true;
+			s.Properties.ValueField = "Id2";
+			s.Properties.TextField = "Name2";
+			s.Properties.ValueType = typeof(int);
+			s.Properties.NullDisplayText = "Выберите марку...";
+			s.ControlStyle.CssClass = "editor";
+			//settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+			s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+			//s.Properties.ClientSideEvents.ValueChanged = "function(s, e) { EquipmentTypeName.PerformCallback(); }";
+			
+			//settings.ReadOnly = !(haveEdit && !Model.IsReadOnly);
+			//settings.ShowModelErrors = true;
+			//settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+			//settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+			//settings.Properties.ClientSideEvents.BeginCallback = "function(s, e) { e.customArgs['MainClientDepatmentId'] = MainClientDepatmentId.GetValue(); e.customArgs['Id'] = " + @Model.Id + "}";
+			//settings.Properties.ClientSideEvents.EndCallback = "function(s, e) { s.SetSelectedIndex(-1);}";
+			//settings.Properties.ClientSideEvents.GotFocus = "OnEditorGotFocus";
+			//settings.Properties.ClientSideEvents.LostFocus = "OnEditorLostFocus";
+		}).BindList(BusinessObjects.Web.Core.EquimpmentWebView.GetView(DocumentsWeb.Models.WADataProvider.WA).Where(c => c.KindId2 == Equipment.KINDID_EQUIPMENTAUTO)).Bind(Model.EquipmentId == 0 ? null : (int?)Model.EquipmentId).GetHtml();
+		//@Html.Partial("MarkAutoPartial", Model);
+		ViewContext.Writer.Write("</td></tr>");
+
+		ViewContext.Writer.Write("<tr><td style=\"width: 100px;\">");
+		@Html.DevExpress().Label(s =>
+		{
+			s.ControlStyle.CssClass = "label";
+			s.Text = "Тип ТС:";
+			s.AssociatedControlName = "TypeTS";
+		}).GetHtml();
+		ViewContext.Writer.Write("</td>");
+		ViewContext.Writer.Write("<td>");
+		@Html.DevExpress().TextBox(s =>
+		{
+			s.Name = "TypeTS";
+			s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+			s.ControlStyle.CssClass = "editor";
+			s.Enabled = false;
+		}).Bind(Model.EquipmentTypeName).GetHtml();
+		ViewContext.Writer.Write("</td></tr>");
+
+		ViewContext.Writer.Write("<tr><td style=\"width: 100px;\">");
+		@Html.DevExpress().Label(s =>
+		{
+			s.ControlStyle.CssClass = "label";
+			s.Text = "Закрепленный водитель:";
+		}).GetHtml();
+		ViewContext.Writer.Write("</td>");
+		ViewContext.Writer.Write("<td>");
+		@Html.DevExpress().TextBox(s =>
+		{
+			s.Name = "Driver";
+			s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+			s.ControlStyle.CssClass = "editor";
+			s.Enabled = false;
+		}).GetHtml();
+		ViewContext.Writer.Write("</td></tr>");
+
+		ViewContext.Writer.Write("<tr><td style=\"width: 100px;\">");
+		@Html.DevExpress().Label(s =>
+		{
+			s.ControlStyle.CssClass = "label";
+			s.Text = "Дата выпуска:";
+			s.AssociatedControlName = GlobalPropertyNames.DateOn;
+		}).GetHtml();
+		ViewContext.Writer.Write("</td>");
+		ViewContext.Writer.Write("<td>");
+		@Html.DevExpress().DateEdit(s =>
+		{
+			s.Name = GlobalPropertyNames.DateOn;
+			s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+			s.ControlStyle.CssClass = "date_in_popup";
+		}).Bind(Model.DateOn).GetHtml();
+		ViewContext.Writer.Write("</td></tr>");
+
+		ViewContext.Writer.Write("<tr><td style=\"width: 100px;\">");
+		@Html.DevExpress().Label(s =>
+		{
+			s.ControlStyle.CssClass = "label";
+			s.Text = "Принадлежность:";
+			s.AssociatedControlName = GlobalPropertyNames.MyCompanyId;
+		}).GetHtml();
+		ViewContext.Writer.Write("</td>");
+		ViewContext.Writer.Write("<td>");
+		@Html.DevExpress().ComboBox(s =>
+		{
+			s.ControlStyle.CssClass = "editor";
+			s.Name = GlobalPropertyNames.MyCompanyId;
+			//s.ReadOnly = !(haveEdit && !Model.IsReadOnly);
+			s.Properties.ValueField = GlobalPropertyNames.Id;
+			s.Properties.TextField = GlobalPropertyNames.Name;
+			s.Properties.ValueType = typeof(int);
+			s.Properties.NullDisplayText = "Выберите компанию...";
+			s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+			s.ShowModelErrors = true;
+			s.Properties.ValidationSettings.ErrorDisplayMode = DevExpress.Web.ASPxEditors.ErrorDisplayMode.ImageWithText;
+			s.Properties.ValidationSettings.ErrorTextPosition = DevExpress.Web.ASPxClasses.ErrorTextPosition.Bottom;
+			//s.Properties.ClientSideEvents.ValueChanged = "function(s, e) { ManagerId.PerformCallback(); }";
+			//s.Properties.ClientSideEvents.GotFocus = "OnEditorGotFocus";
+			//s.Properties.ClientSideEvents.LostFocus = "OnEditorLostFocus";
+		}).BindList(DocumentsWeb.Areas.Agents.Models.ClientModel.GetMyDepatments()).Bind(Model.MyCompanyId == 0 ? null : (int?)Model.MyCompanyId).GetHtml();
+		//@Html.DevExpress().TextBox(s =>
+		//{
+		//    s.Name = "Comp";
+		//    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+		//    s.ControlStyle.CssClass = "editor";
+		//    s.Enabled = false;
+		//}).GetHtml();
+		ViewContext.Writer.Write("</td></tr>");
+		
+		ViewContext.Writer.Write("</table>");
+	});
+
+	MVCxTabPage pageTeh = settings.TabPages.Add("Технические данные");
+	pageTeh.SetContent(() =>
+	{
+		ViewContext.Writer.Write("<table style=\"width: 100%; height: 100%;\">");
+
+		ViewContext.Writer.Write("<tr><td style=\"width: 100px;\">");
+		@Html.DevExpress().Label(s =>
+		{
+			s.ControlStyle.CssClass = "label";
+			s.Text = "Используемое топливо:";
+			s.AssociatedControlName = GlobalPropertyNames.UsedFuelId;
+		}).GetHtml();
+		ViewContext.Writer.Write("</td>");
+		ViewContext.Writer.Write("<td>");
+		@Html.DevExpress().TextBox(s =>
+		{
+			s.Name = GlobalPropertyNames.UsedFuelId;
+			s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+			s.ControlStyle.CssClass = "editor";
+		}).Bind(Model.UsedFuelId).GetHtml();
+		ViewContext.Writer.Write("</td></tr>");
+
+		ViewContext.Writer.Write("<tr><td style=\"width: 100px;\">");
+		@Html.DevExpress().Label(s =>
+		{
+			s.ControlStyle.CssClass = "label";
+			s.Text = "Номер тех. паспорта:";
+			s.AssociatedControlName = GlobalPropertyNames.AutoPassportNumber;
+		}).GetHtml();
+		ViewContext.Writer.Write("</td>");
+		ViewContext.Writer.Write("<td>");
+		@Html.DevExpress().TextBox(s =>
+		{
+			s.Name = GlobalPropertyNames.AutoPassportNumber;
+			s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+			s.ControlStyle.CssClass = "editor";
+		}).Bind(Model.AutoPassportNumber).GetHtml();
+		ViewContext.Writer.Write("</td></tr>");
+
+		ViewContext.Writer.Write("<tr><td style=\"width: 100px;\">");
+		@Html.DevExpress().Label(s =>
+		{
+			s.ControlStyle.CssClass = "label";
+			s.Text = "Номер шасси:";
+			s.AssociatedControlName = GlobalPropertyNames.AutoChassis;
+		}).GetHtml();
+		ViewContext.Writer.Write("</td>");
+		ViewContext.Writer.Write("<td>");
+		@Html.DevExpress().TextBox(s =>
+		{
+			s.Name = GlobalPropertyNames.AutoChassis;
+			s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+			s.ControlStyle.CssClass = "editor";
+		}).Bind(Model.AutoChassis).GetHtml();
+		ViewContext.Writer.Write("</td></tr>");
+
+		ViewContext.Writer.Write("<tr><td style=\"width: 100px;\">");
+		@Html.DevExpress().Label(s =>
+		{
+			s.ControlStyle.CssClass = "label";
+			s.Text = "Номер двигателя:";
+			s.AssociatedControlName = GlobalPropertyNames.AutoMotor;
+		}).GetHtml();
+		ViewContext.Writer.Write("</td>");
+		ViewContext.Writer.Write("<td>");
+		@Html.DevExpress().TextBox(s =>
+		{
+			s.Name = GlobalPropertyNames.AutoMotor;
+			s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+			s.ControlStyle.CssClass = "editor";
+		}).Bind(Model.AutoMotor).GetHtml();
+		ViewContext.Writer.Write("</td></tr>");
+
+		ViewContext.Writer.Write("<tr><td style=\"width: 100px;\">");
+		@Html.DevExpress().Label(s =>
+		{
+			s.ControlStyle.CssClass = "label";
+			s.Text = "Норма расхода топлива:";
+			s.AssociatedControlName = GlobalPropertyNames.RateFuelConsumption;
+		}).GetHtml();
+		ViewContext.Writer.Write("</td>");
+		ViewContext.Writer.Write("<td>");
+		@Html.DevExpress().TextBox(s =>
+		{
+			s.Name = GlobalPropertyNames.RateFuelConsumption;
+			s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+			s.ControlStyle.CssClass = "editor";
+		}).Bind(Model.RateFuelConsumption).GetHtml();
+		ViewContext.Writer.Write("</td></tr>");
+
+		ViewContext.Writer.Write("<tr><td style=\"width: 100px;\">");
+		@Html.DevExpress().Label(s =>
+		{
+			s.ControlStyle.CssClass = "label";
+			s.Text = "Полная масса:";
+			s.AssociatedControlName = GlobalPropertyNames.GrossVehicleWeight;
+		}).GetHtml();
+		ViewContext.Writer.Write("</td>");
+		ViewContext.Writer.Write("<td>");
+		@Html.DevExpress().TextBox(s =>
+		{
+			s.Name = GlobalPropertyNames.GrossVehicleWeight;
+			s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+			s.ControlStyle.CssClass = "editor";
+		}).Bind(Model.GrossVehicleWeight).GetHtml();
+		ViewContext.Writer.Write("</td></tr>");
+
+		ViewContext.Writer.Write("<tr><td style=\"width: 100px;\">");
+		@Html.DevExpress().Label(s =>
+		{
+			s.ControlStyle.CssClass = "label";
+			s.Text = "Собственная масса:";
+			s.AssociatedControlName = GlobalPropertyNames.UnladenWeight;
+		}).GetHtml();
+		ViewContext.Writer.Write("</td>");
+		ViewContext.Writer.Write("<td>");
+		@Html.DevExpress().TextBox(s =>
+		{
+			s.Name = GlobalPropertyNames.UnladenWeight;
+			s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+			s.ControlStyle.CssClass = "editor";
+		}).Bind(Model.UnladenWeight).GetHtml();
+		ViewContext.Writer.Write("</td></tr>");
+
+		ViewContext.Writer.Write("<tr><td style=\"width: 100px;\">");
+		@Html.DevExpress().Label(s =>
+		{
+			s.ControlStyle.CssClass = "label";
+			s.Text = "Объем двигнателя:";
+			s.AssociatedControlName = GlobalPropertyNames.VolumeVehicleEngine;
+		}).GetHtml();
+		ViewContext.Writer.Write("</td>");
+		ViewContext.Writer.Write("<td>");
+		@Html.DevExpress().TextBox(s =>
+		{
+			s.Name = GlobalPropertyNames.VolumeVehicleEngine;
+			s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+			s.ControlStyle.CssClass = "editor";
+		}).Bind(Model.VolumeVehicleEngine).GetHtml();
+		ViewContext.Writer.Write("</td></tr>");
+
+		ViewContext.Writer.Write("<tr><td style=\"width: 100px;\">");
+		@Html.DevExpress().Label(s =>
+		{
+			s.ControlStyle.CssClass = "label";
+			s.Text = "Дополнительный бак:";
+			s.AssociatedControlName = GlobalPropertyNames.AdditionalFuelTank;
+		}).GetHtml();
+		ViewContext.Writer.Write("</td>");
+		ViewContext.Writer.Write("<td>");
+		@Html.DevExpress().CheckBox(s =>
+		{
+			s.Name = GlobalPropertyNames.AdditionalFuelTank;
+			s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+			s.ControlStyle.CssClass = "editor";
+		}).Bind(Model.AdditionalFuelTank).GetHtml();
+		ViewContext.Writer.Write("</td></tr>");
+	
+		ViewContext.Writer.Write("</table>");
+	});
+	
+	MVCxTabPage pageDoc = settings.TabPages.Add("Документы");
+	pageDoc.SetContent(() =>
+	{
+		ViewContext.Writer.Write("<table style=\"width: 100%; height: 100%;\">");
+		
+		ViewContext.Writer.Write("<tr><td style=\"width: 100px;\">");
+		@Html.DevExpress().Label(s =>
+		{
+			s.ControlStyle.CssClass = "label";
+			s.Text = "Номер страховки:";
+			s.AssociatedControlName = GlobalPropertyNames.InsuranceNumber;
+		}).GetHtml();
+		ViewContext.Writer.Write("</td>");
+		ViewContext.Writer.Write("<td>");
+		@Html.DevExpress().TextBox(s =>
+		{
+			s.Name = GlobalPropertyNames.InsuranceNumber;
+			s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+			s.ControlStyle.CssClass = "editor";
+		}).Bind(Model.InsuranceNumber).GetHtml();
+		ViewContext.Writer.Write("</td></tr>");
+		
+		ViewContext.Writer.Write("<tr><td style=\"width: 100px;\">");
+		@Html.DevExpress().Label(s =>
+		{
+			s.ControlStyle.CssClass = "label";
+			s.Text = "Дата начала страховки:";
+			s.AssociatedControlName = GlobalPropertyNames.InsuranceDateStart;
+		}).GetHtml();
+		ViewContext.Writer.Write("</td>");
+		ViewContext.Writer.Write("<td>");
+		@Html.DevExpress().DateEdit(s =>
+		{
+			s.Name = GlobalPropertyNames.InsuranceDateStart;
+			s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+			s.ControlStyle.CssClass = "editor";
+		}).Bind(Model.InsuranceDateStart).GetHtml();
+		ViewContext.Writer.Write("</td></tr>");
+
+		ViewContext.Writer.Write("<tr><td style=\"width: 100px;\">");
+		@Html.DevExpress().Label(s =>
+		{
+			s.ControlStyle.CssClass = "label";
+			s.Text = "Дата окончания страховки:";
+			s.AssociatedControlName = GlobalPropertyNames.InsuranceDateExpiration;
+		}).GetHtml();
+		ViewContext.Writer.Write("</td>");
+		ViewContext.Writer.Write("<td>");
+		@Html.DevExpress().DateEdit(s =>
+		{
+			s.Name = GlobalPropertyNames.InsuranceDateExpiration;
+			s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+			s.ControlStyle.CssClass = "editor";
+		}).Bind(Model.InsuranceDateExpiration).GetHtml();
+		ViewContext.Writer.Write("</td></tr>");
+
+		ViewContext.Writer.Write("<tr><td style=\"width: 100px;\">");
+		@Html.DevExpress().Label(s =>
+		{
+			s.ControlStyle.CssClass = "label";
+			s.Text = "Номер лицензии:";
+			s.AssociatedControlName = GlobalPropertyNames.LicenseNumber;
+		}).GetHtml();
+		ViewContext.Writer.Write("</td>");
+		ViewContext.Writer.Write("<td>");
+		@Html.DevExpress().TextBox(s =>
+		{
+			s.Name = GlobalPropertyNames.LicenseNumber;
+			s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+			s.ControlStyle.CssClass = "editor";
+		}).Bind(Model.LicenseNumber).GetHtml();
+		ViewContext.Writer.Write("</td></tr>");
+
+		ViewContext.Writer.Write("<tr><td style=\"width: 100px;\">");
+		@Html.DevExpress().Label(s =>
+		{
+			s.ControlStyle.CssClass = "label";
+			s.Text = "Дата начала лицензии:";
+			s.AssociatedControlName = GlobalPropertyNames.LicenseDateStart;
+		}).GetHtml();
+		ViewContext.Writer.Write("</td>");
+		ViewContext.Writer.Write("<td>");
+		@Html.DevExpress().DateEdit(s =>
+		{
+			s.Name = GlobalPropertyNames.LicenseDateStart;
+			s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+			s.ControlStyle.CssClass = "editor";
+		}).Bind(Model.LicenseDateStart).GetHtml();
+		ViewContext.Writer.Write("</td></tr>");
+
+		ViewContext.Writer.Write("<tr><td style=\"width: 100px;\">");
+		@Html.DevExpress().Label(s =>
+		{
+			s.ControlStyle.CssClass = "label";
+			s.Text = "Дата окончания лицензии:";
+			s.AssociatedControlName = GlobalPropertyNames.LicenseDateExpiration;
+		}).GetHtml();
+		ViewContext.Writer.Write("</td>");
+		ViewContext.Writer.Write("<td>");
+		@Html.DevExpress().DateEdit(s =>
+		{
+			s.Name = GlobalPropertyNames.LicenseDateExpiration;
+			s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+			s.ControlStyle.CssClass = "editor";
+		}).Bind(Model.LicenseDateExpiration).GetHtml();
+		ViewContext.Writer.Write("</td></tr>");
+
+		ViewContext.Writer.Write("<tr><td style=\"width: 100px;\">");
+		@Html.DevExpress().Label(s =>
+		{
+			s.ControlStyle.CssClass = "label";
+			s.Text = "Номер санитарного паспорта:";
+			s.AssociatedControlName = GlobalPropertyNames.SanitaryNumber;
+		}).GetHtml();
+		ViewContext.Writer.Write("</td>");
+		ViewContext.Writer.Write("<td>");
+		@Html.DevExpress().TextBox(s =>
+		{
+			s.Name = GlobalPropertyNames.SanitaryNumber;
+			s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+			s.ControlStyle.CssClass = "editor";
+		}).Bind(Model.SanitaryNumber).GetHtml();
+		ViewContext.Writer.Write("</td></tr>");
+
+		ViewContext.Writer.Write("<tr><td style=\"width: 100px;\">");
+		@Html.DevExpress().Label(s =>
+		{
+			s.ControlStyle.CssClass = "label";
+			s.Text = "Дата начала санитарного паспорта:";
+			s.AssociatedControlName = GlobalPropertyNames.SanitaryDateStart;
+		}).GetHtml();
+		ViewContext.Writer.Write("</td>");
+		ViewContext.Writer.Write("<td>");
+		@Html.DevExpress().DateEdit(s =>
+		{
+			s.Name = GlobalPropertyNames.SanitaryDateStart;
+			s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+			s.ControlStyle.CssClass = "editor";
+		}).Bind(Model.SanitaryDateStart).GetHtml();
+		ViewContext.Writer.Write("</td></tr>");
+
+		ViewContext.Writer.Write("<tr><td style=\"width: 100px;\">");
+		@Html.DevExpress().Label(s =>
+		{
+			s.ControlStyle.CssClass = "label";
+			s.Text = "Дата окончания санитарного паспорта:";
+			s.AssociatedControlName = GlobalPropertyNames.SanitaryDateExpiration;
+		}).GetHtml();
+		ViewContext.Writer.Write("</td>");
+		ViewContext.Writer.Write("<td>");
+		@Html.DevExpress().DateEdit(s =>
+		{
+			s.Name = GlobalPropertyNames.SanitaryDateExpiration;
+			s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+			s.ControlStyle.CssClass = "editor";
+		}).Bind(Model.SanitaryDateExpiration).GetHtml();
+		ViewContext.Writer.Write("</td></tr>");
+		
+		ViewContext.Writer.Write("</table>");
+	});
+}).GetHtml()

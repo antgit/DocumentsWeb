@@ -1,0 +1,169 @@
+﻿@using BusinessObjects
+@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentWeb.Extentions
+@using DocumentsWeb.Areas.Reports.Models
+@using DocumentsWeb.Models
+@{   
+    //bool haveCreate = WADataProvider.LibrariesElementRightView.IsAllow(Right.UICREATE, WebModuleNames.WEB_SUPPLYER);
+    //bool haveEdit = WADataProvider.LibrariesElementRightView.IsAllow(Right.UIEDIT, WebModuleNames.WEB_SUPPLYER);
+    //bool haveDelete = WADataProvider.LibrariesElementRightView.IsAllow(Right.UITRASH, WebModuleNames.WEB_SUPPLYER);
+    //bool haveView = WADataProvider.LibrariesElementRightView.IsAllow(Right.UIVIEW, WebModuleNames.WEB_SUPPLYER);
+    
+}
+
+@Html.DevExpress().NavBar(
+nbrSettings =>
+{
+    nbrSettings.Name = "nbReports";
+    nbrSettings.AllowExpanding = true;
+    nbrSettings.AllowSelectItem = true;
+    nbrSettings.AutoCollapse = false;
+    nbrSettings.EnableHotTrack = true;
+    nbrSettings.EnableAnimation = true;
+    nbrSettings.Width = System.Web.UI.WebControls.Unit.Pixel(250);
+    nbrSettings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+    nbrSettings.EncodeHtml = false;
+    
+    nbrSettings.Groups.Add(group => {
+        group.Text = "Основные отчеты";
+        group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+        group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.CssClass = "navpanellink";
+        group.Expanded = true;
+        group.HeaderStyle.Font.Bold = true;
+
+        if (WebReportModel.IsReportAllow("WEBREP_SALE_DOCLISTINOUT"))
+        {
+            Library report = WADataProvider.WA.Cashe.GetCasheData<Library>().ItemCode<Library>("WEBREP_SALE_DOCLISTINOUT");
+            MVCxNavBarItem item = group.Items.Add(report.Name, string.Format("mnuReport{0}", report.Code), "~/Images/STIREPORT_X16.png");
+            item.ToolTip = report.Memo;
+            item.Target = "_blank";
+            item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "Report", Action = "Build", Area = "Reports" }) + "?id=" + report.Id;
+        }
+
+        if (WebReportModel.IsReportAllow("WEBREP_SALE_DOCLISTINOUTBYPRODUCT"))
+        {
+            Library report = WADataProvider.WA.Cashe.GetCasheData<Library>().ItemCode<Library>("WEBREP_SALE_DOCLISTINOUTBYPRODUCT");
+            MVCxNavBarItem item = group.Items.Add(report.Name, string.Format("mnuReport{0}", report.Code), "~/Images/STIREPORT_X16.png");
+            item.ToolTip = report.Memo;
+            item.Target = "_blank";
+            item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "Report", Action = "Build", Area = "Reports" }) + "?id=" + report.Id;
+        }
+
+        if (WebReportModel.IsReportAllow("WEBREP_SALE_DOCLISTOUTANDMONEYIN"))
+        {
+            Library report = WADataProvider.WA.Cashe.GetCasheData<Library>().ItemCode<Library>("WEBREP_SALE_DOCLISTOUTANDMONEYIN");
+            MVCxNavBarItem item = group.Items.Add(report.Name, string.Format("mnuReport{0}", report.Code), "~/Images/STIREPORT_X16.png");
+            item.ToolTip = report.Memo;
+            item.Target = "_blank";
+            item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "Report", Action = "Build", Area = "Reports" }) + "?id=" + report.Id;
+        }
+        
+        
+        if (WebReportModel.IsReportAllow("WEBREP_SALE_PRODUCTLEAVE"))
+        {
+            Library report = WADataProvider.WA.Cashe.GetCasheData<Library>().ItemCode<Library>("WEBREP_SALE_PRODUCTLEAVE");
+            MVCxNavBarItem item = group.Items.Add(report.Name, string.Format("mnuReport{0}", report.Code), "~/Images/STIREPORT_X16.png");
+            item.ToolTip = report.Memo;
+            item.Target = "_blank";
+            item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "Report", Action = "Build", Area = "Reports" }) + "?id=" + report.Id;
+        }
+        
+        if (WADataProvider.HiearchyElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_REPORTS))
+        {
+            MVCxNavBarItem item = group.Items.Add("Перейти в отчеты...", "mnuReportNavToReportsMain", "~/Images/arrowgreen.png");
+            item.ToolTip = "Перейти в раздел отчетов...";
+            item.NavigateUrl = Url.Action("Index", new { area = "Reports", Controller = "Report" });
+            item.Target = "_blank";
+        }
+        
+    });
+    nbrSettings.Groups.Add(group =>
+    {
+        group.Text = "Реестры документов";
+        group.Expanded = true;
+        group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.HeaderStyle.Font.Bold = true;
+        group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+        group.ItemStyle.CssClass = "navpanellink";
+        MVCxNavBarItem item = null;
+        
+
+        item = group.Items.Add("Приходные накладные", "mnuReportsIn", "~/Images/STIREPORT_X16.png");
+        item.ToolTip = "Отчет \"Реестр приходных накладных\"";
+        item.Target = "_blank";
+        Library report = WADataProvider.WA.Cashe.GetCasheData<Library>().ItemCode<Library>("WEBREP_SALE_DOCLISTIN");
+        if (report!=null)
+        {
+            item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "Report", Action = "Build", Area = "Reports" }) + "?id=" + report.Id;
+        }
+        //item.ClientEnabled = haveEdit;
+        //item.NavigateUrl = "javascript:changeState(1, 'Supplyer');";
+
+        item = group.Items.Add("Расходные накладные", "mnuReportsOut", "~/Images/STIREPORT_X16.png");
+        item.ToolTip = "Отчет \"Реестр приходных накладных\"";
+        item.Target = "_blank";
+        report = WADataProvider.WA.Cashe.GetCasheData<Library>().ItemCode<Library>("WEBREP_SALE_DOCLISTOUT");
+        if (report != null)
+        {
+            item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "Report", Action = "Build", Area = "Reports" }) + "?id=" + report.Id;
+        }
+        //item.ClientEnabled = haveEdit;
+        //item.NavigateUrl = "javascript:changeState(2, 'Supplyer');";
+
+        item = group.Items.Add("Исходящие счета", "mnuReportsAccountOut", "~/Images/STIREPORT_X16.png");
+        item.ToolTip = "Отчет \"Реестр исходящих счетов\"";
+        item.Target = "_blank";
+        report = WADataProvider.WA.Cashe.GetCasheData<Library>().ItemCode<Library>("WEBREP_SALE_DOCLISTACCOUNTOUT");
+        if (report != null)
+        {
+            item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "Report", Action = "Build", Area = "Reports" }) + "?id=" + report.Id;
+        }
+        //item.ClientEnabled = haveEdit;
+        //item.NavigateUrl = "javascript:changeState(2, 'Supplyer');";
+
+        item = group.Items.Add("Входящие счета", "mnuReportsAccountIn", "~/Images/STIREPORT_X16.png");
+        item.ToolTip = "Отчет \"Реестр входящих счетов\"";
+        item.Target = "_blank";
+        report = WADataProvider.WA.Cashe.GetCasheData<Library>().ItemCode<Library>("WEBREP_SALE_DOCLISTACCOUNTIN");
+        if (report != null)
+        {
+            item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "Report", Action = "Build", Area = "Reports" }) + "?id=" + report.Id;
+        }
+        //item.ClientEnabled = haveEdit;
+        //item.NavigateUrl = "javascript:changeState(2, 'Supplyer');";
+
+        item = group.Items.Add("Внутреннии перемещения", "mnuReportsMove", "~/Images/STIREPORT_X16.png");
+        item.ToolTip = "Отчет \"Реестр внутренних перемещений\"";
+        item.Target = "_blank";
+        report = WADataProvider.WA.Cashe.GetCasheData<Library>().ItemCode<Library>("WEBREP_SALE_DOCLISTMOVE");
+        if (report != null)
+        {
+            item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "Report", Action = "Build", Area = "Reports" }) + "?id=" + report.Id;
+        }
+        //item.ClientEnabled = haveEdit;
+        //item.NavigateUrl = "javascript:changeState(2, 'Supplyer');";
+
+        item = group.Items.Add("Перейти в отчеты...", "mnuReportNavToReports", "~/Images/arrowgreen.png");
+        item.ToolTip = "Перейти в раздел отчетов...";
+        //item.ClientEnabled = haveEdit;
+        item.NavigateUrl = Url.Action("Index", new {area = "Reports", Controller = "Report"});
+
+    });
+
+    nbrSettings.Groups.Add(group =>
+    {
+        group.Text = "Избранное";
+        group.Expanded = false;
+        group.HeaderStyle.Font.Bold = true;
+        group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+        group.ItemStyle.CssClass = "navpanellink";
+        MVCxNavBarItem item = null;
+
+        
+    });
+
+}).GetHtml()

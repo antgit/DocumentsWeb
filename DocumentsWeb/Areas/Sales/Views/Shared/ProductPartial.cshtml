@@ -1,0 +1,36 @@
+﻿@using DocumentsWeb.Models
+@using DocumentsWeb.Areas.Products.Models
+@using BusinessObjects
+@using DocumentsWeb.Areas.Products.Models
+@model DocumentsWeb.Areas.Sales.Models.DocumentSaleModel
+@Html.DevExpress().ComboBox(settings =>{
+    settings.Name = "ProductId";
+
+    settings.CallbackRouteValues = new { Controller = Url.RequestContext.RouteData.Values["controller"], Action = "ProductPartial", modelId = Model.ModelId };
+    settings.Properties.EnableCallbackMode = true;
+    settings.Properties.CallbackPageSize = 15;
+    
+    settings.Properties.TextField = "Name";
+    settings.Properties.ValueField = "Id";
+    settings.Properties.ValueType = typeof(int);
+
+    settings.Properties.TextFormatString = "{0}";
+    settings.EncodeHtml = false;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.ShowModelErrors = true;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    settings.Properties.FilterMinLength = 3;
+    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+
+    EditButton b = settings.Properties.Buttons.Add();
+    b.Image.Url = "~/Images/search_x10.png";
+    b.ToolTip = "Поиск";
+
+    settings.Properties.DropDownWidth = 400;
+    ListBoxColumn colName = settings.Properties.Columns.Add("Name", "Имя");
+    settings.Properties.Columns.Add("Nomenclature", "Номенклатура").Width = 50;
+    settings.Properties.Columns.Add("UnitName", "Ед.изм").Width = 20;
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = "ProductId_SelectedIndexChanged";
+    settings.Properties.ClientSideEvents.ButtonClick = "function(s, e) { switch(e.buttonIndex) { case 0: ShowProductFinder(); break; } }";
+}).BindList(ProductModel.GetProductRange,ProductModel.GetProductByID).BindList(ProductModel.GetProductsByValue(ViewData["ProductId"])).Bind(ViewData["ProductId"]).GetHtml()

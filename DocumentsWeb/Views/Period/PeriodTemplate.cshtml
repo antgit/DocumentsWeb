@@ -1,0 +1,140 @@
+﻿@using DocumentsWeb.Models
+@using System.Web.UI.WebControls
+@model PeriodModel
+
+<script type="text/javascript" language="javascript">
+    var PeriodAction = "";
+    var PeriodDate = "";
+    var PeriodChanged = false;
+
+    function startPeriodChange(s, e) {
+        PeriodAction = "set_start";
+        PeriodDate = s.GetDate().format("yyyy.MM.dd");
+        cbpPeriod.PerformCallback();
+    }
+
+    function endPeriodChange(s, e) {
+        PeriodAction = "set_end";
+        PeriodDate = s.GetDate().format("yyyy.MM.dd");
+        cbpPeriod.PerformCallback();
+    }
+
+    function setYesterday() {
+        PeriodAction = "yesterday";
+        cbpPeriod.PerformCallback();
+    }
+
+    function setToday() {
+        PeriodAction = "today";
+        cbpPeriod.PerformCallback();
+    }
+
+    function setTomorrow() {
+        PeriodAction = "tomorrow";
+        cbpPeriod.PerformCallback();
+    }
+
+    function setCurrMonth() {
+        PeriodAction = "cur_month";
+        cbpPeriod.PerformCallback();
+    }
+
+    function setCurYear() {
+        PeriodAction = "cur_year";
+        cbpPeriod.PerformCallback();
+    }
+</script>
+
+<div style="margin: 7px;">
+    <table style="width: 100%; height: 100%;">
+        <tr>
+            <td colspan="3">
+                @Html.DevExpress().Label(s =>
+               {
+                   s.Text = "<b>Рабочий период:</b>";
+                   s.EncodeHtml = false;
+               }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td rowspan="2">
+                <img src="@Url.Content("~/Images/PERIOD_X32.png")" style="padding-right: 5px;" alt="" />
+            </td>
+            <td>
+                @Html.DevExpress().Label(s =>
+                {
+                    s.Text = "Начало:";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().DateEdit(s =>
+                {
+                    s.Name = "periodStart";
+                    s.Width = Unit.Pixel(100);
+                    s.Properties.DisplayFormatString = "dd.MM.yyyy";
+                    s.Properties.EditFormatString = "dd.MM.yyyy";
+                    s.Properties.ClientSideEvents.DateChanged = "startPeriodChange";
+                }).Bind(Model.periodStart).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DevExpress().Label(s =>
+                {
+                    s.Text = "Конец:";
+                }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().DateEdit(s =>
+                {
+                    s.Name = "periodEnd";
+                    s.Width = Unit.Pixel(100);
+                    s.Properties.DisplayFormatString = "dd.MM.yyyy";
+                    s.Properties.EditFormatString = "dd.MM.yyyy";
+                    s.Properties.ClientSideEvents.DateChanged = "endPeriodChange";
+                }).Bind(Model.periodEnd).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3" style="text-align: center;">
+                @Html.DevExpress().HyperLink(s =>
+                {
+                    s.Name = "setYesterday";
+                    s.Properties.Text = "Вчера";
+                    s.NavigateUrl = "javascript:setYesterday();";
+                }).GetHtml()
+                &nbsp;&nbsp;&nbsp;
+                @Html.DevExpress().HyperLink(s =>
+                {
+                    s.Name = "setToday";
+                    s.Properties.Text = "Сегодня";
+                    s.NavigateUrl = "javascript:setToday();";
+                }).GetHtml()
+                &nbsp;&nbsp;&nbsp;
+                @Html.DevExpress().HyperLink(s =>
+                {
+                    s.Name = "setTomorrow";
+                    s.Properties.Text = "Завтра";
+                    s.NavigateUrl = "javascript:setTomorrow();";
+                }).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3" style="text-align: center;">
+                @Html.DevExpress().HyperLink(s =>
+                {
+                    s.Name = "setCurrMonth";
+                    s.Properties.Text = "Текущий месяц";
+                    s.NavigateUrl = "javascript:setCurrMonth();";
+                }).GetHtml()
+                &nbsp;&nbsp;&nbsp;
+                @Html.DevExpress().HyperLink(s =>
+                {
+                    s.Name = "setCurYear";
+                    s.Properties.Text = "Текущий год";
+                    s.NavigateUrl = "javascript:setCurYear();";
+                }).GetHtml()
+            </td>
+        </tr>
+    </table>
+</div>

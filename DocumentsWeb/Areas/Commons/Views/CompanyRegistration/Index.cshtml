@@ -1,0 +1,64 @@
+﻿@using System.Web.UI.WebControls;
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Регистрация";
+}
+
+<script type="text/javascript" type="text/javascript">
+    var re = /^(([^<>()[\]\\.,;:\s@@\"]+(\.[^<>()[\]\\.,;:\s@@\"]+)*)|(\".+\"))@@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+
+    function registryClick(s, e) {
+        var ok = true;
+
+        if (CompanyName.GetValue() != null) {
+            CompanyNameValidator.SetImageUrl('@(Url.Content("~/Images/ok_16.png"))');
+            CompanyNameValidator.SetVisible(true);
+        } else {
+            CompanyNameValidator.SetImageUrl('@(Url.Content("~/Images/error_16.png"))');
+            CompanyNameValidator.SetVisible(true);
+            ok = false;
+        }
+
+        if (WorkerName.GetValue() != null) {
+            WorkerNameValidator.SetImageUrl('@(Url.Content("~/Images/ok_16.png"))');
+            WorkerNameValidator.SetVisible(true);
+        } else {
+            WorkerNameValidator.SetImageUrl('@(Url.Content("~/Images/error_16.png"))');
+            WorkerNameValidator.SetVisible(true);
+            ok = false;
+        }
+
+        if (Email.GetValue() != null && re.test(Email.GetValue().toString())) {
+            EmailValidator.SetImageUrl('@(Url.Content("~/Images/ok_16.png"))');
+            EmailValidator.SetVisible(true);
+        } else {
+            EmailValidator.SetImageUrl('@(Url.Content("~/Images/error_16.png"))');
+            EmailValidator.SetVisible(true);
+            ok = false;
+        }
+
+        if (Login.GetValue() != null) {
+            LoginValidator.SetImageUrl('@(Url.Content("~/Images/ok_16.png"))');
+            LoginValidator.SetVisible(true);
+        } else {
+            LoginValidator.SetImageUrl('@(Url.Content("~/Images/error_16.png"))');
+            LoginValidator.SetVisible(true);
+            ok = false;
+        }
+
+        if (ok) {
+            if (DataOk.GetChecked()) {
+                document.getElementById("companyRegistry").submit();
+            }
+            else {
+                alert('Если Вы подтверждаете правильность введенных данных. Установите пожалуйста соответствующую галочку на форме регистрации.');
+            }
+        }
+    }
+</script>
+
+@using (Html.BeginForm("Registry", "CompanyRegistration", FormMethod.Post, new { @id = "companyRegistry" }))
+{
+    @Html.Partial("RegistryPartial")
+}

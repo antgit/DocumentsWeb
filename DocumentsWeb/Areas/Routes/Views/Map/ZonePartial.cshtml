@@ -1,0 +1,32 @@
+﻿@using DocumentsWeb.Areas.Agents.Models
+@using DocumentsWeb.Areas.Routes.Models
+@using DocumentsWeb.Models
+@model RouteTemplateModel
+
+@{
+    string Name = (string)ViewData["Name"];
+    int Id = (int)ViewData["Id"];
+    ZoneModel obj = Id > 0 ? ZoneModel.GetZone(Id) : null;
+}
+
+@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = Name;
+    settings.ControlStyle.CssClass = "editor";
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.CallbackRouteValues = new { Area = "Routes", Controller = "Map", Action = "ZonePartial", mId = Model.ModelId };
+
+    settings.Properties.EnableCallbackMode = true;
+    settings.Properties.CallbackPageSize = 30;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    settings.Properties.FilterMinLength = 2;
+    if (obj != null) settings.Properties.Items.Add(obj.Name, Id);
+    settings.Properties.TextField = "Name";
+    settings.Properties.ValueField = "AgentId";
+    settings.Properties.ValueType = typeof(int);
+    //settings.Properties.DropDownStyle = DropDownStyle.DropDown;
+    settings.EncodeHtml = false;
+    //settings.Properties.EnableClientSideAPI = true;
+        
+    settings.Properties.ClientSideEvents.BeginCallback = "function(s, e) { e.customArgs['Id'] = " + Id.ToString() + "; e.customArgs['Name'] = '" + Name + "'; }";
+}).BindList(ZoneModel.GetZonesRange, ZoneModel.GetZoneById).Bind(Id == 0 ? null : (int?)Id).GetHtml()

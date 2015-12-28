@@ -1,0 +1,183 @@
+﻿@using BusinessObjects
+@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentsWeb.Areas.Agents.Models
+@using DocumentsWeb.Areas.Kb.Models
+@using DocumentsWeb.Models
+@model NewsModel
+
+@{
+    bool haveEdit = !Model.IsReadOnly && WADataProvider.LibrariesElementRightView.IsAllow(Right.UIEDIT, WebModuleNames.WEB_MODULE_NEWS) && !WADataProvider.CommonRightView.ReadOnly;
+}
+
+<input type="hidden" id="KindId" name="KindId" value="@Model.KindId" />
+            
+<table style="width: 600px;">
+    <tr><td class="table_label">
+            @Html.DevExpress().Label(s =>
+                {
+                    s.ControlStyle.CssClass = "label";
+                    //s.Style.Add("float", "left");
+                    s.Text = "Предприятие:";
+                    s.AssociatedControlName = GlobalPropertyNames.MyCompanyId;
+                    s.ToolTip = NewsData.GetTooltip("cmbMyCompanyId");
+                }).GetHtml()
+        </td><td>
+                 @Html.DevExpress().ComboBox(settings =>{
+                                                            settings.Name = GlobalPropertyNames.MyCompanyId;
+                                                            settings.ReadOnly = Model.IsReadOnly | Model.IsSystem | Model.Id > 0;
+                                                            if (!settings.ReadOnly)
+                                                            {
+                                                                settings.Properties.NullDisplayText = "Выберите предприятие...";
+                                                                settings.ToolTip = AgentData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), "cmbMyCompanyId");
+                                                            }
+                                                            //settings.CallbackRouteValues = new { Area = "Agents", Controller = "Store", Action = "StorekeeperPartial" };
+                                                            settings.Properties.EnableCallbackMode = true;
+                                                            settings.Properties.ValueField = GlobalPropertyNames.Id;
+                                                            settings.Properties.TextField = GlobalPropertyNames.Name;
+                                                            settings.Properties.ValueType = typeof(int);
+                                                            settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                                                            settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                                                            settings.ShowModelErrors = true;
+                                                            settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                                                            settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                                                            settings.Properties.ClientSideEvents.ValueChanged = "function AgentDepartmentFromId_Changed(s, e) { UserOwnerId.PerformCallback(); }";
+                 }).BindList(ClientModel.GetMyDepatmentsBind(Model.MyCompanyId)).Bind(Model.MyCompanyId == 0 ? null : (int?)Model.MyCompanyId).GetHtml()
+             </td></tr>
+             
+    <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            //s.Style.Add("float", "left");
+            s.Text = "Автор:";
+            s.AssociatedControlName = GlobalPropertyNames.UserOwnerId;
+            s.ToolTip = NewsData.GetTooltip(GlobalPropertyNames.UserOwnerId);
+        }).GetHtml()
+        </td><td>
+         @Html.DevExpress().ComboBox(settings =>{
+        settings.Name = GlobalPropertyNames.UserOwnerId;
+    settings.ReadOnly = Model.IsReadOnly | Model.IsSystem | Model.Id > 0;
+    if (!settings.ReadOnly)
+    {
+        settings.Properties.NullDisplayText = "Выберите автора...";
+        settings.ToolTip = NewsData.GetTooltip(GlobalPropertyNames.UserOwnerId);
+    }
+    settings.Properties.EnableCallbackMode = true;
+    settings.Properties.ValueField = GlobalPropertyNames.Id;
+    settings.Properties.TextField = "WorkerName";
+    settings.Properties.ValueType = typeof(int);
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.ShowModelErrors = true;
+    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+    settings.Properties.ClientSideEvents.BeginCallback = "function(s, e) { e.customArgs['UserOwnerId'] = UserOwnerId.GetValue(); e.customArgs['MyCompanyId'] = MyCompanyId.GetValue(); e.customArgs['ReadOnly'] = '" + (!haveEdit).ToString() + "'; }";
+    settings.Properties.ClientSideEvents.ButtonClick = "function(s, e) { switch(e.buttonIndex) { case 0: PeopleFinderAuthor.Show(); break; } }";
+    }).BindList(UserModel.GetUserAgents(Model.UserOwnerId)).Bind(Model.UserOwnerId == 0 ? (int?)null : Model.UserOwnerId).GetHtml() 
+        </td></tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>{
+                                             s.ControlStyle.CssClass = "label";
+                                             s.Text = "Заголовок:";
+                                             if (string.IsNullOrEmpty(Model.Name))
+                                                 s.ControlStyle.ForeColor = System.Drawing.Color.Red;
+                                             s.AssociatedControlName = GlobalPropertyNames.Name;
+                                             s.ToolTip = NewsData.GetTooltip(GlobalPropertyNames.Name);
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBox(s =>{
+                                               s.Name = GlobalPropertyNames.Name;
+                                               s.ControlStyle.CssClass = "editor";
+                                               s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                                               s.ShowModelErrors = true;
+                                               s.ReadOnly = !haveEdit;
+                                               if(!s.ReadOnly)
+                                               {
+                                                   s.Properties.NullTextStyle.ForeColor = System.Drawing.Color.FromArgb(249, 97, 97);
+                                                   s.Properties.NullText = NewsData.GetNullText(GlobalPropertyNames.Name);
+                                                   s.ToolTip = NewsData.GetTooltip(GlobalPropertyNames.Name);
+                                               }
+                                               s.Properties.ConvertEmptyStringToNull = true;
+                                               s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                                               s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.Name).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>
+                {
+                    s.ControlStyle.CssClass = "label";
+                    s.Text = "Кратко:";
+                    s.AssociatedControlName = GlobalPropertyNames.NameFull;
+                    s.ToolTip = NewsData.GetTooltip(GlobalPropertyNames.NameFull);
+                }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().Memo(s =>
+                {
+                    s.Name = GlobalPropertyNames.NameFull;
+                    s.ControlStyle.CssClass = "editor";
+                    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    s.ShowModelErrors = true;
+                    s.ReadOnly = !haveEdit;
+                    if (!s.ReadOnly)
+                    {
+                        s.Properties.NullText = NewsData.GetNullText(GlobalPropertyNames.NameFull);
+                        s.ToolTip = NewsData.GetTooltip(GlobalPropertyNames.NameFull);
+                    }
+                    s.Height = 40;
+                    s.Properties.ConvertEmptyStringToNull = true;
+                    s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                    s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                }).Bind(Model.NameFull).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+                {
+                    settings.Text = "Дата публикации:";
+                    settings.AssociatedControlName = GlobalPropertyNames.SendDate;
+                    settings.ToolTip = NewsData.GetTooltip(GlobalPropertyNames.SendDate);
+                }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().DateEdit(settings =>
+                {
+                    settings.Style.Add("float", "left");
+                    settings.Name = GlobalPropertyNames.SendDate;
+                    settings.Properties.NullDisplayText = "Выберите дату...";
+                    settings.ToolTip = NewsData.GetTooltip(GlobalPropertyNames.SendDate);
+                    settings.ShowModelErrors = true;
+                    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                    settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                    settings.ReadOnly = !haveEdit;
+                    settings.Properties.AllowNull = true;
+                    settings.Properties.Style.ForeColor = settings.ReadOnly ? System.Drawing.Color.LightGray : System.Drawing.Color.Black;
+                }).Bind(Model.SendDate).GetHtml() 
+                
+                @Html.DevExpress().TimeEdit(settings =>
+                        {
+                            settings.Style.Add("float", "left");
+                            settings.Width = System.Web.UI.WebControls.Unit.Pixel(70);
+                            settings.Name = "SendTimeAsDate";
+                            settings.Properties.NullDisplayText = "Выберите время...";
+                            settings.ShowModelErrors = true;
+                            settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                            settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                            settings.ReadOnly = !haveEdit;
+                            settings.Properties.Style.ForeColor = settings.ReadOnly ? System.Drawing.Color.LightGray : System.Drawing.Color.Black;
+                        }).Bind(Model.SendTimeAsDate).GetHtml() 
+        </td>
+    </tr>
+
+    <tr>
+        <td colspan="2" >
+            @Html.Partial("MemoPartial", Model)
+        </td>
+    </tr>
+</table>

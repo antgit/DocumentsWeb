@@ -1,0 +1,467 @@
+﻿@model DocumentsWeb.Areas.Kb.Models.TaskModel
+@using BusinessObjects
+@using DocumentsWeb.Models
+@using DocumentsWeb.Areas.Analitics.Models
+
+<input type="hidden" id="HierarchyId" name="HierarchyId" value="@Model.HierarchyId"/>
+<input type="hidden" id="FlagString" name="FlagString" value="@Model.FlagString"/>
+<input type="hidden" id="Id" name="Id" value="@Model.Id"/>
+<input type="hidden" id="ModelId" name="ModelId" value="@Model.ModelId"/>
+<input type="hidden" id="IsReadOnly" name="IsReadOnly" value="@Model.IsReadOnly"/>
+
+<table class="edit_form_table2">
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Name = "lblName";
+                settings.ToolTip = "Краткое наименование задачи";
+                settings.Text = "Имя";
+                settings.AssociatedControlName = "Name";
+                settings.Properties.EnableClientSideAPI = true;
+                settings.ClientVisible = false;
+            }).GetHtml()
+        </td>
+        <td colspan="3">                       
+            @Html.DevExpress().Memo(settings =>
+            {
+                settings.Name = "Name";
+                settings.ToolTip = "Краткое наименование задачи";
+                settings.Properties.NullDisplayText = "Введите имя...";
+                settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                settings.ClientVisible = false;
+                settings.Enabled = !Model.IsReadOnly;
+            }).Bind(Model.Name).GetHtml() 
+        </td>
+    </tr>
+
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Name = "lblCode";
+                settings.ToolTip = "Системный код задачи";
+                settings.Text = "Признак";
+                settings.AssociatedControlName = GlobalPropertyNames.Code;
+                settings.Properties.EnableClientSideAPI = true;
+                settings.ClientVisible = false;
+            }).GetHtml()
+        </td>
+        <td colspan="3">                       
+            @Html.DevExpress().TextBox(settings =>
+            {
+                settings.Name = GlobalPropertyNames.Code;
+                settings.ToolTip = "Системный код задачи";
+                settings.Properties.NullDisplayText = "Введите код...";
+                settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                settings.ClientVisible = false;
+                settings.Enabled = !Model.IsReadOnly;
+            }).Bind(Model.Code).GetHtml() 
+        </td>
+    </tr>
+
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Name = "lblNameFull";
+                settings.ToolTip = "Полное наименование задачи";
+                settings.Text = "Полное наименование";
+                settings.AssociatedControlName = "NameFull";
+                settings.Properties.EnableClientSideAPI = true;
+                settings.ClientVisible = false;
+            }).GetHtml()
+        </td>
+        <td colspan="3">                       
+            @Html.DevExpress().Memo(settings =>
+            {
+                settings.Name = "NameFull";
+                settings.ToolTip = "Полное наименование задачи";
+                settings.Properties.NullDisplayText = "Введите полное наименование...";
+                settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                settings.ClientVisible = false;
+                settings.Enabled = !Model.IsReadOnly;
+            }).Bind(Model.NameFull).GetHtml() 
+        </td>
+    </tr>
+
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Text = "Автор";
+                settings.ToolTip = "Автор (инициатор) задачи, в списке выбора доступны пользователи ассоциированные с сотрудниками";
+                settings.AssociatedControlName = GlobalPropertyNames.UserOwnerId;
+            }).GetHtml()
+        </td>
+        <td colspan="3">                       
+            @Html.DevExpress().ComboBox(settings =>
+            {
+                settings.Name = GlobalPropertyNames.UserOwnerId;
+                settings.ToolTip = "Автор (инициатор) задачи, в списке выбора доступны пользователи ассоциированные с сотрудниками";
+                settings.Properties.NullDisplayText = "Выберите автора...";
+                settings.Properties.TextFormatString = "{0}";
+                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                settings.Properties.ValueField = GlobalPropertyNames.Id;
+                settings.Properties.TextField = "WorkerName";
+                settings.Properties.ValueType = typeof(int);
+                settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                settings.ShowModelErrors = true;
+                settings.Enabled = !Model.IsReadOnly;
+                EditButton b = settings.Properties.Buttons.Add();
+                b.Image.Url = "~/Images/search_x10.png";
+                b.ToolTip = "Поиск";
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                settings.Properties.Columns.Add("WorkerName", "Наименование", 150);
+                if (WADataProvider.CurrentUserCompanyMultyCount())
+                {
+                    settings.Properties.Columns.Add("MyCompanyName", "Компания-владелец", 150);
+                }
+                settings.Properties.ClientSideEvents.ButtonClick = "function(s, e) { switch(e.buttonIndex) { case 0: ShowPeopleFinderAuthor(); break; } }";
+            }).BindList(UserModel.GetUserAgents(Model.UserOwnerId)).Bind(Model.UserOwnerId == 0 ? (int?)null : Model.UserOwnerId).GetHtml() 
+        </td>
+    </tr>
+
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Text = "Исполнитель";
+                settings.AssociatedControlName = "UserToId";
+            }).GetHtml()
+        </td>
+        <td colspan="3">                       
+            @Html.DevExpress().ComboBox(settings =>
+            {
+                settings.Name = "UserToId";
+                settings.ToolTip = "Исполнитель задачи, в списке выбора доступны пользователи ассоциированные с сотрудниками";
+                settings.Properties.NullDisplayText = "Выберите исполнителя...";
+                settings.Properties.TextFormatString = "{0}";
+                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                settings.Properties.ValueField = "Id";
+                settings.Properties.TextField = "WorkerName";
+                settings.Properties.ValueType = typeof(int);
+                settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                settings.ShowModelErrors = true;
+                settings.Enabled = !Model.IsReadOnly;
+                EditButton b = settings.Properties.Buttons.Add();
+                b.Image.Url = "~/Images/search_x10.png";
+                b.ToolTip = "Поиск";
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                settings.Properties.Columns.Add("WorkerName", "Наименование", 150);
+                if (WADataProvider.CurrentUserCompanyMultyCount())
+                {
+                    settings.Properties.Columns.Add("MyCompanyName", "Компания-владелец", 150);
+                }
+
+                settings.Properties.ClientSideEvents.ButtonClick = "function(s, e) { switch(e.buttonIndex) { case 0: ShowPeopleFinderCreator(); break; } }";
+            }).BindList(UserModel.GetUserAgents(Model.UserToId)).Bind(Model.UserToId == 0 ? (int?)null : Model.UserToId).GetHtml() 
+        </td>
+    </tr>
+
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Text = "Состояние";
+                settings.ToolTip = "Состояние задачи, в списке выбора доступны данные из аналитического справочника \"Состояние задач\"";
+                settings.AssociatedControlName = "TaskStateId";
+            }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().ComboBox(settings =>
+            {
+                settings.Name = "TaskStateId";
+                settings.ToolTip = "Состояние задачи, в списке выбора доступны данные из аналитического справочника \"Состояние задач\"";
+                settings.Properties.NullDisplayText = "Выберите состояние...";
+                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                settings.Properties.ValueField = "Id";
+                settings.Properties.TextField = "Name";
+                settings.Properties.ValueType = typeof(int);
+                settings.Enabled = !Model.IsReadOnly;
+                //settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).BindList(AnaliticModel.GetCollection("SYSTEM_ANALITIC_TASKSTATE")).Bind(Model.TaskStateId == 0 ? (int?)null : Model.TaskStateId).GetHtml() 
+        </td>
+
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Text = "Приоритет";
+                settings.ToolTip = "Состояние задачи, в списке выбора доступны данные из аналитического справочника \"Важность\"";
+                settings.AssociatedControlName = "PriorityId";
+            }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().ComboBox(settings =>
+            {
+                settings.Name = "PriorityId";
+                settings.ToolTip = "Состояние задачи, в списке выбора доступны данные из аналитического справочника \"Важность\"";
+                settings.Properties.NullDisplayText = "Выберите приоритет...";
+                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                settings.Properties.ValueField = "Id";
+                settings.Properties.TextField = "Name";
+                settings.Properties.ValueType = typeof(int);
+                //settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                settings.Enabled = !Model.IsReadOnly;
+            }).BindList(AnaliticModel.GetCollection("CONTRACT_PRIORITY")).Bind(Model.PriorityId == 0 ? (int?)null : Model.PriorityId).GetHtml() 
+        </td>
+    </tr>
+
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Text = "Дата план начала";
+                settings.ToolTip = "Дата планового начала выполнения или рассмотрения задачи";
+                settings.AssociatedControlName = "DateStartPlan";
+            }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().DateEdit(settings =>
+            {
+                settings.Name = "DateStartPlan";
+                settings.ToolTip = "Дата планового начала выполнения или рассмотрения задачи";
+                settings.Properties.NullDisplayText = "Выберите дату...";
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                settings.Enabled = !Model.IsReadOnly;
+            }).Bind(Model.DateStartPlan).GetHtml() 
+        </td>
+
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Text = "Время план начала";
+                settings.ToolTip = "Время планового начала выполнения или рассмотрения задачи";
+                settings.AssociatedControlName = "DateStartPlanTimeAsDate";
+            }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().TimeEdit(settings =>
+            {
+                settings.Name = "DateStartPlanTimeAsDate";
+                settings.ToolTip = "Время планового начала выполнения или рассмотрения задачи";
+                settings.Properties.NullDisplayText = "Выберите время...";
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                settings.Enabled = !Model.IsReadOnly;
+            }).Bind(Model.DateStartPlanTimeAsDate).GetHtml() 
+        </td>
+    </tr>
+
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Text = "Дата план завершения";
+                settings.ToolTip = "Дата планового завершения задачи";
+                settings.AssociatedControlName = "DateEndPlan";
+            }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().DateEdit(settings =>
+            {
+                settings.Name = "DateEndPlan";
+                settings.ToolTip = "Дата планового завершения задачи";
+                settings.Properties.NullDisplayText = "Выберите дату...";
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                settings.Enabled = !Model.IsReadOnly;
+            }).Bind(Model.DateEndPlan).GetHtml() 
+        </td>
+
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Text = "Время план завершения";
+                settings.ToolTip = "Время планового завершения задачи";
+                settings.AssociatedControlName = "DateEndPlanTimeAsDate";
+            }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().TimeEdit(settings =>
+            {
+                settings.Name = "DateEndPlanTimeAsDate";
+                settings.ToolTip = "Время планового завершения задачи";
+                settings.Properties.NullDisplayText = "Выберите время...";
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                settings.Enabled = !Model.IsReadOnly;
+            }).Bind(Model.DateEndPlanTimeAsDate).GetHtml() 
+        </td>
+    </tr>
+
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Text = "Дата начала";
+                settings.ToolTip = "Дата фактического начала выполнения задачи";
+                settings.AssociatedControlName = "DateStart";
+            }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().DateEdit(settings =>
+            {
+                settings.Name = "DateStart";
+                settings.ToolTip = "Дата фактического начала выполнения задачи";
+                settings.Properties.NullDisplayText = "Выберите дату...";
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                settings.Enabled = !Model.IsReadOnly;
+            }).Bind(Model.DateStart).GetHtml() 
+        </td>
+
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Text = "Время начала";
+                settings.ToolTip = "Время фактического начала выполнения задачи";
+                settings.AssociatedControlName = "DateStartTimeAsDate";
+            }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().TimeEdit(settings =>
+            {
+                settings.Name = "DateStartTimeAsDate";
+                settings.ToolTip = "Время фактического начала выполнения задачи";
+                settings.Properties.NullDisplayText = "Выберите время...";
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                settings.Enabled = !Model.IsReadOnly;
+            }).Bind(Model.DateStartTimeAsDate).GetHtml() 
+        </td>
+    </tr>
+
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Text = "Дата завершения";
+                settings.ToolTip = "Дата фактического завершения задачи";
+                settings.AssociatedControlName = "DateEnd";
+            }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().DateEdit(settings =>
+            {
+                settings.Name = "DateEnd";
+                settings.ToolTip = "Дата фактического завершения задачи";
+                settings.Properties.NullDisplayText = "Выберите дату...";
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                settings.Enabled = !Model.IsReadOnly;
+            }).Bind(Model.DateEnd).GetHtml() 
+        </td>
+
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Text = "Время завершения";
+                settings.ToolTip = "Время фактического завершения задачи";
+                settings.AssociatedControlName = "DateEndTimeAsDate";
+            }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().TimeEdit(settings =>
+            {
+                settings.Name = "DateEndTimeAsDate";
+                settings.ToolTip = "Время фактического завершения задачи";
+                settings.Properties.NullDisplayText = "Выберите время...";
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                settings.Enabled = !Model.IsReadOnly;
+            }).Bind(Model.DateEndTimeAsDate).GetHtml() 
+        </td>
+    </tr>
+
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Text = "Номер";
+                settings.AssociatedControlName = "TaskNumber";
+            }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().SpinEdit(settings =>
+            {
+                settings.Name = "TaskNumber";
+                settings.ToolTip = "Порядковый номер задачи";
+                settings.Properties.NullDisplayText = "Введите номер...";
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                settings.Enabled = !Model.IsReadOnly;
+            }).Bind(Model.TaskNumber).GetHtml() 
+        </td>
+
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Text = "% выполения";
+                settings.ToolTip = "Текущий процент выполнения задачи";
+                settings.AssociatedControlName = "DonePersent";
+            }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().SpinEdit(settings =>
+            {
+                settings.Name = "DonePersent";
+                settings.ToolTip = "Текущий процент выполнения задачи";
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                settings.Enabled = !Model.IsReadOnly;
+                settings.Properties.Increment = 5;
+            }).Bind(Model.DonePersent).GetHtml()
+        </td>
+    </tr>
+
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Text = "Видна только автору";
+                settings.ToolTip = "Видимость задачи ограничена только автором задачи, другие пользователи не могут увидеть задачу в списке";
+                settings.AssociatedControlName = "InPrivate";
+            }).GetHtml()
+        </td>
+        <td  colspan="3">                       
+            @Html.DevExpress().CheckBox(settings =>
+            {
+                settings.Name = "InPrivate";
+                settings.ToolTip = "Видимость задачи ограничена только автором задачи, другие пользователи не могут увидеть задачу в списке";
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                settings.Enabled = !Model.IsReadOnly;
+            }).Bind(Model.InPrivate).GetHtml() 
+        </td>
+    </tr>
+</table>

@@ -1,0 +1,111 @@
+﻿@using BusinessObjects
+@*
+    Вкладка "Своства" для окна редактирования объекта
+*@
+<table class="edit_form_table2">
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>
+            {
+                s.Text = "Идентификатор:";
+                s.AssociatedControlName = "txtId";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = "txtId";
+                s.Enabled = false;
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.Id).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>
+                                   {
+                                       s.Text = "Пользователь:";
+                                       s.AssociatedControlName = GlobalPropertyNames.UserName;
+                                   }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBox(s =>
+                                     {
+                                         s.Name = "txtUserName";
+                                         //s.ControlStyle.CssClass = "editor2";
+                                         s.Enabled = false;
+                                         s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                                         s.ShowModelErrors = true;
+                                         s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                                         s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                                     }).Bind(Model.UserName).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>
+                                   {
+                                       s.Text = "Дата изменения:";
+                                       s.AssociatedControlName = "txtDateModified";
+                                   }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBox(s =>
+                                     {
+                                         s.Name = "txtDateModified";
+                                         //s.ControlStyle.CssClass = "editor2";
+                                         s.Enabled = false;
+                                         s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                                         s.ShowModelErrors = true;
+                                         s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                                         s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                                     }).Bind(Model.DateModified).GetHtml()
+        </td>
+    </tr>
+    
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>
+            {
+                s.Text = "Компания:";
+                s.AssociatedControlName = "MyCompanyName";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = "txtMyCompanyName";
+                //s.ControlStyle.CssClass = "editor2";
+                s.Enabled = false;
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.MyCompanyName).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>
+            {
+                s.Text = "Ид компании:";
+                s.AssociatedControlName = "MyCompanyId";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = "txtMyCompanyId";
+                //s.ControlStyle.CssClass = "editor2";
+                s.Enabled = false;
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.MyCompanyId).GetHtml()
+        </td>
+    </tr>
+</table>

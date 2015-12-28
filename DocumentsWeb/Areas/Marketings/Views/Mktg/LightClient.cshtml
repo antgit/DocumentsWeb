@@ -1,0 +1,74 @@
+﻿@using BusinessObjects
+@using DocumentsWeb.Models
+@using DevExpress.Web.Mvc
+@using DevExpress.Web.Mvc.UI
+@using DocumentsWeb.Areas.Agents.Models
+@model ClientModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("LightClient", "Mktg", FormMethod.Post, new { @class = "edit_form", @id = "editForm" }))
+{
+    <br />
+    <br />
+    <b>Клиент:</b>
+    <input type="hidden" id="MyCompanyId" name="MyCompanyId" value="@Model.MyCompanyId" />
+    <input type="hidden" id="KindId" name="KindId" value="@Model.KindId" />
+    <table style="width: 100%; height: 100%;">
+        <tr>
+            <td class="table_label">
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Style.Add("float", "left");
+                s.Text = "Факт. имя:";
+                s.AssociatedControlName = GlobalPropertyNames.Name;
+            }).GetHtml()
+            </td>
+            <td>
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.ControlStyle.CssClass = "editor";
+                s.Name = GlobalPropertyNames.Name;
+                s.Style.Add("float", "left");
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                //s.Properties.ClientSideEvents.GotFocus = "OnEditorGotFocus";
+                //s.Properties.ClientSideEvents.LostFocus = "OnEditorLostFocus";
+                s.Properties.NullDisplayText = "Введите фактическое имя ...";
+            }).Bind(Model.Name).GetHtml()
+            </td>
+        </tr>
+        <tr class="table_label">
+            <td>
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Style.Add("float", "left");
+                s.Text = "Юр. имя:";
+                s.AssociatedControlName = GlobalPropertyNames.NameFull;
+            }).GetHtml()
+            </td>
+            <td>
+            @Html.DevExpress().Memo(s =>
+            {
+                s.Properties.NullDisplayText = "Введите юридическое имя...";
+                s.ControlStyle.CssClass = "editor";
+                s.Name = GlobalPropertyNames.NameFull;
+                s.Style.Add("float", "left");
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.Height = 170;
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                //s.Properties.ClientSideEvents.GotFocus = "OnEditorGotFocus";
+                //s.Properties.ClientSideEvents.LostFocus = "OnEditorLostFocus";
+            }).Bind(Model.NameFull).GetHtml()
+            </td>
+        </tr>
+    </table>
+}

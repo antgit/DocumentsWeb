@@ -1,0 +1,25 @@
+﻿@using DocumentsWeb.Areas.Agents.Models
+@using DocumentsWeb.Areas.Sales.Models
+@model DocumentSaleModel
+@Html.DevExpress().ComboBox(settings =>{
+    settings.Name = "SupervisorId";
+    settings.CallbackRouteValues = new { Controller = Url.RequestContext.RouteData.Values["controller"], Action = "SupervisorPartial", modelId = Model.ModelId };
+    settings.Properties.EnableCallbackMode = true;
+    //settings.Properties.CallbackPageSize = 20;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    settings.Properties.ValueField = "Id";
+    settings.Properties.TextField = "Name";
+    settings.Properties.ValueType = typeof(int);
+    settings.Properties.NullDisplayText = "Выберите супервайзера...";
+    EditButton b = settings.Properties.Buttons.Add();
+    b.Image.Url = "~/Images/search_x10.png";
+    b.ToolTip = "Поиск";
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.ClientEnabled = !Model.IsReadOnly;
+    settings.ShowModelErrors = !Model.IsReadOnly && Model.MainCompanyDepatmentId.HasValue && Model.MainCompanyDepatmentId.Value != 0; 
+    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+    settings.Properties.ClientSideEvents.BeginCallback = "function(s, e) { e.customArgs['MainCompanyDepatmentId'] = MainCompanyDepatmentId.GetValue();}";
+    settings.Properties.ClientSideEvents.EndCallback = "function(s, e) { s.SetSelectedIndex(-1);}";
+    settings.Properties.ClientSideEvents.ButtonClick = "function(s, e) { switch(e.buttonIndex) { case 0: ShowSupervisorFinder(); break; } }";
+}).BindList(ClientModel.GetChainSourceList(Model.MainCompanyDepatmentId)).BindList(ClientModel.GetAgentsLightByValue(Model.SupervisorId)).Bind(Model.SupervisorId == 0 ? null : (int?)Model.SupervisorId).GetHtml()

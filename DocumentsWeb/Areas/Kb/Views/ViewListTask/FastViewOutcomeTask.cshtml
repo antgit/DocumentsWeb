@@ -1,0 +1,83 @@
+﻿@using DocumentsWeb.Areas.Kb.Models
+@Html.DevExpress().GridView(gs =>
+                                                {
+                                                    gs.Name = "gvLastTaskOutcome";
+                                                    gs.KeyFieldName = "Id";
+                                                    gs.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                                                    gs.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+                                                    gs.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.NextColumn;
+                                                    gs.SettingsPager.PageSize = 5;
+                                                    gs.Settings.ShowColumnHeaders = false;
+                                                    gs.Settings.ShowTitlePanel = true;
+                                                    gs.SettingsText.Title = "Задачи на контроле...";
+                                                    gs.SetTitlePanelTemplateContent(s =>
+                                                    {
+                                                        ViewContext.Writer.Write("<div style=\"width: 100%; text-align: center; font-size: 10pt;\">");
+                                                        @Html.DevExpress().HyperLink(hl =>
+                                                        {
+                                                            hl.Properties.ImageUrl = Url.Content("~/Images/TASK_RED_X16.png");
+                                                            hl.ToolTip = "Задачи...";
+                                                            hl.Style.Add("float", "left");
+                                                            hl.NavigateUrl = Url.Action("Index", new { area = "Kb", controller = "ViewListTask", action = "Index" });
+                                                        }).Render();
+
+                                                        Html.DevExpress().HyperLink(set =>
+                                                        {
+                                                            set.Style.Add("float", "left");
+                                                            set.Style.Add("margin-left", "5px");
+
+                                                            set.NavigateUrl = Url.Action("Index", new { area = "Kb", controller = "ViewListTask", action = "Index" });
+                                                            set.Properties.Text = "Задачи на контроле...";
+                                                            set.ToolTip = "Задачи поставленные мною для исполнения";
+
+                                                        }).Render();
+
+                                                        ViewContext.Writer.Write("</div>");
+                                                    });
+
+                                                    gs.SetEmptyDataRowTemplateContent(s => @Html.DevExpress().HyperLink(set =>
+                                                        {
+                                                            set.NavigateUrl = Url.Action("Index", new { area = "Kb", controller = "ViewListTask", action = "Index" });
+                                                            set.Properties.Text = "У вас нет задач на контроле";
+                                                        }).GetHtml());
+                                                    gs.Settings.ShowVerticalScrollBar = true;
+                                                    gs.Settings.VerticalScrollableHeight = 125;
+                                                    gs.CallbackRouteValues = new { area = "Kb", Controller = "ViewListTask", Action = "FastViewOutcomeTask" };
+                                                    gs.SettingsBehavior.AllowFocusedRow = true;
+                                                    gs.Styles.Cell.Font.Size = System.Web.UI.WebControls.FontUnit.Point(11);
+                                                    gs.Styles.Cell.Paddings.Padding = System.Web.UI.WebControls.Unit.Pixel(2);
+                                                    gs.Styles.Cell.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+
+                                                    gs.Settings.ShowFilterRow = false;
+                                                    gs.Settings.ShowHorizontalScrollBar = true;
+                                                    gs.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+                                                    gs.Styles.AlternatingRow.Enabled = DefaultBoolean.True;
+
+
+                                                    MVCxGridViewColumn colDate = gs.Columns.Add("DateStart", "Дата");
+                                                    colDate.Width = 70;
+                                                    colDate.PropertiesEdit.DisplayFormatString = "d";
+                                                    colDate.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+                                                    colDate.ColumnType = MVCxGridViewColumnType.DateEdit;
+
+                                                   gs.Columns.Add(cc =>
+                                                                                                    {
+                                                                                                        cc.Name = "colName";
+                                                                                                        cc.FieldName = "Name";
+                                                                                                        cc.Caption = "Наименование";
+                                                                                                        //cc.FixedStyle = GridViewColumnFixedStyle.Left;
+                                                                                                        cc.Settings.AllowDragDrop = DefaultBoolean.False;
+                                                                                                        cc.Settings.AllowSort = DefaultBoolean.False;
+                                                                                                        cc.Width = 525;
+                                                                                                        cc.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+                                                                                                        cc.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+                                                                                                        cc.SetDataItemTemplateContent(c => Html.DevExpress().HyperLink(linkSettings =>
+                                                                                                            {
+                                                                                                                linkSettings.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Kb", Controller = "Task", Action = "Edit", Id = DataBinder.Eval(c.DataItem, "Id") });
+                                                                                                                linkSettings.Properties.Target = "_blank";
+                                                                                                                linkSettings.ToolTip = "Просмотреть задачу";
+                                                                                                                linkSettings.Properties.Text = (string)DataBinder.Eval(c.DataItem, "Name");
+
+                                                                                                            }).Render());
+                                                                                                    });
+                                                }).Bind(TaskModel.GetLastOutcommingTask()).GetHtml()

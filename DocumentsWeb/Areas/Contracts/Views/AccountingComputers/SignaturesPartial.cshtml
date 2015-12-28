@@ -1,0 +1,244 @@
+﻿@using System.Globalization
+@using DocumentsWeb.Models;
+@model DocumentsWeb.Areas.Contracts.Models.DocumentContractModel
+
+@Html.DevExpress().GridView(s => {
+    s.Name = "gvResponsible";
+    s.KeyFieldName = "RowId";
+    s.CallbackRouteValues = new { Controller = "AccountingComputers", Action = "SignaturesPartial", mId = Model.ModelId };
+    s.SettingsEditing.AddNewRowRouteValues = new { Controller = "AccountingComputers", Action = "SignatureAddPartial", mId = Model.ModelId };
+    s.SettingsEditing.UpdateRowRouteValues = new { Controller = "AccountingComputers", Action = "SignatureUpdatePartial", mId = Model.ModelId };
+    s.SettingsEditing.DeleteRowRouteValues = new { Controller = "AccountingComputers", Action = "SignatureDeletePartial", mId = Model.ModelId };
+    s.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    s.Height = System.Web.UI.WebControls.Unit.Pixel(290);
+     
+    s.Settings.ShowVerticalScrollBar = true;
+    s.Settings.ShowHorizontalScrollBar = true;
+    s.Settings.VerticalScrollableHeight = 290;
+    
+    s.Columns.Add(cc =>
+    {
+        cc.Name = "colImageAction";
+        cc.Width = System.Web.UI.WebControls.Unit.Pixel(35);
+        cc.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+        cc.CellStyle.Paddings.PaddingLeft = 2;
+        cc.Settings.AllowDragDrop = DefaultBoolean.False;
+        cc.Settings.AllowSort = DefaultBoolean.False;
+        cc.ShowInCustomizationForm = false;
+        cc.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+        cc.SetDataItemTemplateContent(c =>
+        {
+            ViewContext.Writer.Write("<table><tr>");
+            ViewContext.Writer.Write("<td>");
+            Html.DevExpress().HyperLink(hl =>
+            {
+                hl.Properties.ImageUrl = Url.Content("~/Images/edit10x10.png");
+                hl.ToolTip = "Изменить";
+                hl.NavigateUrl = "javascript:updateRow(" + c.ItemIndex.ToString(CultureInfo.InvariantCulture) + ");";
+            }).Render();
+            ViewContext.Writer.Write("</td><td>");
+            Html.DevExpress().HyperLink(hl =>
+            {
+                hl.Properties.ImageUrl = Url.Content("~/Images/DELETEDELEMENT_X16.png");
+                hl.ToolTip = "Удалить";
+                hl.NavigateUrl = "javascript:deleteRow(" + c.ItemIndex.ToString(CultureInfo.InvariantCulture) + ");";
+                //hl.Enabled = haveDelete;
+            }).Render();
+            ViewContext.Writer.Write("</td></tr></table>");
+        });
+    });
+    
+    s.Columns.Add("OrderNo", "Порядок");
+    s.Columns.Add("AgentName", "Ответственный").Width = 200;
+    s.Columns.Add("AgentSubName", "Заместитель").Width = 200;
+    s.Columns.Add("DateTo", "Подписать ДО").ColumnType = MVCxGridViewColumnType.DateEdit;
+    s.Columns.Add("ResolutionName", "Резолюция");
+    s.Columns.Add("DateSign", "Дата резолюции").ColumnType = MVCxGridViewColumnType.DateEdit;
+    s.Columns.Add("AgentSignName", "Подписант").Width = 200;
+    s.Columns.Add("Memo", "Примечание");
+    s.Columns.Add("PriorityName", "Важность");
+    s.Columns.Add("GroupNo", "Группа");
+    s.Columns.Add("DepatmentName", "Отдел");
+    s.Columns.Add("TaskNeed", "Задание").Visible = false;
+    s.Columns.Add("MessageNeed", "Сообщение").Visible = false;
+
+    @*s.Settings.ShowFooter = true;*@
+    s.Settings.ShowTitlePanel = true;
+
+    @*s.SetFooterRowTemplateContent(c =>
+    {
+        ViewContext.Writer.Write("<div style=\"width: 100%; text-align: center; font-size: 10pt;\"><a href=\"javascript:gvResponsible.AddNewRow();\">Создать</a> / <a href=\"javascript:FillResponsibles();\">Заполнить</a></div>");
+    });*@
+
+    s.SetTitlePanelTemplateContent(c =>
+    {
+        ViewContext.Writer.Write("<div style=\"width: 100%; text-align: center; font-size: 10pt;\"><a href=\"javascript:gvResponsible.AddNewRow();\">Создать</a> / <a href=\"javascript:FillResponsibles();\">Заполнить</a></div>");
+    });
+
+    s.SetEditFormTemplateContent(c =>
+    {
+        ViewContext.Writer.Write("<input type=\"hidden\" id=\"OwnId\" name=\"OwnId\" value=\"" + Model.Id + "\">");
+
+        ViewContext.Writer.Write("<table style=\"width: 450px;\">");
+        ViewContext.Writer.Write("<tr><td colspan=\"2\">");
+        ViewContext.Writer.Write("<table><tr><td>");
+        Html.DevExpress().Button(btnSettings =>
+        {
+            btnSettings.Name = "btnUpdate";
+            btnSettings.ControlStyle.CssClass = "button";
+            btnSettings.Text = "Сохранить";
+            btnSettings.ClientSideEvents.Click = "function(s, e){ gvResponsible.UpdateEdit(); }";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().Button(btnSettings =>
+        {
+            btnSettings.Name = "btnCancel";
+            btnSettings.ControlStyle.CssClass = "button";
+            btnSettings.Text = "Отмена";
+            btnSettings.ClientSideEvents.Click = "function(s, e){ gvResponsible.CancelEdit(); }";
+        }).Render();
+        ViewContext.Writer.Write("</td></tr></table>");
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Очередь:";
+            edtSettings.AssociatedControlName = "OrderNo";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().SpinEdit(edtSettings =>
+        {
+            edtSettings.Name = "OrderNo";
+            edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            edtSettings.ControlStyle.CssClass = "editor";
+            edtSettings.Properties.MinValue = 0;
+            edtSettings.Properties.MaxValue = 9999;
+            edtSettings.ShowModelErrors = true;
+            edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "OrderNo") : null).Render();
+        ViewContext.Writer.Write("</td></tr>");
+        
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Ответственный:";
+            edtSettings.AssociatedControlName = "AgentId";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.RenderPartial("WorkerPartial", new ViewDataDictionary
+        {
+            { "WorkerId", c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "AgentId") : null },
+            { "GridName", "AgentId" }
+        });
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Заместитель:";
+            edtSettings.AssociatedControlName = "AgentSubId";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.RenderPartial("WorkerPartial", new ViewDataDictionary
+        {
+            { "WorkerId", c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "AgentSubId") : null },
+            { "GridName", "AgentSubId" }
+        });
+        ViewContext.Writer.Write("</td></tr>");
+         
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Подписать до:";
+            edtSettings.AssociatedControlName = "DateTo";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().DateEdit(edtSettings =>
+        {
+            edtSettings.Name = "DateTo";
+            edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            edtSettings.ControlStyle.CssClass = "editor";
+            edtSettings.ShowModelErrors = true;
+            edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "DateTo") : null).Render();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Оповестить:";
+            edtSettings.AssociatedControlName = "MessageNeed";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().CheckBox(edtSettings =>
+        {
+            edtSettings.Name = "MessageNeed";
+            edtSettings.ControlStyle.CssClass = "editor";
+        }).Bind(c.ItemIndex >= 0 ? Convert.ToBoolean(DataBinder.Eval(c.DataItem, "MessageNeed")) : true).Render();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Создать задание:";
+            edtSettings.AssociatedControlName = "TaskNeed";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().CheckBox(edtSettings =>
+        {
+            edtSettings.Name = "TaskNeed";
+            edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            edtSettings.ControlStyle.CssClass = "editor";
+        }).Bind(c.ItemIndex >= 0 ? Convert.ToBoolean(DataBinder.Eval(c.DataItem, "TaskNeed")) : true).Render();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Важность:";
+            edtSettings.AssociatedControlName = "PriorityId";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().ComboBox(edtSettings =>
+        {
+            edtSettings.Name = "PriorityId";
+            edtSettings.Properties.ValueField = "Id";
+            edtSettings.Properties.ValueType = typeof(int);
+            edtSettings.Properties.TextField = "Name";
+            edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            edtSettings.ControlStyle.CssClass = "editor";
+        }).BindList(DocumentsWeb.Areas.Analitics.Models.AnaliticModel.GetCollection("CONTRACT_PRIORITY")).
+        Bind(c.ItemIndex >= 0 &&  Convert.ToInt32(DataBinder.Eval(c.DataItem, "PriorityId"))!=0 ? Convert.ToInt32(DataBinder.Eval(c.DataItem, "PriorityId")) : (int?)null).Render();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Группа:";
+            edtSettings.AssociatedControlName = "GroupNo";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TextBox(edtSettings =>
+        {
+            edtSettings.Name = "GroupNo";
+            edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            edtSettings.ControlStyle.CssClass = "editor";
+        }).Bind(c.ItemIndex >= 0 ? Convert.ToInt32(DataBinder.Eval(c.DataItem, "GroupNo")) : 0).Render();
+        ViewContext.Writer.Write("</td></tr>");
+        
+        ViewContext.Writer.Write("</table>");
+    });
+    
+}).Bind(Model.Signs.Where(w => w.StateId != BusinessObjects.State.STATEDELETED)).GetHtml()

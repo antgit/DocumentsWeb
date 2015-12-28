@@ -1,0 +1,107 @@
+﻿@using System.Globalization
+@using BusinessObjects
+@using DocumentsWeb.Models
+@Html.DevExpress().GridView(settings=>{
+                                                settings.Settings.ShowTitlePanel = true;
+                                                
+                                                settings.SetTitlePanelTemplateContent(c =>
+                                                {
+                                                    ViewContext.Writer.Write("<div style=\"width: 100%; text-align: center; font-size: 10pt;\">");
+                                                    Html.DevExpress().HyperLink(hl =>
+                                                    {
+                                                        hl.Properties.ImageUrl = Url.Content("~/Images/REFRESHGREEN_X16.png");
+                                                        hl.ToolTip = "Обновить";
+                                                        hl.Style.Add("float", "left");
+                                                        hl.NavigateUrl = "javascript:gvServiceDocumentsAccountIn.PerformCallback('refresh=true');";
+                                                    }).Render();
+                                                    Html.DevExpress().HyperLink(s =>
+                                                    {
+                                                        s.Properties.Text = "Просмотреть весь список документов входящих счетов";
+                                                        s.NavigateUrl = Url.Action("Index", "ViewListAccountIn", new { Area = "Services", Controller = "ViewListIn" });
+
+                                                    }).Render();
+
+                                                    ViewContext.Writer.Write("</div>");
+                                                });
+                                                settings.Name = "gvServiceDocumentsAccountIn";
+                                                settings.CallbackRouteValues = new { Area = "Services", Controller = "Home", Action = "ViewBoardAccountInPartial" };
+                                                settings.Settings.ShowFilterBar = GridViewStatusBarMode.Hidden;
+                                                settings.SettingsBehavior.AllowFocusedRow = true;
+                                                settings.KeyFieldName = GlobalPropertyNames.Id;
+                                                settings.Settings.ShowGroupPanel = false;
+                                                settings.Settings.ShowFilterRow = false;
+                                                settings.Settings.ShowFilterRowMenu = false;
+                                                settings.SettingsPager.Visible = false;
+                                                settings.Settings.ShowVerticalScrollBar = true;
+                                                settings.Settings.ShowHorizontalScrollBar = true;
+                                                settings.Styles.Cell.Font.Size = System.Web.UI.WebControls.FontUnit.Point(11);
+                                                settings.Styles.Cell.Paddings.Padding = System.Web.UI.WebControls.Unit.Pixel(0);
+                                                settings.Styles.Cell.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+    
+                                                settings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+                                                settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+                                                
+                
+                                                settings.Columns.Add(column =>
+                                                                         {
+                                                                             column.Caption = "";
+                                                                             column.Width = 20;
+                                                                             column.SetDataItemTemplateContent(c =>
+                                                                                                                   {
+                                                                                                                       Html.DevExpress().HyperLink(hl =>
+                                                                                                                       {
+                                                                                                                           hl.Name = "ServicesDocumentEdit_" + c.ItemIndex.ToString(CultureInfo.InvariantCulture);
+                                                                                                                           hl.Properties.ImageUrl = Url.Content("~/Images/DOCUMENTDONE_X16.png");
+                                                                                                                           hl.ToolTip = "Просмотреть/Изменить";
+                                                                                                                           hl.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Services", Controller = "ServiceAccountIn", Action = "Edit", Id = c.KeyValue });
+                                                                                                                           hl.Properties.Target = "_blank";
+                                                                                                                           //hl.ClientEnabled = haveEdit || haveView;
+                                                                                                                       }).Render();
+                                                                                                                   });
+                                                                         });
+                                                settings.Columns.Add(column =>
+                                                                         {
+                                                                             column.FieldName = GlobalPropertyNames.Date;
+                                                                             column.Caption = "Дата";
+                                                                             column.Width = 70;
+                                                                             column.PropertiesEdit.DisplayFormatString = "d";
+                                                                             column.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+                                                                             column.ColumnType = MVCxGridViewColumnType.DateEdit;
+                                                                         });
+                                                MVCxGridViewColumn colNumber = settings.Columns.Add("DocNumber", "Номер");
+                                                colNumber.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+                                                colNumber.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+                                                colNumber.Width = 70;
+                
+    
+                                                settings.Columns.Add(column =>
+                                                                         {
+                                                                             column.FieldName = GlobalPropertyNames.DocSumma;
+                                                                             column.Caption = "Сумма";
+                                                                             column.Width = 100;
+                                                                             column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+                                                                             column.PropertiesEdit.DisplayFormatString = "0.00";
+                                                                             column.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+                                                                         });
+    
+                                                MVCxGridViewColumn colWhom = settings.Columns.Add("AgentToName", "Кому");
+                                                colWhom.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+                                                colWhom.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+                                                colWhom.Width = 450;
+                                                settings.ClientSideEvents.ColumnResizing = "function (s, e) {if (e.column.name == 'colImageAction') {e.cancel = true;}}";
+                                                settings.CustomCallback = (sender, e) =>
+                                                {
+                                                    MVCxGridView grid = (MVCxGridView)sender;
+                                                    string refreshArg = e.Parameters.Split('&').FirstOrDefault(s => s.StartsWith("refresh"));
+                                                    bool refresh = (refreshArg != null) && (refreshArg.EndsWith("true"));
+                                                    if (refresh)
+                                                    {
+                                                        System.Data.DataTable tbl = ServicesHelper.GetDocumentsAccounts(true, Folder.CODE_FIND_SERVICE_IN_ACCOUNT, true, 10, State.STATEACTIVE);
+                                                        tbl.DefaultView.RowFilter = "StateId=1";
+                                                        grid.DataSource = tbl.DefaultView.ToTable();
+                                                    }
+                                                    grid.DataBind();
+                                                };
+    
+}).Bind(Model).GetHtml()

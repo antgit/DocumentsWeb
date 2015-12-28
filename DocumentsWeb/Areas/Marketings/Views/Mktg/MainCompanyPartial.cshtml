@@ -1,0 +1,54 @@
+﻿@model DocumentsWeb.Areas.Marketings.Models.DocumentMktgModel
+@using DocumentsWeb.Areas.Agents.Models
+@using DocumentsWeb.Areas.Marketings.Models
+@using DocumentsWeb.Models
+@using BusinessObjects;
+@using BusinessObjects.Security;
+@using BusinessObjects.Web.Core;
+
+@{   
+    bool haveEdit = WADataProvider.FolderElementRightView.IsAllow(BusinessObjects.Security.Right.DOCEDIT, WADataProvider.WA.GetFolderByCodeFind(BusinessObjects.Folder.CODE_FIND_MKTG_MRAK).Id);
+}
+
+@Html.DevExpress().ComboBox(settings =>
+{
+    settings.Name = "MainCompanyId";
+    settings.ControlStyle.CssClass = "editor";
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.ReadOnly = !(haveEdit && !Model.IsReadOnly);
+    settings.CallbackRouteValues = new { Area = "Marketings", Controller = "Mktg", Action = "MainCompanyPartial", mId = Model.ModelId };
+
+    settings.Properties.EnableCallbackMode = true;
+    settings.Properties.CallbackPageSize = 20;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    settings.Properties.FilterMinLength = 2;
+    settings.Properties.TextField = "Name";
+    settings.Properties.ValueField = "Id";
+    settings.Properties.ValueType = typeof(int);
+    settings.Properties.DropDownStyle = DropDownStyle.DropDown;
+    settings.EncodeHtml = false;
+    settings.Properties.EnableClientSideAPI = true;
+
+    if (!Model.IsReadOnly)
+    {
+        //settings.Properties.Buttons.Add("...");
+        EditButton b = settings.Properties.Buttons.Add();
+        //b.Text = "Новый";
+        b.Image.Url = "~/Images/add10x10.png";
+        EditButton btnView = settings.Properties.Buttons.Add();
+        //btnView.Text = "Просмотр";
+        btnView.Image.Url = "~/Images/edit10x10.png";
+    }
+
+    settings.ShowModelErrors = true;
+    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+
+    settings.Properties.ClientSideEvents.ButtonClick = "MainCompanyId_ButtonClick";
+    //settings.Properties.ClientSideEvents.ValueChanged = "AgentToId_ValueChanged";
+    settings.Properties.ClientSideEvents.BeginCallback = "function(s,e){ e.customArgs['MainClientDepatmentId'] = MainClientDepatmentId.GetValue(); e.customArgs['Id'] = " + @Model.Id + "; e.customArgs['ModelId'] = '" + @Model.ModelId + "';}";
+    settings.Properties.ClientSideEvents.GotFocus = "OnEditorGotFocus";
+    settings.Properties.ClientSideEvents.LostFocus = "OnEditorLostFocus";
+    settings.Properties.ClientSideEvents.ValueChanged = "Client_ValueChanged";
+}).BindList(ClientModel.GetAgentsRange, ClientModel.GetAgentByID).BindList(ClientModel.GetCurrentClient(Model.MainCompanyId)).Bind(Model.MainCompanyId == 0 ? null : (int?)Model.MainCompanyId).GetHtml()
+

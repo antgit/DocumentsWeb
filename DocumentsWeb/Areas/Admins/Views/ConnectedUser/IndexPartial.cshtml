@@ -1,0 +1,38 @@
+﻿@using BusinessObjects
+@using DevExpress.Web.Mvc.UI;
+@using DevExpress.Web.Mvc;
+
+@Html.DevExpress().GridView( settings => {
+    settings.Name = "dxGridViewConnectedUsers";
+    settings.CallbackRouteValues = new { Controller = "ConnectedUser", Action = "IndexPartial" };
+    settings.CustomCallback = (sender, e) =>
+    {
+        MVCxGridView grid = (MVCxGridView)sender;
+        // you can use the e.Parameter
+        grid.DataBind();
+    };
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+    settings.KeyFieldName = GlobalPropertyNames.Id;
+    settings.Columns.Add("LogName", "Пользователь").Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+    settings.Columns.Add("Name", "Наименование").Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+    settings.Columns.Add("LastActivityDate", "Активность").Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+    settings.Columns.Add("RemoteAddr", "Адрес").Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+    settings.Columns.Add("LastPasswordChangedDate", "Дата последнего изменения пароля").Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+
+    
+    settings.Settings.ShowGroupPanel = true;
+    settings.Settings.ShowFilterRow = true;
+    settings.Settings.ShowFilterRowMenu = true;
+    settings.Settings.ShowFilterBar = GridViewStatusBarMode.Visible;
+    settings.SettingsPager.PageSize = Utils.GetPageSize(settings);
+    settings.SettingsPager.Position = System.Web.UI.WebControls.PagerPosition.Top;
+    settings.SettingsPager.AlwaysShowPager = true;
+    settings.SettingsBehavior.AllowFocusedRow = true;
+    settings.SettingsBehavior.EnableCustomizationWindow = true;
+    settings.SetPagerBarTemplateContent(c => Html.RenderPartial("TablePager", new ViewDataDictionary
+        {
+            { "ContentObject", c },
+            { "TableCaption", "<b><a href=\"" + Url.Action("Index", new { area = "Admins", controller = "Home", action = "Index" }) + "\"  title=\"Перейти к выбору всех административных функций\">Администрирование</a>\\Подключенные пользователи</b>" }
+        }));
+}).Bind(Model).GetHtml()

@@ -1,0 +1,201 @@
+﻿@using System.Globalization
+@using BusinessObjects
+@using DocumentsWeb.Areas.Agents.Models
+@using DocumentsWeb.Areas.General.Models
+@using DocumentsWeb.Models
+@model ClientModel
+@Html.DevExpress().GridView(settings=>{
+    settings.Name = "gvAccount";
+    settings.CallbackRouteValues = new { Controller = Url.RequestContext.RouteData.Values["controller"], Action = "AccountsGridPartial", agId = Model.Id };
+    settings.SettingsEditing.AddNewRowRouteValues = new { Controller = Url.RequestContext.RouteData.Values["controller"], Action = "AddNewAccountPartial" };
+    settings.SettingsEditing.UpdateRowRouteValues = new { Controller = Url.RequestContext.RouteData.Values["controller"], Action = "UpdateAccountPartial" };
+    settings.SettingsEditing.DeleteRowRouteValues = new { Controller = Url.RequestContext.RouteData.Values["controller"], Action = "DeleteAccountPartial" };
+    settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Styles.Cell.Paddings.Padding = System.Web.UI.WebControls.Unit.Pixel(2);
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+    settings.KeyFieldName = GlobalPropertyNames.Id;
+    settings.SettingsBehavior.AllowFocusedRow = true;
+
+    settings.Columns.Add(cc =>
+    {
+        cc.Name = "colImageAction";
+        cc.Width = System.Web.UI.WebControls.Unit.Pixel(35);
+        cc.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+        cc.Settings.AllowDragDrop = DefaultBoolean.False;
+        cc.Settings.AllowSort = DefaultBoolean.False;
+        cc.SetDataItemTemplateContent(c =>
+        {
+            ViewContext.Writer.Write("<table><tr>");
+            ViewContext.Writer.Write("<td>");
+            Html.DevExpress().HyperLink(hl =>
+            {
+                hl.Properties.ImageUrl = Url.Content("~/Images/edit10x10.png");
+                hl.ToolTip = "Изменить";
+                hl.NavigateUrl = "javascript:gvAccount.StartEditRow(" + c.ItemIndex.ToString(CultureInfo.InvariantCulture) + ");";
+            }).Render();
+            ViewContext.Writer.Write("</td><td>");
+            Html.DevExpress().HyperLink(hl =>
+            {
+                hl.Properties.ImageUrl = Url.Content("~/Images/DELETEDELEMENT_X16.png");
+                hl.ToolTip = "Удалить";
+                hl.NavigateUrl = "javascript:if (confirm(\"Удалить строку документа?\")) {gvAccount.DeleteRow(" + c.ItemIndex.ToString(CultureInfo.InvariantCulture) + ");}";
+            }).Render();
+            ViewContext.Writer.Write("</td></tr></table>");
+        });
+    });
+    
+    settings.Columns.Add("BankName", "Банк");
+    settings.Columns.Add("CurrencyName", "Валюта");
+
+    settings.Settings.ShowFooter = true;
+
+    settings.SetFooterRowTemplateContent(c => ViewContext.Writer.Write("<div style=\"width: 100%; text-align: center; font-size: 10pt;\"><a href=\"javascript:gvAccount.AddNewRow();\">Создать</a></div>"));
+    
+    settings.SetEditFormTemplateContent(c =>
+    {
+        ViewContext.Writer.Write("<input type=\"hidden\" id=\"AgentId\" name=\"AgentId\" value=\"" + Model.Id + "\">");
+
+        ViewContext.Writer.Write("<table style=\"width: 450px;\">");
+        ViewContext.Writer.Write("<tr><td colspan=\"2\">");
+        ViewContext.Writer.Write("<table><tr><td>");
+        Html.DevExpress().Button(btnSettings =>
+        {
+            btnSettings.Name = "btnUpdate";
+            btnSettings.ControlStyle.CssClass = "button";
+            btnSettings.Text = "Сохранить";
+            btnSettings.ClientSideEvents.Click = "function(s, e){ gvAccount.UpdateEdit(); }";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().Button(btnSettings =>
+        {
+            btnSettings.Name = "btnCancel";
+            btnSettings.ControlStyle.CssClass = "button";
+            btnSettings.Text = "Отмена";
+            btnSettings.ClientSideEvents.Click = "function(s, e){ gvAccount.CancelEdit(); }";
+        }).Render();
+        ViewContext.Writer.Write("</td></tr></table>");
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Тип:";
+            edtSettings.AssociatedControlName = "KindIdABA";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().ComboBox(edtSettings =>
+        {
+            edtSettings.Name = "KindIdABA";
+            edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            edtSettings.Properties.ValueField = "Id";
+            edtSettings.Properties.TextField = "Name";
+            edtSettings.Properties.ValueType = typeof(int);
+            edtSettings.Properties.NullDisplayText = "Выберите тип...";
+            edtSettings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+            //edtSettings.Properties.FilterMinLength = 2;
+            edtSettings.ControlStyle.CssClass = "editor";
+            edtSettings.ShowModelErrors = true;
+            edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).BindList(new[] { 
+            new ComboboxModel { Id = AgentBankAccount.KINDID_ACCOUNT, Name = "Расчетный счет" },
+            new ComboboxModel { Id = AgentBankAccount.KINDID_BUDGET, Name = "Бюджетный" },
+            new ComboboxModel { Id = AgentBankAccount.KINDID_CREDIT, Name = "Кредитный" },
+            new ComboboxModel { Id = AgentBankAccount.KINDID_DEPOSIT, Name = "Депозитный" },
+            new ComboboxModel { Id = AgentBankAccount.KINDID_DISTRIBUTIVE, Name = "Распределенный" }
+        }).Bind(DataBinder.Eval(c.DataItem, "KindIdABA")).GetHtml();
+        ViewContext.Writer.Write("</td></tr>");
+        
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Имя:";
+            edtSettings.AssociatedControlName = "Name";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TextBox(edtSettings =>
+        {
+            edtSettings.Name = "Name";
+            edtSettings.Properties.NullDisplayText = "Введите имя...";
+            edtSettings.ControlStyle.CssClass = "editor";
+            edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            edtSettings.ShowModelErrors = true;
+            edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(DataBinder.Eval(c.DataItem, "Name")).GetHtml();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Код:";
+            edtSettings.AssociatedControlName = "Code";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TextBox(edtSettings =>
+        {
+            edtSettings.Name = "Code";
+            edtSettings.Properties.NullDisplayText = "Введите код...";
+            edtSettings.ControlStyle.CssClass = "editor";
+            edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            edtSettings.ShowModelErrors = true;
+            edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(DataBinder.Eval(c.DataItem, "Code")).GetHtml();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Банк:";
+            edtSettings.AssociatedControlName = "BankId";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().ComboBox(edtSettings =>
+        {
+            edtSettings.Name = "BankId";
+            edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            edtSettings.Properties.ValueField = "Id";
+            edtSettings.Properties.TextField = "Name";
+            edtSettings.Properties.ValueType = typeof(int);
+            edtSettings.Properties.NullDisplayText = "Выберите банк...";
+            edtSettings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+            //edtSettings.Properties.FilterMinLength = 2;
+            edtSettings.ControlStyle.CssClass = "editor";
+            edtSettings.ShowModelErrors = true;
+            edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).BindList(ClientModel.GetBanks()).Bind(DataBinder.Eval(c.DataItem, "BankId")).GetHtml();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Валюта:";
+            edtSettings.AssociatedControlName = "CurrencyId";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().ComboBox(edtSettings =>
+        {
+            edtSettings.Name = "CurrencyId";
+            edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            edtSettings.Properties.ValueField = "Id";
+            edtSettings.Properties.TextField = "Name";
+            edtSettings.Properties.ValueType = typeof(int);
+            edtSettings.Properties.NullDisplayText = "Выберите валюту...";
+            edtSettings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+            //edtSettings.Properties.FilterMinLength = 2;
+            edtSettings.ControlStyle.CssClass = "editor";
+            edtSettings.ShowModelErrors = true;
+            edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).BindList(WebCurrencyModel.GetCollection()).Bind(DataBinder.Eval(c.DataItem, "CurrencyId")).GetHtml();
+        ViewContext.Writer.Write("</td></tr></table>");
+    });
+}).Bind(Model.AccountsCollection).GetHtml()

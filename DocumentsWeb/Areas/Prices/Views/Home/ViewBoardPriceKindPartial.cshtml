@@ -1,0 +1,220 @@
+﻿@using System.Globalization
+@using BusinessObjects
+@using DocumentsWeb.Models
+@{
+    Html.EnableClientValidation();
+}
+
+@{
+    bool haveCreate = WADataProvider.LibrariesElementRightView.IsAllow(BusinessObjects.Security.Right.UICREATE, BusinessObjects.Web.Core.WebModuleNames.WEB_DOCPRICE);
+    bool haveEdit = WADataProvider.LibrariesElementRightView.IsAllow(BusinessObjects.Security.Right.UIEDIT, BusinessObjects.Web.Core.WebModuleNames.WEB_DOCPRICE);
+    bool haveDelete = WADataProvider.LibrariesElementRightView.IsAllow(BusinessObjects.Security.Right.UIDELETE, BusinessObjects.Web.Core.WebModuleNames.WEB_DOCPRICE);
+    bool haveView = WADataProvider.LibrariesElementRightView.IsAllow(BusinessObjects.Security.Right.UIVIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_DOCPRICE);
+    if(!ViewContext.ViewData.ModelState.IsValid) 
+    {
+        <script type="text/javascript">
+            alert('@ViewContext.ViewData.ModelState["PriceNameErrorDelete"].Errors[0].ErrorMessage');
+        </script>
+    }
+}
+
+@Html.DevExpress().GridView(settings =>
+{
+    settings.Name = "gvPriceKinds";
+
+    settings.CallbackRouteValues = new { Area = "Prices", Controller = "Home", Action = "ViewBoardPriceKindPartial" };
+    settings.SettingsEditing.AddNewRowRouteValues = new { Area = "Prices", Controller = "Home", Action = "ViewBoardPriceKindAddPartial" };
+    settings.SettingsEditing.UpdateRowRouteValues = new { Area = "Prices", Controller = "Home", Action = "ViewBoardPriceKindUpdatePartial" };
+    settings.SettingsEditing.DeleteRowRouteValues = new { Area = "Prices", Controller = "Home", Action = "ViewBoardPriceKindDeletePartial" };
+
+    //settings.Style.Add("border", "none");
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control; 
+    
+    settings.SetEditFormTemplateContent(c => {
+        ViewContext.Writer.Write("<input id=\"Id\" name=\"Id\" type=\"hidden\" value=\"" + (c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "Id") : "") + "\" />");
+        ViewContext.Writer.Write("<input id=\"StateId\" name=\"StateId\" type=\"hidden\" value=\"" + (c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "StateId") : "") + "\" />");
+        
+        ViewContext.Writer.Write("<table style=\"width: 350px;\">");
+        ViewContext.Writer.Write("<tr><td colspan=\"2\">");
+        ViewContext.Writer.Write("<table><tr><td>");
+        Html.DevExpress().Button(btnSettings =>
+        {
+            btnSettings.Name = "btnUpdate";
+            btnSettings.ControlStyle.CssClass = "button";
+            btnSettings.Text = "Сохранить";
+            btnSettings.ClientSideEvents.Click = "function(s, e){ gvPriceKinds.UpdateEdit(); }";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().Button(btnSettings =>
+        {
+            btnSettings.Name = "btnCancel";
+            btnSettings.ControlStyle.CssClass = "button";
+            btnSettings.Text = "Отмена";
+            btnSettings.ClientSideEvents.Click = "function(s, e){ gvPriceKinds.CancelEdit(); }";
+        }).Render();
+        ViewContext.Writer.Write("</td></tr></table>");
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Имя:";
+            edtSettings.AssociatedControlName = "Name";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TextBox(tb => {
+            tb.Name = "Name";
+            tb.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        }).Bind((c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "Name") : "")).Render();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Тип:";
+            edtSettings.AssociatedControlName = "KindId";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().ComboBox(cb =>
+        {
+            cb.Name = "KindId";
+            cb.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            cb.Properties.ValueField = "Id";
+            cb.Properties.TextField = "Name";
+            cb.Properties.ValueType = typeof(int);
+            cb.ReadOnly = c.ItemIndex >= 0;
+        }).BindList(new[] { 
+            new ComboboxModel { Id = PriceName.KINDID_COMPETITOR, Name = "Цены конкурентов"},
+            new ComboboxModel { Id = PriceName.KINDID_PROVIDER, Name = "Цены поставщиков"},
+            new ComboboxModel { Id = PriceName.KINDID_PRICENAME, Name = "Цены реализации"} 
+        }).Bind((c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "KindId") : null)).Render();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Валюта:";
+            edtSettings.AssociatedControlName = "CurrencyId";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().ComboBox(cb =>
+        {
+            cb.Name = "CurrencyId";
+            cb.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            cb.Properties.ValueField = "Id";
+            cb.Properties.TextField = "Name";
+            cb.Properties.ValueType = typeof(int);
+        }).BindList(WADataProvider.GetCurrences()).Bind((c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "CurrencyId") : null)).Render();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+        Html.DevExpress().Label(edtSettings =>
+        {
+            edtSettings.ControlStyle.CssClass = "label";
+            edtSettings.Text = "Примечание:";
+            edtSettings.AssociatedControlName = GlobalPropertyNames.Memo;
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().Memo(tb =>
+        {
+            tb.Name = "Memo";
+            tb.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            tb.Height = System.Web.UI.WebControls.Unit.Pixel(40);
+        }).Bind((c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "Memo") : null)).Render();
+        ViewContext.Writer.Write("</td></tr>");
+        
+        ViewContext.Writer.Write("</table>");
+    });
+
+    if (haveDelete || haveEdit)
+    {
+        settings.Columns.Add(cc =>
+        {
+            cc.Width = System.Web.UI.WebControls.Unit.Pixel(55);
+            cc.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+            cc.SetDataItemTemplateContent(c =>
+            {
+                //ViewContext.Writer.Write("<table><tr>");
+                //ViewContext.Writer.Write("<td>");
+                Html.DevExpress().HyperLink(hl =>
+                {
+                    hl.Name = "PriceKindEdit_" + c.ItemIndex.ToString(CultureInfo.InvariantCulture);
+                    hl.Properties.ImageUrl = Url.Content("~/Images/edit_x16.png");
+                    hl.ToolTip = "Изменить";
+                    hl.NavigateUrl = "javascript:gvPriceKinds.StartEditRow(" + c.ItemIndex.ToString(CultureInfo.InvariantCulture) + ");";
+                    hl.ClientEnabled = haveEdit;
+                    hl.ClientVisible = haveEdit;
+                }).Render();
+                //ViewContext.Writer.Write("</td><td>");
+                Html.DevExpress().HyperLink(hl =>
+                {
+                    hl.Name = "PriceKindDelete_" + c.ItemIndex.ToString(CultureInfo.InvariantCulture);
+                    hl.Properties.ImageUrl = Url.Content("~/Images/delete_x16.png");
+                    hl.ToolTip = "Удалить";
+                    if ((bool)DataBinder.Eval(c.DataItem, "IsReadOnly") || (bool)DataBinder.Eval(c.DataItem, "IsSystem") || !haveDelete)
+                    {
+                        hl.ClientEnabled = false;
+                        hl.ClientVisible = false;
+                    }
+                    hl.NavigateUrl = "javascript:if (confirm(\"Вы уверены, что хотите удалить этот вид цены?\")) {gvPriceKinds.DeleteRow(" + c.ItemIndex.ToString(CultureInfo.InvariantCulture) + ");}";
+                }).Render();
+                //ViewContext.Writer.Write("</td></tr></table>");
+            });
+        });
+    }
+    
+    settings.Settings.ShowTitlePanel = true;
+    settings.SetTitlePanelTemplateContent(c =>
+    {
+        ViewContext.Writer.Write("<div style=\"width: 100%; text-align: center; font-size: 10pt;\">");
+        Html.DevExpress().HyperLink(hl =>
+        {
+            hl.Properties.ImageUrl = Url.Content("~/Images/REFRESHGREEN_X16.png");
+            hl.ToolTip = "Обновить";
+            hl.Style.Add("float", "left");
+            hl.NavigateUrl = "javascript:gvPriceKinds.PerformCallback();";
+        }).Render();
+        Html.DevExpress().HyperLink(hl =>
+        {
+            hl.Name = "PriceKindCreate_" + c.ItemIndex.ToString(CultureInfo.InvariantCulture);
+            hl.Properties.Text = "Создать";
+            hl.NavigateUrl = "javascript:gvPriceKinds.AddNewRow();";
+            hl.ClientEnabled = haveCreate;
+            hl.ClientVisible = haveCreate;
+        }).Render();
+        ViewContext.Writer.Write("</div>");
+    });
+    
+    settings.Settings.ShowFilterBar = GridViewStatusBarMode.Hidden;
+    settings.SettingsBehavior.AllowFocusedRow = true;
+    settings.KeyFieldName = GlobalPropertyNames.Id;
+    settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+    settings.SettingsPager.Visible = false;                           
+                                                    
+    settings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Settings.ShowVerticalScrollBar = true;
+    settings.Settings.ShowHorizontalScrollBar = true;
+    settings.Settings.VerticalScrollableHeight = 230;
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+    
+    settings.Columns.Add(col =>
+    {
+        col.Caption = "Наименование";
+        col.FieldName = GlobalPropertyNames.Name;
+        col.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    });
+    if (WADataProvider.CurrentUserCompanyMultyCount())
+    {
+        settings.Columns.Add(col =>
+        {
+            col.Caption = "Компания-владелец";
+            col.FieldName = GlobalPropertyNames.MyCompanyName;
+            col.Width = System.Web.UI.WebControls.Unit.Pixel(150);
+        });
+    }
+
+}).Bind(PriceListHelper.GetPriceNames()).GetHtml()

@@ -1,0 +1,43 @@
+﻿<div style="width: 100%; height: 18px; margin: 3px;">
+    @Html.DevExpress().Image(s =>
+    {
+        s.Name = "btnAddRoute";
+        s.ImageUrl = Url.Content("~/Images/Routes/add_x16.png");
+        s.ToolTip = "Создать маршрут";
+        s.Properties.Style.Cursor = "pointer";
+        s.Properties.ClientSideEvents.Click = "function(s, e) { editRoute(0); }";
+    }).GetHtml()
+    @Html.DevExpress().Image(s =>
+    {
+        s.Name = "btnEditRoute";
+        s.ImageUrl = Url.Content("~/Images/Routes/edit_x16.png");
+        s.ToolTip = "Редактировать маршрут";
+        s.Properties.Style.Cursor = "pointer";
+        s.Properties.ClientSideEvents.Click = "function(s, e) { if (gvRoutesList.GetSelectedKeysOnPage().length > 0) { var id = gvRoutesList.GetSelectedKeysOnPage()[0]; if (id != null) editRoute(id); } }";
+    }).GetHtml()
+    @Html.DevExpress().Image(s =>
+    {
+        s.Name = "btnRemoveRoute";
+        s.ImageUrl = Url.Content("~/Images/Routes/delete_x16.png");
+        s.ToolTip = "Удалить маршрут";
+        s.Properties.Style.Cursor = "pointer";
+        s.Properties.ClientSideEvents.Click = "function(s, e) { if (gvRoutesList.GetSelectedKeysOnPage().length > 0) { var id = gvRoutesList.GetSelectedKeysOnPage()[0]; if (id != null) deleteRoute(id); } }";
+    }).GetHtml()
+    @Html.DevExpress().Image(s =>
+    {
+        s.Name = "btnBuildRoute";
+        s.ImageUrl = Url.Content("~/Images/Routes/get_route_x16.png");
+        s.ToolTip = "Построить маршрут";
+        s.Style.Add("padding-left", "5px");
+        s.Properties.Style.Cursor = "pointer";
+        s.Properties.ClientSideEvents.Click = "function(s, e) { buildRoute(); }";
+    }).GetHtml()
+    @Html.DevExpress().Image(s =>
+    {
+        s.Name = "btnSaveRoute";
+        s.ImageUrl = Url.Content("~/Images/save_x16.png");
+        s.ToolTip = "Сохранить маршрут";
+        s.Properties.Style.Cursor = "pointer";
+        s.Properties.ClientSideEvents.Click = "function(s, e) { saveRoute(); }";
+    }).GetHtml()
+</div>

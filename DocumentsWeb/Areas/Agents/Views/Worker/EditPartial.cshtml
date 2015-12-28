@@ -1,0 +1,283 @@
+﻿@using BusinessObjects
+@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentsWeb.Models
+@using DocumentsWeb.Areas.Agents.Models
+@model ClientModel
+@{
+    bool haveEdit = Model.Id == 0 && !Model.IsReadOnly && WADataProvider.LibrariesElementRightView.IsAllow(Right.UIEDIT, WebModuleNames.WEB_EMPLOERS) && !WADataProvider.CommonRightView.ReadOnly;
+}
+@if (!ViewContext.ViewData.ModelState.IsValid)
+{
+    <p id="error_pane"> &nbsp"
+    <a class="triggerError" href="#">Ошибки</a>
+    </p>
+    <div id="error_container" class="panelError">
+    <a href="javascript:OnErrorPanelClose();">&nbsp;Закрыть</a>
+    @Html.ValidationSummary(false)
+    </div>
+}
+
+<input type="hidden" id="StateId" name="StateId" value="@Model.StateId" />
+    <input type="hidden" id="KindId" name="KindId" value="@Model.KindId" />
+    <input type="hidden" id="MyCompanyId" name="MyCompanyId" value="@Model.MyCompanyId" />
+        <table style="width:600px;">
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Наименование:";
+            if (string.IsNullOrEmpty(Model.Name))
+                s.ControlStyle.ForeColor = System.Drawing.Color.Red;
+            s.AssociatedControlName = GlobalPropertyNames.Name;
+            s.ToolTip = "Наименование физического лица в справочнике, старайтесь давать наименования уникальные в вашей компании, например Фамилия И.O.";
+        }).GetHtml()
+        </td><td colspan="3">
+        @Html.DevExpress().TextBox(s =>
+        {
+            s.Name = GlobalPropertyNames.Name;
+            s.ToolTip = "Наименование физического лица в справочнике, старайтесь давать наименования уникальные в вашей компании, например Фамилия И.O.";
+            s.ReadOnly = !haveEdit;
+            s.Properties.ConvertEmptyStringToNull = true;
+            if (!s.ReadOnly)
+            {
+                s.Properties.NullText = "Введите наименование...";
+                s.Properties.NullTextStyle.ForeColor = System.Drawing.Color.FromArgb(249, 97, 97); 
+            }
+            s.ControlStyle.CssClass = "editor";
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.ShowModelErrors = true;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.Name).GetHtml()
+        </td></tr>
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Полное имя:";
+            s.ToolTip = "Полное наименование физического лица используется при печати некоторых отчетов";
+            s.AssociatedControlName = GlobalPropertyNames.NameFull;
+        }).GetHtml()
+        </td><td colspan="3">
+        @Html.DevExpress().Memo(s =>
+        {
+            s.Name = GlobalPropertyNames.NameFull;
+            s.Properties.ConvertEmptyStringToNull = true;
+            s.ToolTip = "Полное наименование физического лица используется при печати некоторых отчетов";
+            s.ReadOnly = !haveEdit;
+            if (!s.ReadOnly)
+            {
+                s.Properties.NullText = "Введите полное наименование...";
+            }
+            s.ControlStyle.CssClass = "editor";
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.ShowModelErrors = true;
+            s.Height = 35;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.NameFull).GetHtml()
+        </td></tr>
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Фамилия:";
+            if (string.IsNullOrEmpty(Model.FirstName))
+                s.ControlStyle.ForeColor = System.Drawing.Color.Red;
+            s.ToolTip = "Рекомендуется вводить полностью, без сокращения";
+            s.AssociatedControlName = GlobalPropertyNames.FirstName;
+        }).GetHtml()
+        </td><td colspan="3">
+        @Html.DevExpress().TextBox(s =>
+        {
+            s.Name = GlobalPropertyNames.FirstName;
+            s.ToolTip = "Рекомендуется вводить полностью, без сокращения";
+            s.ReadOnly = !haveEdit;
+            s.Properties.ConvertEmptyStringToNull = true;
+            if (!s.ReadOnly)
+            {
+                s.Properties.NullText = "Введите фамилию...";
+                s.Properties.NullTextStyle.ForeColor = System.Drawing.Color.FromArgb(249, 97, 97);
+            }
+            s.ControlStyle.CssClass = "editor";
+            s.ShowModelErrors = true;
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.FirstName).GetHtml()
+        </td></tr>
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            s.Text = "Имя:";
+            if (string.IsNullOrEmpty(Model.LastName))
+                s.ControlStyle.ForeColor = System.Drawing.Color.Red;
+            s.ToolTip = "Рекомендуется вводить полностью, без сокращения";
+            s.AssociatedControlName = GlobalPropertyNames.LastName;
+        }).GetHtml()
+        </td><td colspan="3">
+        @Html.DevExpress().TextBox(s =>
+        {
+            s.Name = GlobalPropertyNames.LastName;
+            s.ToolTip = "Рекомендуется вводить полностью, без сокращения";
+            s.ReadOnly = !haveEdit;
+            s.Properties.ConvertEmptyStringToNull = true;
+            if (!s.ReadOnly)
+            {
+                s.Properties.NullText = "Введите имя...";
+                s.Properties.NullTextStyle.ForeColor = System.Drawing.Color.FromArgb(249, 97, 97);
+            }
+            s.ControlStyle.CssClass = "editor";
+            s.ShowModelErrors = true;
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.LastName).GetHtml()
+        </td></tr>
+
+        <tr><td class="table_label">
+        @Html.DevExpress().Label(s =>
+        {
+            s.ControlStyle.CssClass = "label";
+            if (string.IsNullOrEmpty(Model.MidleName))
+                s.ControlStyle.ForeColor = System.Drawing.Color.Red;
+            s.ToolTip = "Рекомендуется вводить полностью, без сокращения";
+            s.Text = "Отчество:";
+            s.AssociatedControlName = GlobalPropertyNames.MidleName;
+        }).GetHtml()
+        </td><td colspan="3">
+        @Html.DevExpress().TextBox(s =>
+        {
+            s.Name = GlobalPropertyNames.MidleName;
+            s.ToolTip = "Рекомендуется вводить полностью, без сокращения";
+            s.ReadOnly = !haveEdit;
+            s.Properties.ConvertEmptyStringToNull = true;
+            if (!s.ReadOnly)
+            {
+                s.Properties.NullText = "Введите отчество...";
+                s.Properties.NullTextStyle.ForeColor = System.Drawing.Color.FromArgb(249, 97, 97);
+            }
+
+            s.ControlStyle.CssClass = "editor";
+            s.ShowModelErrors = true;
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.MidleName).GetHtml()
+        </td></tr>
+        <tr>
+            <td class="table_label">
+                @Html.DevExpress().Label(s =>
+                    {
+                        s.ControlStyle.CssClass = "label";
+                        s.Text = "Телефон:";
+                        s.ToolTip = "Основной контактный телефон";
+                        s.AssociatedControlName = GlobalPropertyNames.Phone;
+                    }).GetHtml()
+            </td>
+            <td>
+        @Html.DevExpress().TextBox(s =>
+        {
+            s.Name = GlobalPropertyNames.Phone;
+            s.ToolTip = "Основной контактный телефон";
+            s.ReadOnly = !haveEdit;
+            if (!s.ReadOnly)
+            {
+                s.Properties.NullText = "Введите телефон...";
+            }
+            s.ControlStyle.CssClass = "editor";
+            s.ShowModelErrors = true;
+            s.Properties.MaskSettings.Mask = "000-000-00-00";
+            s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            s.Properties.MaskSettings.IncludeLiterals = MaskIncludeLiteralsMode.None;
+            s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+            s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+        }).Bind(Model.Phone).GetHtml()
+             </td><td class="table_label">
+                      @Html.DevExpress().Label(s =>
+                          {
+                              s.ControlStyle.CssClass = "label";
+                              s.Text = "ИНН:";
+                              s.ToolTip = "Идентификационный номер";
+                              s.AssociatedControlName = "TaxNumber";
+                          }).GetHtml()
+                  </td>
+                  <td>
+                      @Html.DevExpress().TextBox(s =>
+                          {
+                              s.Name = "TaxNumber";
+                              s.ToolTip = "Идентификационный номер";
+                              s.ReadOnly = !haveEdit;
+                              if (!s.ReadOnly)
+                              {
+                                  s.Properties.NullText = "Введите ИНН...";
+                              }
+                              s.ControlStyle.CssClass = "editor";
+                              s.ShowModelErrors = true;
+                              s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                              s.Properties.MaskSettings.IncludeLiterals = MaskIncludeLiteralsMode.None;
+                              s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                              s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                          }).Bind(Model.TaxNumber).GetHtml()
+                  </td>
+                  </tr>
+        
+            <tr><td class="table_label">
+                    @Html.DevExpress().Label(s =>
+                        {
+                            s.ControlStyle.CssClass = "label";
+                            s.ToolTip = "Номер cтраховки - числовое значение состоящее из трех групп";
+                            s.Text = "Номер cтраховки:";
+                            s.AssociatedControlName = "InsuranceNumber";
+                        }).GetHtml()
+                </td>
+            <td>
+                @Html.DevExpress().TextBox(s =>
+                    {
+                        s.Name = "InsuranceNumber";
+                        s.ToolTip = "Номер cтраховки - числовое значение состоящее из трех групп";
+                        s.ReadOnly = !haveEdit;
+                        if (!s.ReadOnly)
+                        {
+                            s.Properties.NullText = "Введите номер страховки...";
+                        }
+                        s.ControlStyle.CssClass = "editor";
+                        s.ShowModelErrors = true;
+                        s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                        s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                        s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                    }).Bind(Model.InsuranceNumber).GetHtml()
+            </td>
+            <td class="table_label">
+                @Html.DevExpress().Label(s =>
+                    {
+                        s.ControlStyle.CssClass = "label";
+                        s.ToolTip = "Серия страховки  - обычно три символа, вводиться большими буквами";
+                        s.Text = "Серия страховки:";
+                        s.AssociatedControlName = "InsuranceSeries";
+                    }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().TextBox(s =>
+                    {
+                        s.Name = "InsuranceSeries";
+                        s.ToolTip = "Серия страховки  - обычно три символа, вводиться большими буквами";
+                        s.ReadOnly = !haveEdit;
+                        if (!s.ReadOnly)
+                        {
+                            s.Properties.NullText = "Введите серию страховки...";
+                        }
+                        s.ControlStyle.CssClass = "editor";
+                        s.ShowModelErrors = true;
+                        s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                        s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                        s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                    }).Bind(Model.InsuranceSeries).GetHtml()
+
+            </td>
+            <tr></table>

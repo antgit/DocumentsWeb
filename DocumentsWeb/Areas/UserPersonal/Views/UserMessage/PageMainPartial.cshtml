@@ -1,0 +1,257 @@
+﻿@model DocumentsWeb.Areas.UserPersonal.Models.WebMessageModel
+@using BusinessObjects
+@using DocumentsWeb.Models
+@using System.Linq
+@using DocumentsWeb.Areas.Analitics.Models
+
+@*<input type="hidden" id="HierarchyId" name="HierarchyId" value="@Model.HierarchyId"/>*@
+@*<input type="hidden" id="FlagString" name="FlagString" value="@Model.FlagString"/>*@
+<input type="hidden" id="ModelId" name="ModelId" value="@Model.ModelId"/>
+<input type="hidden" id="UserOwnerId" name="UserOwnerId" value="@Model.UserOwnerId"/>
+@{
+    //Сообщение можно редактировать только если оно отправленное и не посланное или если это собственное сообщение
+    bool enabled = Model.IsOutcomminMessage && !Model.IsSend || Model.IsSelfMessage;
+}
+
+<table class="edit_form_table2">
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Name = "lblName";
+                settings.Text = "Тема";
+                settings.AssociatedControlName = "Name";
+                settings.Properties.EnableClientSideAPI = true;
+            }).GetHtml()
+        </td>
+        <td colspan="3">                       
+            @Html.DevExpress().Memo(settings =>
+            {
+                settings.Name = "Name";
+                settings.Properties.NullDisplayText = "Введите тему сообщения...";
+                settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                settings.ReadOnly = !enabled;
+                settings.Properties.Style.ForeColor = settings.ReadOnly ? System.Drawing.Color.LightGray : System.Drawing.Color.Black;
+            }).Bind(Model.Name).GetHtml() 
+        </td>
+    </tr>
+
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Text = "Отправитель:";
+                settings.AssociatedControlName = "UserSenderId";
+            }).GetHtml()
+        </td>
+        <td colspan="3">
+            @Html.DevExpress().TextBox(s =>{
+           s.Name = "AgentOwnerName";
+                s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ShowModelErrors = true;
+                s.ReadOnly = true;
+                s.Properties.ConvertEmptyStringToNull = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+       }).Bind(Model.AgentOwnerName).GetHtml()                      
+            @*@Html.DevExpress().ComboBox(settings =>
+            {
+                settings.Name = "UserSenderId";
+                settings.Properties.NullDisplayText = "Выберите автора...";
+                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                settings.Properties.ValueField = "Id";
+                settings.Properties.TextField = "WorkerName";
+                settings.Properties.ValueType = typeof(int);
+                settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                settings.ShowModelErrors = true;
+                //EditButton b = settings.Properties.Buttons.Add();
+                //b.Image.Url = "~/Images/search_x10.png";
+                //b.Visible = enabled;
+                //b.ToolTip = "Поиск";
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                //settings.Properties.ClientSideEvents.ButtonClick = "function(s, e) { switch(e.buttonIndex) { case 0: PeopleFinderAuthor.Show(); break; } }";
+                settings.ReadOnly = true;
+                settings.Properties.Style.ForeColor = settings.ReadOnly ? System.Drawing.Color.LightGray : System.Drawing.Color.Black;
+            }).BindList(UserModel.GetUserAgents(Model.UserSenderId)).Bind(Model.UserSenderId == 0 ? (int?)null : Model.UserSenderId).GetHtml() *@
+        </td>
+    </tr>
+
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Text = "Получатель:";
+                settings.AssociatedControlName = "UserRecipientId";
+            }).GetHtml()
+        </td>
+        <td colspan="3">                       
+            @Html.DevExpress().ComboBox(settings =>
+            {
+                settings.Name = "UserId";
+                settings.Properties.NullDisplayText = "Выберите исполнителя...";
+                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                settings.Properties.ValueField = "Id";
+                settings.Properties.TextField = "WorkerName";
+                settings.Properties.ValueType = typeof(int);
+                settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                settings.ShowModelErrors = true;
+                EditButton b = settings.Properties.Buttons.Add();
+                b.Image.Url = "~/Images/search_x10.png";
+                b.Visible = enabled;
+                b.ToolTip = "Поиск";
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                settings.Properties.ClientSideEvents.ButtonClick = "function(s, e) { switch(e.buttonIndex) { case 0: PeopleFinderCreator.Show(); break; } }";
+                settings.ReadOnly = !enabled;
+                settings.Properties.Style.ForeColor = settings.ReadOnly ? System.Drawing.Color.LightGray : System.Drawing.Color.Black;
+            }).BindList(UserModel.GetUserAgents()).Bind(Model.UserId == 0 ? (int?)null : Model.UserId).GetHtml() 
+        </td>
+    </tr>
+
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Text = "Приоритет:";
+                settings.AssociatedControlName = "PriorityId";
+            }).GetHtml()
+        </td>
+        <td>                        
+            @Html.DevExpress().ComboBox(settings =>
+            {
+                settings.Name = "PriorityId";
+                settings.Properties.NullDisplayText = "Выберите приоритет...";
+                settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                settings.Properties.ValueField = "Id";
+                settings.Properties.TextField = "Name";
+                settings.Properties.ValueType = typeof(int);
+                settings.ShowModelErrors = true;
+                settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                settings.ReadOnly = !enabled;
+                settings.Properties.Style.ForeColor = settings.ReadOnly ? System.Drawing.Color.LightGray : System.Drawing.Color.Black;
+            }).BindList(AnaliticModel.GetCollection("CONTRACT_PRIORITY")).Bind(Model.PriorityId == 0 ? (int?)null : Model.PriorityId).GetHtml() 
+        </td>
+        <td colspan="2">
+            @Html.DevExpress().CheckBox(s =>
+            {
+                s.Name = "HasRead";
+                s.Text = "Требовать прочтения";
+                s.ReadOnly = !enabled;
+                s.Properties.Style.ForeColor = s.ReadOnly ? System.Drawing.Color.LightGray : System.Drawing.Color.Black;
+            }).Bind(Model.HasRead).GetHtml()
+        </td>
+    </tr> 
+
+    <tr>
+        <td colspan="4">
+            <table>
+                <tr>
+                    <td>
+                        @Html.DevExpress().CheckBox(s =>
+                        {
+                            s.Name = "ReadDone";
+                            s.Text = "Прочел, ознакомлен";
+                            s.ReadOnly = !Model.IsIncomminMessage || Model.ReadDone;
+                            s.Properties.Style.ForeColor = s.ReadOnly ? System.Drawing.Color.LightGray : System.Drawing.Color.Black;
+                            s.Properties.ClientSideEvents.CheckedChanged = "function(s, e) { if(s.GetChecked()){ ReadDate.SetDate(new Date()); ReadTime.SetDate(new Date());} else { ReadDate.SetDate(null); ReadTime.SetDate(null); } }";
+                        }).Bind(Model.ReadDone).GetHtml()
+                    </td>
+                    <td>
+                        @Html.DevExpress().Label(settings=>
+                        {
+                            settings.Text = "Дата прочетния:";
+                            settings.AssociatedControlName = "ReadDate";
+                        }).GetHtml()
+                    </td>
+                    <td>
+                        @Html.DevExpress().DateEdit(settings =>
+                        {
+                            settings.Name = "ReadDate";
+                            settings.Properties.NullDisplayText = "Выберите дату...";
+                            settings.ShowModelErrors = true;
+                            settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                            settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                            settings.ReadOnly = true;
+                            settings.Properties.Style.ForeColor = settings.ReadOnly ? System.Drawing.Color.LightGray : System.Drawing.Color.Black;
+                        }).Bind(Model.ReadDate).GetHtml() 
+                    </td>
+                    <td>
+                        @Html.DevExpress().Label(settings=>
+                        {
+                            settings.Text = "Время прочетния:";
+                            settings.AssociatedControlName = "ReadTimeAsDate";
+                        }).GetHtml()
+                    </td>
+                    <td>     
+                        @Html.DevExpress().TimeEdit(settings =>
+                        {
+                            settings.Name = "ReadTimeAsDate";
+                            settings.Properties.NullDisplayText = "Выберите время...";
+                            settings.ShowModelErrors = true;
+                            settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                            settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                            settings.ReadOnly = true;
+                            settings.Properties.Style.ForeColor = settings.ReadOnly ? System.Drawing.Color.LightGray : System.Drawing.Color.Black;
+                        }).Bind(Model.ReadTimeAsDate).GetHtml() 
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @Html.DevExpress().CheckBox(s =>
+                        {
+                            s.Name = "IsSend";
+                            s.Text = "Отправлено";
+                            s.ReadOnly = !enabled;
+                            s.Properties.Style.ForeColor = s.ReadOnly ? System.Drawing.Color.LightGray : System.Drawing.Color.Black;
+                            s.Properties.ClientSideEvents.CheckedChanged = "function(s, e) { if(s.GetChecked()){ SendDate.SetDate(new Date()); SendTimeAsDate.SetDate(new Date());} else { SendDate.SetDate(null); SendTimeAsDate.SetDate(null); } }";
+                        }).Bind(Model.IsSend).GetHtml()
+                    </td>
+                    <td>
+                        @Html.DevExpress().Label(settings=>
+                        {
+                            settings.Text = "Дата отправки:";
+                            settings.AssociatedControlName = "SendDate";
+                        }).GetHtml()
+                    </td>
+                    <td>
+                        @Html.DevExpress().DateEdit(settings =>
+                        {
+                            settings.Name = "SendDate";
+                            settings.Properties.NullDisplayText = "Выберите дату...";
+                            settings.ShowModelErrors = true;
+                            settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                            settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                            settings.ReadOnly = true;
+                            settings.Properties.Style.ForeColor = settings.ReadOnly ? System.Drawing.Color.LightGray : System.Drawing.Color.Black;
+                        }).Bind(Model.SendDate).GetHtml() 
+                    </td>
+                    <td>
+                        @Html.DevExpress().Label(settings=>
+                        {
+                            settings.Text = "Время отправки:";
+                            settings.AssociatedControlName = "SendTimeAsDate";
+                        }).GetHtml()
+                    </td>
+                    <td>     
+                        @Html.DevExpress().TimeEdit(settings =>
+                        {
+                            settings.Name = "SendTimeAsDate";
+                            settings.Properties.NullDisplayText = "Выберите время...";
+                            settings.ShowModelErrors = true;
+                            settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                            settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                            settings.ReadOnly = true;
+                            settings.Properties.Style.ForeColor = settings.ReadOnly ? System.Drawing.Color.LightGray : System.Drawing.Color.Black;
+                        }).Bind(Model.SendTimeAsDate).GetHtml() 
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>

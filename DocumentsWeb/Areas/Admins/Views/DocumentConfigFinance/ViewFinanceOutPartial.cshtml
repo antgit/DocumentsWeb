@@ -1,0 +1,253 @@
+﻿@using BusinessObjects
+@using DocumentsWeb.Areas.Admins.Models
+@model DocumentConfigFinancesModel
+
+@*// ссылки на форматирование чисел
+//http://msdn.microsoft.com/ru-ru/library/0c899ak8.aspx
+//http://msdn.microsoft.com/ru-ru/library/dwhawy9k.aspx*@
+
+@Html.DevExpress().CheckBox(s =>
+   {
+       s.Name = "Config.Out.AllowNumberEdit";
+       s.ShowModelErrors = true;
+       s.Text = "Разрешить редактирование номера";
+       s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), s.Name);
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+   }).Bind(Model.Config.Out.AllowNumberEdit).GetHtml()
+
+@Html.DevExpress().CheckBox(s =>
+   {
+       s.Name = "Config.Out.AllowAgenToEdit";
+       s.ShowModelErrors = true;
+       s.Text = "Разрешить редактирование контрагента";
+       s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), s.Name);
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+   }).Bind(Model.Config.Out.AllowAgenToEdit).GetHtml()
+
+@Html.DevExpress().CheckBox(s =>
+   {
+       s.Name = "Config.Out.AllowProductEdit";
+       s.ShowModelErrors = true;
+       s.Text = "Разрешить редактирование товара";
+       s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), s.Name);
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+   }).Bind(Model.Config.Out.AllowProductEdit).GetHtml()
+
+<hr />
+
+@Html.DevExpress().CheckBox(s =>
+   {
+       s.Name = "Config.Out.AllowAgenToSearch";
+       s.ShowModelErrors = true;
+       s.Text = "Разрешить поиск корреспондента";
+       s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), s.Name);
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+   }).Bind(Model.Config.Out.AllowAgenToSearch).GetHtml()
+   
+
+@Html.DevExpress().CheckBox(s =>
+   {
+       s.Name = "Config.Out.AllowProductSearch";
+       s.ShowModelErrors = true;
+       s.Text = "Разрешить поиск товара";
+       s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), s.Name);
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+   }).Bind(Model.Config.Out.AllowProductSearch).GetHtml()
+<hr />
+
+@Html.DevExpress().CheckBox(s =>
+   {
+       s.Name = "Config.Out.AllowAgenToCreate";
+       s.ShowModelErrors = true;
+       s.Text = "Разрешить создание корреспондента";
+       s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), s.Name);
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+   }).Bind(Model.Config.Out.AllowAgenToCreate).GetHtml()
+
+@Html.DevExpress().CheckBox(s =>
+   {
+       s.Name = "Config.Out.AllowProductCreate";
+       s.ShowModelErrors = true;
+       s.Text = "Разрешить создание товара";
+       s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), s.Name);
+       s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+   }).Bind(Model.Config.Out.AllowProductCreate).GetHtml()
+<hr />
+
+<table style="width:200px;" >
+    <thead>
+@Html.DevExpress().Label(s =>
+            {
+                
+                s.Text = "Количество десятичных знаков при редактировании";
+                s.AssociatedControlName = "date";
+                
+                //s.ToolTip = "Дата документа - фактическое отражение факта времени документа в учетной системе";
+            }).GetHtml()        
+    </thead>
+    <tr>
+        <td style="width:100px;" >
+            @Html.DevExpress().Label(s =>
+                {
+                    s.Text = "Количество";
+                    //s.AssociatedControlName = "date";
+                    //s.ToolTip = "Дата документа - фактическое отражение факта времени документа в учетной системе";
+                }).GetHtml()        
+        </td>
+        <td >
+            @Html.DevExpress().Label(s =>
+                {
+                    s.Text = "Цена";
+                    //s.AssociatedControlName = "date";
+                    //s.ToolTip = "Дата документа - фактическое отражение факта времени документа в учетной системе";
+                }).GetHtml()    
+        </td>
+        <td>
+            @Html.DevExpress().Label(s =>
+                {
+                    s.Text = "Сумма";
+                    //s.AssociatedControlName = "date";
+                    //s.ToolTip = "Дата документа - фактическое отражение факта времени документа в учетной системе";
+                }).GetHtml()  
+        </td>
+    </tr>
+    
+    <tr>
+        <td style="width:100px;">
+            @Html.DevExpress().SpinEdit(s =>
+                {
+                    s.Name = "Config.Out.DecimalPlacesQty";
+                    s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), s.Name);
+                    s.ShowModelErrors = true;
+                    s.Properties.MinValue = 0;
+                    s.Properties.MaxValue = 4;
+                    s.Properties.NumberType = SpinEditNumberType.Integer;
+                    s.Properties.DecimalPlaces = 0;
+                    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                    s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                    s.ControlStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+                }).Bind(Model.Config.Out.DecimalPlacesQty).GetHtml()    
+
+            
+        </td>
+        <td>
+            @Html.DevExpress().SpinEdit(s =>
+                {
+                    s.Name = "Config.Out.DecimalPlacesPrice";
+                    s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), s.Name);
+                    s.ShowModelErrors = true;
+                    s.Properties.MinValue = 0;
+                    s.Properties.MaxValue = 4;
+                    s.Properties.NumberType = SpinEditNumberType.Integer;
+                    s.Properties.DecimalPlaces = 0;
+                    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                    s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                    s.ControlStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+                }).Bind(Model.Config.Out.DecimalPlacesPrice).GetHtml()        
+        </td>
+        <td>
+            @Html.DevExpress().SpinEdit(s =>
+                {
+                    s.Name = "Config.Out.DecimalPlacesSumma";
+                    s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), s.Name);
+                    s.ShowModelErrors = true;
+                    s.Properties.MinValue = 0;
+                    s.Properties.MaxValue = 4;
+                    s.Properties.NumberType = SpinEditNumberType.Integer;
+                    s.Properties.DecimalPlaces = 0;
+                    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                    s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                    s.ControlStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+                }).Bind(Model.Config.Out.DecimalPlacesSumma).GetHtml()      
+        </td>
+    </tr>
+    
+</table>
+
+
+<table style="width:200px;">
+    <thead>
+@Html.DevExpress().Label(s =>
+            {
+                
+                s.Text = "Формат данных при отображении";
+                s.AssociatedControlName = "date";
+                
+                //s.ToolTip = "Дата документа - фактическое отражение факта времени документа в учетной системе";
+            }).GetHtml()        
+    </thead>
+    <tr>
+        <td style="width:100px;">
+            @Html.DevExpress().Label(s =>
+                {
+                    s.Text = "Количество";
+                    s.AssociatedControlName = "Config.Out.DistpalyFormatQty";
+                    //s.ToolTip = "Дата документа - фактическое отражение факта времени документа в учетной системе";
+                }).GetHtml()        
+        </td>
+        <td >
+            @Html.DevExpress().Label(s =>
+                {
+                    s.Text = "Цена";
+                    s.AssociatedControlName = "Config.Out.DisplayFormatPrice";
+                    //s.ToolTip = "Дата документа - фактическое отражение факта времени документа в учетной системе";
+                }).GetHtml()    
+        </td>
+        <td>
+            @Html.DevExpress().Label(s =>
+                {
+                    s.Text = "Сумма";
+                    s.AssociatedControlName = "Config.Out.DisplayFormatSumma";
+                    //s.ToolTip = "Дата документа - фактическое отражение факта времени документа в учетной системе";
+                }).GetHtml()  
+        </td>
+    </tr>
+    
+    <tr>
+        <td style="width:100px;">
+            @Html.DevExpress().TextBox(s =>
+                {
+                    s.Name = "Config.Out.DistpalyFormatQty";
+                    s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), s.Name);
+                    s.ShowModelErrors = true;
+                    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                    s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                    s.ControlStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+                }).Bind(Model.Config.Out.DistpalyFormatQty).GetHtml()    
+
+            
+        </td>
+        <td>
+            @Html.DevExpress().TextBox(s =>
+                {
+                    s.Name = "Config.Out.DisplayFormatPrice";
+                    s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), s.Name);
+                    s.ShowModelErrors = true;
+                    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                    s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                    s.ControlStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+                }).Bind(Model.Config.Out.DisplayFormatPrice).GetHtml()        
+        </td>
+        <td>
+            
+            @Html.DevExpress().TextBox(s =>
+                {
+                    s.Name = "Config.Out.DisplayFormatSumma";
+                    s.ToolTip = UserData.GetTooltip(Url.RequestContext.RouteData.Values["controller"].ToString(), s.Name);
+                    s.ShowModelErrors = true;
+                    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                    s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                    s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                    s.ControlStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Right;
+                }).Bind(Model.Config.Out.DisplayFormatSumma).GetHtml() 
+            
+        </td>
+    </tr>
+    
+</table>     
+

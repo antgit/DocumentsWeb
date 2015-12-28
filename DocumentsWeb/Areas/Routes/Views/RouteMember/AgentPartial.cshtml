@@ -1,0 +1,24 @@
+﻿@using DocumentsWeb.Models
+@using DocumentsWeb.Areas.Agents.Models
+@using BusinessObjects;
+@using BusinessObjects.Security;
+@using BusinessObjects.Web.Core;
+@model int?
+
+@{
+    string Name = ViewData["Name"].ToString();
+    int MyCompanyId = WADataProvider.CurrentUser.MyCompanyId;
+}
+           
+@Html.DevExpress().ComboBox(settings =>{
+    settings.Name = Name;
+    settings.CallbackRouteValues = new { Area="Routes", Controller = "RouteMember", Action = "AgentPartial" };
+    settings.Properties.EnableCallbackMode = true;
+    settings.Properties.ValueField = "Id";
+    settings.Properties.TextField = "Name";
+    settings.Properties.ValueType = typeof(int);
+    settings.Properties.NullDisplayText = "Выберите корреспондента...";
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Properties.ClientSideEvents.BeginCallback = "function(s, e) { e.customArgs['Name'] = '" + Name + "'; e.customArgs['Id'] = " + (!Model.HasValue ? "0" : Model.Value.ToString()) + "; }";
+}).BindList(ClientModel.GetWorkersCollection()).Bind((!Model.HasValue || Model.Value == 0) ? null : Model).GetHtml()

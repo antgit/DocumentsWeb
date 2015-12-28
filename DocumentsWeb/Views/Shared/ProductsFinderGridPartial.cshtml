@@ -1,0 +1,89 @@
+﻿@using BusinessObjects
+@using DocumentsWeb.Areas.Products.Models
+@using DocumentsWeb.Models
+
+@{
+    string Name = (string)ViewData["Name"];
+    bool showOnlyServices = ViewData["showOnlyServices"] == null ? false : (bool)ViewData["showOnlyServices"];
+    bool showOnlyProducts = ViewData["showOnlyProducts"] == null ? false : (bool)ViewData["showOnlyProducts"];
+
+    System.Collections.IEnumerable Data;
+    
+    if(showOnlyServices)
+    {
+        if(showOnlyProducts)
+        {
+            Data = new List<ProductModel>();
+        }
+        else
+        {
+            Data = ProductModel.GetServices(onlyActiveState: true);
+        }
+    }
+    else
+    {
+        if (showOnlyProducts)
+        {
+            Data = ProductModel.GetProducts(onlyActiveState: true);
+        }
+        else
+        {
+            Data = ProductModel.GetCollection(onlyActiveState: true);
+        }
+    }
+}
+
+@Html.DevExpress().GridView(settings=>{
+    settings.Name = "gv" + Name;
+    settings.KeyFieldName = GlobalPropertyNames.Id;
+    settings.Width = System.Web.UI.WebControls.Unit.Pixel(800);
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+
+    settings.Settings.ShowVerticalScrollBar = true;
+    settings.Settings.VerticalScrollableHeight = 200;
+    settings.CallbackRouteValues = new { Area = "Products", Controller = "Home", Action = "ProductsFinderGridPartial" };
+    settings.SettingsBehavior.AllowFocusedRow = true;
+
+    settings.Settings.ShowFilterRow = true;
+    settings.Settings.ShowFilterRowMenu = true;
+    settings.Settings.ShowHorizontalScrollBar = true;
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+    settings.Styles.AlternatingRow.Enabled = DefaultBoolean.True;
+
+    settings.Columns.Add(column =>
+    {
+        column.FieldName = "Name";
+        column.Caption = "Наименование";
+        column.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+        column.Width = System.Web.UI.WebControls.Unit.Pixel(350);
+    });
+
+    settings.Columns.Add(column =>
+    {
+        column.FieldName = GlobalPropertyNames.Nomenclature;
+        column.Caption = "Номенклатура";
+        column.Width = System.Web.UI.WebControls.Unit.Pixel(150);
+        column.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+    });
+
+    settings.Columns.Add(column =>
+    {
+        column.FieldName = GlobalPropertyNames.UnitName;
+        column.Caption = "Ед.изм";
+        column.Width = System.Web.UI.WebControls.Unit.Pixel(150);
+        column.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+    });
+
+    if (WADataProvider.CurrentUserCompanyMultyCount())
+    {
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "MyCompanyName";
+            column.Caption = "Компания-владелец";
+            column.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+            column.Width = System.Web.UI.WebControls.Unit.Pixel(350);
+        });
+    }
+
+    settings.ClientSideEvents.BeginCallback = "function (s, e) { e.customArgs['Name'] = '" + Name + "'; e.customArgs['showOnlyServices'] = '" + showOnlyServices + "'; e.customArgs['showOnlyProducts'] = '" + showOnlyProducts + "'; }";
+}).Bind(Data).GetHtml()

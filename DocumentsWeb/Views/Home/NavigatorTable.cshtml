@@ -1,0 +1,519 @@
+﻿@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentsWeb.Models
+<script type="text/javascript">
+// <![CDATA[
+    function ShowWidgetPanel(widgetPanelUID) {
+        var panel = dockManager.GetPanelByUID(widgetPanelUID);
+        panel.Show();
+    }
+    function SetWidgetButtonVisible(widgetName, visible) {
+        if (!visible)
+            $('#widgetButton_' + widgetName).addClass('disabled');
+        else
+            $('#widgetButton_' + widgetName).removeClass();
+    }
+    $(document).ready(function () {
+        var DockedPanels = dockManager.GetPanels();
+        var PanelList = '';
+        for (i = 0; i < DockedPanels.length; i++) {
+            var btnName = '#widgetButton_' + DockedPanels[i].panelUID;
+            if (!DockedPanels[i].IsVisible())
+                $(btnName).addClass('disabled');
+            else
+                $(btnName).removeClass();
+        }
+    });
+// ]]> 
+</script>
+@Html.DevExpress().DockManager(
+    settings => {
+        settings.Name = "dockManager";
+        settings.ClientSideEvents.PanelShown = "function(s, e) { SetWidgetButtonVisible(e.panel.panelUID, false) }";
+        settings.ClientSideEvents.PanelCloseUp = "function(s, e) { SetWidgetButtonVisible(e.panel.panelUID, true) }";
+        settings.SaveStateToCookies = true;
+        settings.SaveStateToCookiesID = "HomePageNamigatorCoocies";
+    }
+).GetHtml()
+@Html.DevExpress().DockPanel(
+    settings => {
+        settings.Name = "rpAccount";
+        settings.PanelUID = WebModuleNames.WEB_USERHOME;
+        settings.OwnerZoneUID = "leftZone";
+        settings.HeaderText = "Личная страница";
+        settings.VisibleIndex = 0;
+        settings.ShowCloseButton = false;
+        settings.AllowResize = true;
+        settings.Height = 150;
+        settings.Width = 300;
+        settings.ShowOnPageLoad = WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_USERHOME);
+        settings.Enabled = WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_USERHOME);
+        settings.SetContent(() =>
+            {
+                @Html.DevExpress().HyperLink(s =>
+                {
+                    s.Name = "lnkUserHome";
+                    s.NavigateUrl = "~/UserPersonal/Home";
+                    s.Properties.Text = "Личная страница";
+                    s.ControlStyle.Font.Bold = true;
+                    s.Enabled = WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_USERHOME);
+                    s.ClientEnabled = s.Enabled;
+                }).Render();
+                @ViewContext.Writer.Write(" - Вы можете управлять контактами, просматривать сообщения, узнать о текущих задачах и новостях... ");
+            });
+    }
+).GetHtml()
+
+@Html.DevExpress().DockPanel(
+    settings => {
+        settings.Name = "rpService";
+        settings.PanelUID = WebModuleNames.WEB_DOCSERVICE;
+        settings.OwnerZoneUID = "midleZone";
+        settings.HeaderText = "Услуги";
+        settings.AllowResize = true;
+        settings.VisibleIndex = 0;
+        settings.Height = 150;
+        settings.Width = 300;
+        settings.SaveStateToCookies = true;
+        settings.SaveStateToCookiesID = "HomePageNamigatorCoocies" + settings.PanelUID;
+        settings.ShowOnPageLoad = (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCSERVICE)
+                    || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCSERVICENDS));
+        settings.Enabled = (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCSERVICE)
+                    || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCSERVICENDS));
+        settings.SetContent(() =>
+            {
+                if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCSERVICE)
+                    & WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCSERVICENDS))
+                {
+                    Html.DevExpress().HyperLink(s =>
+                        {
+                            s.Name = "lnkServices";
+                            s.NavigateUrl = "~/ServicesNds/Home";
+                            s.Properties.Text = "Услуги";
+                            s.ControlStyle.Font.Bold = true;
+                            s.Enabled = WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCSERVICENDS);
+                            s.ClientEnabled = s.Enabled;
+                        }).Render();
+                    ViewContext.Writer.Write(" и ");
+                    Html.DevExpress().HyperLink(s =>
+                        {
+                            s.Name = "lnkServicesNds";
+                            s.NavigateUrl = "~/Services/Home/";
+                            s.Properties.Text = "Услуги без НДС";
+                            s.ControlStyle.Font.Bold = true;
+                            s.Enabled = WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCSERVICE);
+                            s.ClientEnabled = s.Enabled;
+                        }).Render();
+                    ViewContext.Writer.Write(" - учет оказанных и полученных услуг. Акты, счета...");
+                }
+
+                else if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCSERVICE))
+                {                    
+                    Html.DevExpress().HyperLink(s =>
+                    {
+                        s.Name = "lnkServicesNds";
+                        s.NavigateUrl = "~/Services/Home/";
+                        s.Properties.Text = "Услуги";
+                        s.ControlStyle.Font.Bold = true;
+                        s.Enabled = WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCSERVICE);
+                        s.ClientEnabled = s.Enabled;
+                    }).Render();
+                    ViewContext.Writer.Write(" - учет оказанных и полученных услуг. Акты, счета...");
+                }
+
+                else if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCSERVICENDS))
+                {
+                    Html.DevExpress().HyperLink(s =>
+                    {
+                        s.Name = "lnkServices";
+                        s.NavigateUrl = "~/ServicesNds/Home";
+                        s.Properties.Text = "Услуги";
+                        s.ControlStyle.Font.Bold = true;
+                        s.Enabled = WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCSERVICENDS);
+                        s.ClientEnabled = s.Enabled;
+                    }).Render();                    
+                    ViewContext.Writer.Write(" - учет оказанных и полученных услуг. Акты, счета...");
+                }
+            });
+    }
+).GetHtml()
+
+@Html.DevExpress().DockPanel(
+    settings => {
+        settings.Name = "rpDocs";
+        settings.PanelUID = WebModuleNames.WEB_DOCDOGOVOR;
+        settings.OwnerZoneUID = "rightZone";
+        settings.HeaderText = "Договора";
+        settings.AllowResize = true;
+        settings.VisibleIndex = 0;
+        settings.Height = 150;
+        settings.Width = 300;
+        settings.SaveStateToCookies = true;
+        settings.SaveStateToCookiesID = "HomePageNamigatorCoocies" + settings.PanelUID;
+        settings.ShowOnPageLoad = WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCDOGOVOR);
+        settings.Enabled = WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCDOGOVOR);
+        settings.SetContent(() =>
+            {
+                Html.DevExpress().HyperLink(s =>
+                {
+                    s.Name = "lnkContracts";
+                    s.NavigateUrl = "~/Contracts/Home";
+                    s.Properties.Text = "Учет договоров";
+                    s.ControlStyle.Font.Bold = true;
+                    s.Enabled = WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCDOGOVOR);
+                    s.ClientEnabled = s.Enabled;
+                }).Render();
+                ViewContext.Writer.Write(" - отражение Ваших бумажных документов в электронном виде, включает возможности поиска документов по папкам, корреспондентам, подукции.");
+            });
+    }
+).GetHtml()
+
+
+
+@Html.DevExpress().DockPanel(
+    settings => {
+        settings.Name = "rpFinance";
+        settings.PanelUID = WebModuleNames.WEB_DOCFINANCE;
+        settings.OwnerZoneUID = "leftZone";
+        settings.HeaderText = "Управление финансами";
+        settings.AllowResize = true;
+        settings.Height = 150;
+        settings.Width = 300;
+        settings.VisibleIndex = 1;
+        settings.SaveStateToCookies = true;
+        settings.SaveStateToCookiesID = "HomePageNamigatorCoocies" + settings.PanelUID;
+        settings.ShowOnPageLoad = (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCFINANCE)
+                    || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCFINANCENDS));
+        settings.Enabled = (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCFINANCE)
+                    || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCFINANCENDS));
+        settings.SetContent(() =>
+            {
+                if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCFINANCE)
+                    & WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCFINANCENDS))
+                {
+                    Html.DevExpress().HyperLink(s =>
+                        {
+                            s.Name = "lnkFinance";
+                            s.NavigateUrl = "~/Finances/Home";
+                            s.Properties.Text = "Управление финансами";
+                            s.ControlStyle.Font.Bold = true;
+                            s.Enabled = WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCFINANCE);
+                            s.ClientEnabled = s.Enabled;
+                        }).Render();
+                    ViewContext.Writer.Write(" и ");
+                    Html.DevExpress().HyperLink(s =>
+                        {
+                            s.Name = "lnkFinanceNds";
+                            s.NavigateUrl = "~/FinancesNds/Home";
+                            s.Properties.Text = "Управление финансами НДС";
+                            s.ControlStyle.Font.Bold = true;
+                            s.Enabled = WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCFINANCENDS);
+                            s.ClientEnabled = s.Enabled;
+                        }).Render();
+
+                    ViewContext.Writer.Write(" – учет денежных операций. Учет денежных средств по расчетному счету, кассе, наличные расчеты...");
+                }
+
+                else if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCFINANCE))
+                {
+                    Html.DevExpress().HyperLink(s =>
+                    {
+                        s.Name = "lnkFinance";
+                        s.NavigateUrl = "~/Finances/Home";
+                        s.Properties.Text = "Управление финансами";
+                        s.ControlStyle.Font.Bold = true;
+                        s.Enabled = WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCFINANCE);
+                        s.ClientEnabled = s.Enabled;
+                    }).Render();
+                    ViewContext.Writer.Write(" – учет денежных операций. Учет денежных средств по расчетному счету, кассе, наличные расчеты...");
+                }
+                else if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCFINANCENDS))
+                {
+                    Html.DevExpress().HyperLink(s =>
+                    {
+                        s.Name = "lnkFinanceNds";
+                        s.NavigateUrl = "~/FinancesNds/Home";
+                        s.Properties.Text = "Управление финансами";
+                        s.ControlStyle.Font.Bold = true;
+                        s.Enabled = WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCFINANCENDS);
+                        s.ClientEnabled = s.Enabled;
+                    }).Render();
+
+                    ViewContext.Writer.Write(" – учет денежных операций. Учет денежных средств по расчетному счету, кассе, наличные расчеты...");
+                }
+            });
+    }
+).GetHtml()
+
+@Html.DevExpress().DockPanel(
+    settings => {
+        settings.Name = "rpTax";
+        settings.PanelUID = WebModuleNames.WEB_DOCTAX;
+        settings.OwnerZoneUID = "midleZone";
+        settings.HeaderText = "Налоговые документы";
+        settings.AllowResize = true;
+        settings.Height = 150;
+        settings.Width = 300;
+        settings.VisibleIndex = 1;
+        settings.SaveStateToCookies = true;
+        settings.SaveStateToCookiesID = "HomePageNamigatorCoocies" + settings.PanelUID;
+        settings.ShowOnPageLoad = WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCTAX);
+        settings.Enabled = WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCTAX);
+        settings.SetContent(() =>
+            {
+                Html.DevExpress().HyperLink(s =>
+                {
+                    s.Name = "lnkTaxes";
+                    s.NavigateUrl = "~/Taxes/Home";
+                    s.Properties.Text = "Налоговые документы";
+                    s.ControlStyle.Font.Bold = true;
+                    s.Enabled = WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCTAX);
+                    s.ClientEnabled = s.Enabled;
+                }).Render();
+                ViewContext.Writer.Write(" - раздел для предприятий плательщиков НДС для учета входящих и исходящих налоговых документов...");
+            });
+    }
+).GetHtml()
+
+@Html.DevExpress().DockPanel(
+    settings => {
+        settings.Name = "rpDocument";
+        settings.PanelUID = WebModuleNames.WEB_DOCALL;
+        settings.OwnerZoneUID = "rightZone";
+        settings.HeaderText = "Все документы";
+        settings.AllowResize = true;
+        settings.Height = 150;
+        settings.Width = 300;
+        settings.VisibleIndex = 1;
+        settings.SaveStateToCookies = true;
+        settings.SaveStateToCookiesID = "HomePageNamigatorCoocies" + settings.PanelUID;
+        settings.ShowOnPageLoad = false;
+        settings.Enabled = WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCALL);
+        settings.SetContent(() =>
+            {
+                Html.DevExpress().HyperLink(s =>
+                {
+                    s.Name = "lnkDocumentList";
+                    s.NavigateUrl = "Document";
+                    s.Properties.Text = "Все документы";
+                    s.ControlStyle.Font.Bold = true;
+                    s.Enabled = (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCALL));
+                    s.ClientEnabled = s.Enabled;
+                }).Render();
+                ViewContext.Writer.Write(" - навигация по всем доступным документам в системе в кратком представлении...");
+            });
+    }
+).GetHtml()
+
+
+@Html.DevExpress().DockPanel(
+    settings => {
+        settings.Name = "rpFeaturesSales";
+        settings.PanelUID = WebModuleNames.WEB_DOCSALE;
+        settings.OwnerZoneUID = "leftZone";
+        settings.HeaderText = "Управление продажами";
+        settings.AllowResize = true;
+        settings.Height = 150;
+        settings.Width = 300;
+        settings.AllowResize = true;
+        settings.VisibleIndex = 2;
+        settings.SaveStateToCookies = true;
+        settings.SaveStateToCookiesID = "HomePageNamigatorCoocies" + settings.PanelUID;
+        settings.Enabled = (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCSALE)
+                    || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCSALENDS));
+        settings.SetContent(() =>
+            {
+                if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCSALE)
+                    & WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCSALENDS))
+                {
+                    Html.DevExpress().HyperLink(s =>
+                        {
+                            s.Name = "lnkSaleNds";
+                            s.NavigateUrl = "~/SalesNds/Home/";
+                            s.Properties.Text = "Управление продажами плательщиками НДС";
+                            s.ControlStyle.Font.Bold = true;
+                            s.Enabled = WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCSALENDS);
+                            s.ClientEnabled = s.Enabled;
+                        }).Render();
+                    ViewContext.Writer.Write(" и ");
+                    Html.DevExpress().HyperLink(s =>
+                        {
+                            s.Name = "lnkSale";
+                            s.NavigateUrl = "~/Sales/Home/";
+                            s.Properties.Text = "Управление продажами не плательщиками НДС";
+                            s.ControlStyle.Font.Bold = true;
+                            s.Enabled = WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCSALE);
+                            s.ClientEnabled = s.Enabled;
+                        }).Render();
+                    ViewContext.Writer.Write(" - создание документов предприятия связянные с торговой деятельностью...");
+                }
+                else if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCSALE))
+                {
+                    Html.DevExpress().HyperLink(s =>
+                    {
+                        s.Name = "lnkSale";
+                        s.NavigateUrl = "~/Sales/Home/";
+                        s.Properties.Text = "Управление продажами";
+                        s.ControlStyle.Font.Bold = true;
+                        s.Enabled = WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCSALE);
+                        s.ClientEnabled = s.Enabled;
+                    }).Render();
+                    ViewContext.Writer.Write(" - создание документов предприятия связянные с торговой деятельностью...");
+                }
+                else if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCSALENDS))
+                {
+                    Html.DevExpress().HyperLink(s =>
+                    {
+                        s.Name = "lnkSaleNds";
+                        s.NavigateUrl = "~/SalesNds/Home/";
+                        s.Properties.Text = "Управление продажами";
+                        s.ControlStyle.Font.Bold = true;
+                        s.Enabled = WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCSALENDS);
+                        s.ClientEnabled = s.Enabled;
+                    }).Render();
+                    
+                    ViewContext.Writer.Write(" - создание документов предприятия связянные с торговой деятельностью...");
+                }
+            });
+    }
+).GetHtml()
+
+@Html.DevExpress().DockPanel(
+    settings => {
+        settings.Name = "rpPrices";
+        settings.PanelUID = WebModuleNames.WEB_DOCPRICE;
+        settings.OwnerZoneUID = "midleZone";
+        settings.HeaderText = "Ценовая политика";
+        settings.AllowResize = true;
+        settings.Height = 150;
+        settings.Width = 300;
+        settings.VisibleIndex = 2;
+        settings.SaveStateToCookies = true;
+        settings.SaveStateToCookiesID = "HomePageNamigatorCoocies" + settings.PanelUID;
+        settings.Enabled = WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCPRICE);
+        settings.SetContent(() =>
+            {
+                Html.DevExpress().HyperLink(s =>
+                {
+                    s.Name = "lnkPrices";
+                    s.NavigateUrl = "~/Prices/Home";
+                    s.Properties.Text = "Ценовая политика";
+                    s.ControlStyle.Font.Bold = true;
+                    s.Enabled = (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCPRICE));
+                    s.ClientEnabled = s.Enabled;
+                }).Render();
+                ViewContext.Writer.Write(" - учет и контроль цен на товары и услуги нашего предприятия, или любого другого, например цен поставщика или конкурентов...");
+            });
+    }
+).GetHtml()
+
+@Html.DevExpress().DockPanel(
+    settings => {
+        settings.Name = "rpMarketings";
+        settings.PanelUID = WebModuleNames.WEB_DOCMKTG;
+        settings.OwnerZoneUID = "rightZone";
+        settings.HeaderText = "Маркетинг";
+        settings.AllowResize = true;
+        settings.Height = 150;
+        settings.Width = 300;
+        settings.VisibleIndex = 2;
+        settings.SaveStateToCookies = true;
+        settings.SaveStateToCookiesID = "HomePageNamigatorCoocies" + settings.PanelUID;
+        settings.Enabled = WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCMKTG); 
+        settings.SetContent(() =>
+            {
+                Html.DevExpress().HyperLink(s =>
+                {
+                    s.Name = "lnkMarketings";
+                    s.NavigateUrl = "~/Marketings/Home";
+                    s.Properties.Text = "Маркетинг";
+                    s.ControlStyle.Font.Bold = true;
+                    s.Enabled = (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCMKTG));
+                    s.ClientEnabled = s.Enabled;
+                }).Render();
+                ViewContext.Writer.Write(" - анкетирование, сбор информации о клиентах, товарах, продукции и ценах");
+            });
+    }
+).GetHtml()
+
+@Html.DevExpress().DockPanel(
+    settings => {
+        settings.Name = "rpTask";
+        settings.PanelUID = WebModuleNames.WEB_TASKS;
+        settings.OwnerZoneUID = "rightZone";
+        settings.HeaderText = "Задачи";
+        settings.AllowResize = true;
+        settings.Height = 150;
+        settings.Width = 300;
+        settings.VisibleIndex = 2;
+        settings.SaveStateToCookies = true;
+        settings.SaveStateToCookiesID = "HomePageNamigatorCoocies" + settings.PanelUID;
+        settings.Enabled = WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_TASKS); 
+        settings.SetContent(() =>
+            {
+                Html.DevExpress().HyperLink(s =>
+                {
+                    s.Name = "lnkTasks";
+                    s.NavigateUrl = "~/Kb/ViewListTask/";
+                    s.Properties.Text = "Задачи";
+                    s.ControlStyle.Font.Bold = true;
+                    s.Enabled = (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_TASKS));
+                    s.ClientEnabled = s.Enabled;
+                }).Render();
+                ViewContext.Writer.Write(" - фиксируйте Ваши дела и задачи, получайте напоминания, контролируйте, отслеживайте ход выполнения");
+            });
+    }
+).GetHtml()
+
+<div class="widgetPanel">
+    @foreach(string widget in HomeData.GetWidgets()) {
+        @Html.DevExpress().Image(
+            settings => {
+                settings.Name = "widgetButton_" + widget;
+                settings.ImageUrl = Url.Content(string.Format("~/Content/Images/Widgets/{0}.png", widget));
+                settings.ControlStyle.Cursor = "pointer";
+                settings.ToolTip = "Показать виджет " + HomeData.GetWidgetsHeader(widget);
+                settings.Properties.ClientSideEvents.Click = string.Format("function(s, e) {{ ShowWidgetPanel('{0}') }}", widget);
+        //        if (!visible)
+        //    $('#widgetButton_' + widgetName).addClass('disabled');
+        //else
+        //    $('#widgetButton_' + widgetName).removeClass();
+            }
+        ).GetHtml()
+    }
+</div>
+
+@Html.DevExpress().DockZone(
+    settings => {
+        settings.Name = "dockZone1";
+        settings.ZoneUID = "leftZone";
+        settings.ControlStyle.CssClass = "leftZone";
+        settings.Width = 320;
+        settings.Height = 650;
+        
+        settings.PanelSpacing = 3;
+    }
+).GetHtml()
+
+@Html.DevExpress().DockZone(
+    settings => {
+        settings.Name = "dockZone2";
+        settings.ZoneUID = "midleZone";
+        settings.ControlStyle.CssClass = "midleZone";
+        settings.Width = 320;
+        settings.Height = 650;
+        settings.PanelSpacing = 3;
+    }
+).GetHtml()
+
+@Html.DevExpress().DockZone(
+    settings => {
+        settings.Name = "dockZone3";
+        settings.ZoneUID = "rightZone";
+        settings.ControlStyle.CssClass = "rightZone";
+        settings.Width = 320;
+        settings.Height = 650;
+        settings.PanelSpacing = 3;
+    }
+).GetHtml()
+

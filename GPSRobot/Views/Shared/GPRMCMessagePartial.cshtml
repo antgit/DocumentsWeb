@@ -1,0 +1,6 @@
+﻿@model GPSRobot.Models.MessageStateModel
+@if (Model.State) {
+    ViewContext.Writer.Write("OK\r\n");
+} else {
+    ViewContext.Writer.Write("ERROR\r\n" + Model.Message);
+}

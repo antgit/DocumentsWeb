@@ -1,0 +1,77 @@
+﻿@using BusinessObjects
+@using DevExpress
+@using DevExpress.Web
+@using DevExpress.Utils
+@using DevExpress.Web.Mvc
+@using DevExpress.Web.Mvc.UI
+@using Unit = System.Web.UI.WebControls.Unit
+@model DocumentsWeb.Areas.Ourp.Models.EquipmentModel
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		Name.Focus();
+	});
+</script>
+
+<table style="width: 400px; height: 100%; ">
+    <tr>
+        <td style="width: 100px;">
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Код:";
+                s.AssociatedControlName = GlobalPropertyNames.Code;
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = GlobalPropertyNames.Code;
+                s.ReadOnly = true;
+                s.ControlStyle.CssClass = "editor";
+                s.Width = Unit.Percentage(100);
+            }).Bind(Model.Code).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 100px;">
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Наименование:";
+                s.AssociatedControlName = GlobalPropertyNames.Name;
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = GlobalPropertyNames.Name;
+                s.ReadOnly = Model.IsSystem | Model.IsReadOnly;
+                s.Width = Unit.Percentage(100);
+                s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            }).Bind(Model.Name).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 100px;">
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Примечание:";
+                s.AssociatedControlName = GlobalPropertyNames.Memo;
+            }).GetHtml()
+        </td>
+        <td>
+           @Html.DevExpress().Memo(s =>
+            {
+                s.Name = GlobalPropertyNames.Memo;
+                s.Properties.NullText = "Введите примечание или описание документа...";
+                s.ControlStyle.CssClass = "editor";
+                s.Height = System.Web.UI.WebControls.Unit.Pixel(40);
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ClientEnabled = !Model.IsReadOnly;
+            }).Bind(Model.Memo).GetHtml()
+        </td>
+    </tr>
+</table>

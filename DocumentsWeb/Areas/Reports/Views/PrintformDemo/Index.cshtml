@@ -1,0 +1,42 @@
+﻿@using System.Web.UI.WebControls
+@using Stimulsoft.Report.Mvc
+@{
+    ViewBag.Title = "Печать документа";
+    Layout = "~/Views/Shared/_LayoutPrintForms.cshtml";
+}
+<table>
+    <tr>
+        <td class="reports" valign="top">
+            <div>
+                @Html.ActionLink("Simple List", "Index", new { id = "1" })
+                <br />Report Snapshot
+
+                <br /><br />
+                @Html.ActionLink("Simple List", "Index", new { id = "2" })
+                <br />Report Template
+
+                <br /><br />
+                @Html.ActionLink("Interaction Sorting", "Index", new { id = "3" })
+                <br />Report Template
+
+                <br /><br />
+                @Html.ActionLink("List of Products", "Index", new { id = "4" })
+                <br />Compiled Report Class
+
+                <br /><br />
+                @Html.ActionLink("Selecting Country", "Index", new { id = "5" })
+                <br />Compiled Report Class
+            </div>
+        </td>
+        <td style="width: 100%;">
+            @Html.StiMvcViewerFx(new StiMvcViewerFxOptions() {
+                        ActionGetReportSnapshot = "GetReportSnapshot",
+                        ActionGetLocalization = "GetLocalization",
+                        ActionExportReport = "ExportReport",
+                        Width = Unit.Percentage(100),
+                        Height = Unit.Pixel(800),
+                        Zoom = 100
+            })
+        </td>
+    </tr>
+</table>

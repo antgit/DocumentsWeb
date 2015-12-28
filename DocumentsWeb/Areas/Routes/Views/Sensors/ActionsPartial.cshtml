@@ -1,0 +1,165 @@
+﻿@using BusinessObjects
+@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentWeb.Extentions
+@using DocumentsWeb.Models
+@using DocumentsWeb.Controllers;
+@using DocumentsWeb.Areas.General.Models;
+@using DevExpress.Utils;
+@using DevExpress.Web.Mvc.UI;
+@{   
+    string HelpDefaultLink = string.Empty;
+    if (ViewData.ContainsKey("HelpDefaultLink"))
+    {
+        HelpDefaultLink = ViewData["HelpDefaultLink"].ToString();
+    }
+}
+
+<div id="divHeader" style="width: 100%;">
+@Html.DevExpress().NavBar(settings =>
+{
+    settings.Name = "nbFeaturesHeader";
+    settings.AllowExpanding = false;
+    settings.AllowSelectItem = false;
+    settings.AutoCollapse = false;
+    settings.EnableHotTrack = false;
+    settings.EnableAnimation = false;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.EncodeHtml = false;
+    settings.SaveStateToCookies = true;
+    settings.SaveStateToCookiesID = Url.RequestContext.RouteData.Values["controller"] + "Nav";
+    settings.Groups.Add(group =>
+    {
+        group.ShowExpandButton = DefaultBoolean.False;
+        group.SetHeaderTemplateContent(head =>
+        {
+            ViewContext.Writer.Write("<table width=\"100%\"><tr><td>");
+            ViewContext.Writer.Write("<div style=\"width: 100%; text-align: center;\">");
+            Html.DevExpress().Label(lb =>
+            {
+                lb.ControlStyle.Font.Bold = true;
+                lb.ControlStyle.Font.Size = System.Web.UI.WebControls.FontUnit.Point(10);
+                lb.Text = "Датчики";
+            }).Render();
+            ViewContext.Writer.Write("</div>");
+
+            ViewContext.Writer.Write("</td><td style=\"width:16px\">");
+            Html.DevExpress().HyperLink(s =>
+            {
+                s.ToolTip = "Показать справочную информацию";
+                s.Properties.ImageUrl = "~/Images/INFO_X16.png";
+                if (string.IsNullOrEmpty(HelpDefaultLink))
+                    s.NavigateUrl = "javascript:alert('Справочная информация отсутствует!');";
+                else
+                {
+                    s.Properties.Target = "_blank";
+                    s.NavigateUrl = HelpDefaultLink.StartsWith("~/") ? Url.Content(HelpDefaultLink) : HelpDefaultLink;
+                }
+            }).Render();
+
+            ViewContext.Writer.Write("</td><td style=\"width:16px\">");
+            Html.DevExpress().HyperLink(s =>
+            {
+                s.Properties.Style.Font.Bold = true;
+                s.Properties.Text = "<<";
+                s.ToolTip = "Скрыть панель управления";
+                s.NavigateUrl = "javascript:CollapseActionsPane();";
+            }).Render();
+            ViewContext.Writer.Write("</tr></td></table>");
+        });
+    });
+}).GetHtml()
+</div>
+
+<div id="divActions" style="width: 100%; height: 100%; overflow: auto;">
+@Html.DevExpress().NavBar(
+nbsettings =>
+{
+    nbsettings.Name = "nbFeatures";
+    nbsettings.AllowExpanding = true;
+    nbsettings.AllowSelectItem = true;
+    nbsettings.AutoCollapse = false;
+    nbsettings.EnableHotTrack = true;
+    nbsettings.EnableAnimation = true;
+    nbsettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    nbsettings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+    nbsettings.EncodeHtml = false;
+    nbsettings.SaveStateToCookies = true;
+    nbsettings.SaveStateToCookiesID = Url.RequestContext.RouteData.Values["controller"] + "Nav";
+    nbsettings.AutoCollapse = true;
+    //nbsettings.ClientSideEvents.ExpandedChanging = "changeExpandActions";
+
+    nbsettings.Groups.Add(group =>
+    {
+        group.Text = "Оборудование";
+        group.Expanded = false;
+        group.HeaderImage.Url = Url.Content("~/Images/Sensors/ActionbarIcons/temperature_x16.png");
+        group.SetContentTemplateContent(content =>
+        {
+            @Html.RenderPartial("DeviceListPartial");
+        });
+    });
+
+    @*nbsettings.Groups.Add(group =>
+    {
+        group.Text = "Поиск";
+        group.Name = "SearchBar";
+        group.Expanded = false;
+        group.HeaderImage.Url = Url.Content("~/Images/Routes/ActionbarIcons/search_x16.png");
+        group.SetContentTemplateContent(content =>
+        {
+            @Html.RenderPartial("SearchPartial");
+        });
+    });
+    
+    nbsettings.Groups.Add(group =>
+    {
+        group.Text = "Зоны";
+        group.Expanded = false;
+        group.HeaderImage.Url = Url.Content("~/Images/Routes/ActionbarIcons/zones_x16.png");
+        group.SetContentTemplateContent(content =>
+        {
+            @Html.RenderPartial("ZonesListPartial");
+        });
+    });
+
+    nbsettings.Groups.Add(group =>
+    {
+        group.Text = "Маршруты";
+        group.Name = "RoutesBar";
+        group.Expanded = true;
+        group.HeaderImage.Url = Url.Content("~/Images/Routes/ActionbarIcons/routes_x16.png");
+        group.SetContentTemplateContent(content =>
+        {
+            @Html.RenderPartial("RoutesToolsPartial");
+            @Html.RenderPartial("RoutesListPartial");
+        });
+        group.ClientVisible = true;
+    });
+
+    nbsettings.Groups.Add(group =>
+    {
+        group.Text = "Треки";
+        group.Name = "TracksBar";
+        group.Expanded = false;
+        group.HeaderImage.Url = Url.Content("~/Images/Routes/ActionbarIcons/tracks_x16.png");
+        group.SetContentTemplateContent(content =>
+        {
+            @Html.RenderPartial("TracksListPartial");
+        });
+    });
+
+    nbsettings.Groups.Add(group =>
+    {
+        group.Text = "Справочники";
+        group.Name = "DictionaryBar";
+        group.Expanded = false;
+        group.HeaderImage.Url = Url.Content("~/Images/Routes/ActionbarIcons/dictionary_x16.png");
+        group.SetContentTemplateContent(content =>
+        {
+            @Html.RenderPartial("DictionaryPartial");
+        });
+    });*@
+}).GetHtml()
+</div>

@@ -1,0 +1,69 @@
+﻿@using DevExpress.Web.Mvc.UI
+@using DevExpress.Web.Mvc
+@using DevExpress.Web.ASPxEditors
+@using DevExpress.Web.ASPxClasses
+@using DevExpress.Utils
+
+@{
+	List<BusinessObjects.Web.Core.EquimpmentWebView> obrazob = new List<BusinessObjects.Web.Core.EquimpmentWebView>();
+	obrazob = BusinessObjects.Web.Core.EquimpmentWebView.GetView(DocumentsWeb.Models.WADataProvider.WA);
+}
+
+@Html.DevExpress().GridView(s => {
+	s.Name = "MyGrid";
+
+	s.CallbackRouteValues = new { Area = "OURP", Controller = "Home", Action = "IndexPartial" };
+	
+	s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+	s.SettingsPager.PageSize = 200;
+
+	s.SettingsBehavior.AllowGroup = true;
+	s.Settings.ShowGroupPanel = true;
+	
+	s.Columns.Add(c =>
+	{
+		c.Name = "Column1";
+		c.Caption = "Имя 1";
+		c.FieldName = "Name1";
+		c.GroupIndex = 0;
+	});
+
+	s.Columns.Add(c =>
+	{
+		c.Name = "Column2";
+		c.Caption = "Имя 2";
+		c.FieldName = "Name2";
+		c.GroupIndex = 1;
+	});
+
+	s.Columns.Add(c =>
+	{
+		c.Name = "Column3";
+		c.Caption = "Имя 3";
+		c.FieldName = "Name3";
+		c.GroupIndex = 2;
+	});
+
+	s.Columns.Add(c =>
+	{
+		c.Name = "Column4";
+		c.Caption = "Имя 4";
+		c.FieldName = "Name4";
+		c.GroupIndex = 3;
+	});
+
+	s.Columns.Add(c =>
+	{
+		c.Name = "Column5";
+		c.Caption = "Имя 5";
+		c.FieldName = "Name5";
+		c.GroupIndex = 4;
+	});
+
+	s.Columns.Add(c =>
+	{
+		c.Name = "Column6";
+		c.Caption = "Имя 6";
+		c.FieldName = "Name6";
+	});
+}).Bind(obrazob).GetHtml()

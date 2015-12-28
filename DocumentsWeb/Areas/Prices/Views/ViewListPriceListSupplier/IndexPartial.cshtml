@@ -1,0 +1,163 @@
+﻿@using System.Globalization
+@using BusinessObjects
+@using DocumentsWeb.Models
+
+@{
+    bool haveEdit = WADataProvider.FolderElementRightView.IsAllow(BusinessObjects.Security.Right.DOCEDIT, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_PRICES_SYPPLYER).Id);
+    bool haveDelete = WADataProvider.FolderElementRightView.IsAllow(BusinessObjects.Security.Right.DOCTRASH, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_PRICES_SYPPLYER).Id);
+    bool haveView = WADataProvider.FolderElementRightView.IsAllow(BusinessObjects.Security.Right.DOCVIEW, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_PRICES_SYPPLYER).Id);
+    int imageColumnWith = 0;
+    if (haveView || haveEdit)
+    {
+        imageColumnWith = imageColumnWith + 20;
+    }
+    if (haveDelete)
+    {
+        imageColumnWith = imageColumnWith + 20;
+    }
+}
+
+@Html.DevExpress().GridView(settings=>{
+    settings.Settings.ShowTitlePanel = false;
+    settings.Name = "gvPriceDocuments";
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+    settings.SettingsBehavior.EnableCustomizationWindow = true;
+    settings.SettingsPopup.CustomizationWindow.VerticalAlign = PopupVerticalAlign.Below;
+    settings.SettingsPopup.CustomizationWindow.HorizontalAlign = PopupHorizontalAlign.OutsideRight;
+    settings.Styles.AlternatingRow.Enabled = DefaultBoolean.True;
+
+    settings.ClientSideEvents.Init = "function(s, e) { adjustSize(); }";
+    settings.ClientSideEvents.EndCallback = "function(s, e) { adjustSize(); }";
+
+    settings.CallbackRouteValues = new { Area = "Prices", Controller = "ViewListPriceListSupplier", Action = "IndexPartial" };
+    settings.SettingsEditing.DeleteRowRouteValues = new { Area = "Prices", Controller = "ViewListPriceListSupplier", Action = "ViewListPriceListDeliveryDeletePartial" };
+    
+    settings.Settings.ShowFilterBar = GridViewStatusBarMode.Hidden;
+    settings.SettingsBehavior.AllowFocusedRow = true;
+    settings.KeyFieldName = GlobalPropertyNames.Id;
+    settings.Settings.ShowGroupPanel = true;
+    settings.Settings.ShowFilterRow = true;
+    settings.Settings.ShowFilterRowMenu = true;
+    settings.Settings.ShowFilterBar = GridViewStatusBarMode.Visible;
+    settings.Settings.ShowVerticalScrollBar = true;
+    settings.Settings.ShowHorizontalScrollBar = true;
+    settings.Styles.Cell.Font.Size = System.Web.UI.WebControls.FontUnit.Point(11);
+    settings.Styles.Cell.Paddings.Padding = System.Web.UI.WebControls.Unit.Pixel(2);
+    settings.Styles.Cell.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+    settings.Settings.VerticalScrollableHeight = 0;
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+
+    settings.SettingsPager.PageSize = Utils.GetPageSize(settings);
+    settings.SettingsPager.Position = System.Web.UI.WebControls.PagerPosition.Top;
+    settings.SettingsPager.AlwaysShowPager = true;
+
+    settings.SetPagerBarTemplateContent(c => Html.RenderPartial("TablePager", new ViewDataDictionary
+        {
+            { "ContentObject", c },
+            { "TableCaption", "<b><a href=\"" + Url.Action("Index", new { Controller = "Home", Action = "Index" }) + "\">Управление ценами</a>\\Прайс-листы поставщиков</b>" }
+        }));
+                                                    
+    settings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100); //System.Web.UI.WebControls.Unit.Percentage(100);
+
+    settings.Columns.Add(cc =>
+        {
+            cc.Name = "colImageAction";
+            cc.Width = System.Web.UI.WebControls.Unit.Pixel(imageColumnWith);
+            cc.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+            cc.SetDataItemTemplateContent(c =>
+            {
+                string icon = (int)DataBinder.Eval(c.DataItem, "StateId") == State.STATEACTIVE
+                                    ? Url.Content("~/Images/DOCUMENTDONE_X16.png")
+                                    : Url.Content("~/Images/DOCUMENTNOTDONE_X16.png");
+                Html.DevExpress().HyperLink(hl =>
+                {
+                    hl.Name = "PriceListEdit_" + c.ItemIndex.ToString(CultureInfo.InvariantCulture);
+                    hl.Properties.ImageUrl = icon;
+                    hl.ToolTip = "Просмотреть/Изменить";
+                    hl.NavigateUrl = DevExpressHelper.GetUrl(new { Area = "Prices", Controller = "PriceListSupplier", Action = "Edit", Id = c.KeyValue });
+                    hl.Properties.Target = "_blank";
+                    hl.ClientVisible = haveView || haveEdit;
+                    hl.ClientEnabled = haveView || haveEdit;
+                }).Render();
+                Html.DevExpress().HyperLink(hl =>
+                {
+                    hl.Name = "PriceListDelete_" + c.ItemIndex.ToString(CultureInfo.InvariantCulture);
+                    hl.Properties.ImageUrl = Url.Content("~/Images/delete_x16.png");
+                    hl.ToolTip = "Удалить";
+                    hl.NavigateUrl = "javascript:if (confirm(\"Вы уверены, что хотите удалить этот прайс-лист?\")) {gvPriceDocuments.DeleteRow(" + c.ItemIndex.ToString(CultureInfo.InvariantCulture) + ");}";
+                    hl.ClientVisible = haveDelete;
+                    hl.ClientEnabled = haveDelete;
+                }).Render();
+            });
+        });
+    
+    settings.Columns.Add(column =>
+    {
+        column.FieldName = GlobalPropertyNames.Date;
+        column.Caption = "Дата";
+        column.Width = 70;
+        column.PropertiesEdit.DisplayFormatString = "d";
+        column.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+        column.ColumnType = MVCxGridViewColumnType.DateEdit;
+    });
+    MVCxGridViewColumn colNumber = settings.Columns.Add(GlobalPropertyNames.DocNumber, "Номер");
+    colNumber.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+    colNumber.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+    colNumber.Width = 70;
+
+
+    settings.Columns.Add(column =>
+    {
+        column.FieldName = "DateStart";
+        column.Caption = "Действует с";
+        column.Width = 100;
+        column.ColumnType = MVCxGridViewColumnType.DateEdit;
+        column.PropertiesEdit.DisplayFormatString = "d";
+        column.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+    });
+
+    settings.Columns.Add(column =>
+    {
+        column.FieldName = "ExpireDate";
+        column.Caption = "Действует по";
+        column.Width = 100;
+        column.ColumnType = MVCxGridViewColumnType.DateEdit;
+        column.PropertiesEdit.DisplayFormatString = "d";
+        column.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+    });
+
+
+    settings.Columns.Add(column =>
+    {
+        column.FieldName = GlobalPropertyNames.AgentDepartmentFromId;
+        column.Caption = "Кто";
+        column.Width = 300;
+        column.ColumnType = MVCxGridViewColumnType.HyperLink;
+        column.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+        column.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+        column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+        HyperLinkProperties colProperties = column.PropertiesEdit as HyperLinkProperties;
+        String urlFormatString = Url.Action("Preview", "MyDepatment", new RouteValueDictionary(new { Area = "Agents", id = "{0}" }));
+        colProperties.NavigateUrlFormatString = HttpUtility.UrlDecode(urlFormatString);
+        colProperties.Target = "_blank";
+        colProperties.TextField = "AgentDepartmentFromName";
+    });
+
+    settings.Columns.Add(column =>
+    {
+        column.FieldName = GlobalPropertyNames.AgentDepartmentToId;
+        column.Caption = "Кому";
+        column.Width = 300;
+        column.ColumnType = MVCxGridViewColumnType.HyperLink;
+        column.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+        column.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+        column.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Left;
+        HyperLinkProperties colProperties = column.PropertiesEdit as HyperLinkProperties;
+        String urlFormatString = Url.Action("Preview", "Byer", new RouteValueDictionary(new { Area = "Agents", id = "{0}" }));
+        colProperties.NavigateUrlFormatString = HttpUtility.UrlDecode(urlFormatString);
+        colProperties.Target = "_blank";
+        colProperties.TextField = "AgentDepartmentToName";
+    });
+
+}).Bind(PriceListHelper.GetDocumentsSupplier(Folder.CODE_FIND_PRICES_SYPPLYER)).GetHtml()

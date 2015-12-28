@@ -1,0 +1,402 @@
+﻿@using BusinessObjects
+@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using System.Web.UI.WebControls
+@using DocumentsWeb.Models
+@using DocumentsWeb.Areas.Agents.Models
+@using DocumentsWeb.Areas.Analitics.Models
+@using DocumentsWeb.Controllers
+@using DocumentsWeb.Areas.General.Models
+@model ClientModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Данные банка - " + Model.Name;
+    bool haveEdit = !Model.IsReadOnly && WADataProvider.LibrariesElementRightView.IsAllow(Right.UIEDIT, WebModuleNames.WEB_BANKS) && !WADataProvider.CommonRightView.ReadOnly;
+}
+<script src="@Url.Content("~/Scripts/jAgentActionsView.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jErrorPanelActions.js")" type="text/javascript"></script>
+<script type="text/javascript">
+     $(document).ready(function () {
+    $(".triggerError").click(function () {
+        $(".panelError").toggle("fast");
+        $(this).toggleClass("active");
+        return false;
+    });
+    });
+
+    function OnAddressesMenuItemClick(s, e) {
+        switch (e.item.name) {
+            case "mnuAdd":
+                gvAddress.AddNewRow();
+                break;
+            case "mnuEdit":
+                if (gvAddress.GetFocusedRowIndex() == -1)break;
+                gvAddress.StartEditRow(gvAddress.GetFocusedRowIndex());
+                break;
+            case "mnuDelete":
+                if (gvAddress.GetFocusedRowIndex() == -1)break;
+                if (confirm("Удалить строку?"))
+                    gvAddress.DeleteRow(gvAddress.GetFocusedRowIndex());
+                break;
+            case "mnuShowOnMap":
+                if (gvAddress.GetFocusedRowIndex() == -1) break;
+                gvAddress.GetRowValues(gvAddress.GetFocusedRowIndex(), 'NavigateX;NavigateY;NavigateZ', OnGetRowValues);
+                break;
+            default:
+                alert(e.item.name);
+                break;
+        }
+    }
+
+    function OnGetRowValues(values) {
+        //alert("x=" + values[0] + "; y=" + values[1]);
+        var path = "http://maps.google.com/maps?ll=" + values[0] + "," + values[1] + "&z=" + values[2] + "&t=m&hl=ru";
+        window.open(path, '_blank');
+    }
+
+    function OnAccountsMenuItemClick(s, e) {
+        switch (e.item.name) {
+            case "mnuAdd":
+                gvAccount.AddNewRow();
+                break;
+            case "mnuEdit":
+                if (gvAccount.GetFocusedRowIndex() == -1) break;
+                gvAccount.StartEditRow(gvAccount.GetFocusedRowIndex());
+                break;
+            case "mnuDelete":
+                if (gvAccount.GetFocusedRowIndex() == -1) break;
+                if (confirm("Удалить строку?"))
+                    gvAccount.DeleteRow(gvAccount.GetFocusedRowIndex());
+                break;
+            default:
+                alert(e.item.name);
+                break;
+        }
+    }
+    function OnCodesMenuItemClick(s, e) {
+        switch (e.item.name) {
+            case "mnuAdd":
+                gvCodes.AddNewRow();
+                break;
+            case "mnuEdit":
+                if (gvCodes.GetFocusedRowIndex() == -1) break;
+                gvCodes.StartEditRow(gvCodes.GetFocusedRowIndex());
+                break;
+        }
+    }
+</script>
+@Html.DevExpress().Menu(mnuSettings =>
+                        {
+                            mnuSettings.EnableHotTrack = true;
+                            mnuSettings.Name = "menuUiViewAgents";
+                            mnuSettings.ClientSideEvents.ItemClick = "OnViewAgentControlMenuItemClick";
+                            mnuSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+                            mnuSettings.Items.Add(item =>
+                                {
+                                    item.Name = "mnuClose";
+                                    item.Text = "Закрыть";
+                                    item.ToolTip = "Закрыть текущее окно или страницу";
+                                    item.Image.Url = @Url.Content("~/Images/cross.png");
+                                });
+
+                            if (haveEdit)
+                            {
+                                mnuSettings.Items.Add(item =>
+                                    {
+                                        item.Name = "mnuSave";
+                                        item.Text = "Сохранить";
+                                        item.ToolTip = "Сохранить текущий документ возможно если заполнены все необходимые данные, требуемые для корректного оформления документа. Для больших документов рекомендуется сохраняться как можно чаще";
+                                        item.ClientEnabled = !Model.IsReadOnly;
+                                        item.Image.Url = @Url.Content("~/Images/SAVE_X16.png");
+                                    });
+                            }
+                        }).GetHtml()
+
+@Html.DevExpress().Splitter(settings =>
+{
+    settings.Name = "splFullScreenMode";
+    settings.Orientation = Orientation.Vertical;
+    settings.Styles.Pane.Paddings.Padding = 0;
+    settings.FullscreenMode = true;
+    settings.Panes.Add(contentMain =>
+    {
+        contentMain.ScrollBars = ScrollBars.Auto;
+        contentMain.Panes.Add(actionsPane =>
+        {
+            actionsPane.Name = "ActionPane";
+            actionsPane.Size = 270;
+            actionsPane.MinSize = 270;
+            actionsPane.MaxSize = 400;
+            actionsPane.AllowResize = DefaultBoolean.True;
+            actionsPane.ShowCollapseBackwardButton = DefaultBoolean.False;
+            actionsPane.SetContent(() => Html.RenderPartial("ControlActionsPartial", Model));
+        });
+        contentMain.Panes.Add(actionsPane =>
+        {
+            actionsPane.Name = "actionPane";
+            actionsPane.ScrollBars = ScrollBars.Auto;
+            actionsPane.SetContent(() =>
+                {
+                    using (Html.BeginForm("ControlView", "Bank", FormMethod.Post, new { @class = "edit_form", @id = "editForm" }))
+                    {
+                        @Html.DevExpress().NavBar(
+                            nbSettings =>
+                                {
+                                    nbSettings.Name = "nbDocFeatures";
+                                    nbSettings.AllowExpanding = true;
+                                    nbSettings.AllowSelectItem = true;
+                                    nbSettings.AutoCollapse = true;
+                                    nbSettings.EnableHotTrack = true;
+                                    nbSettings.EnableAnimation = true;
+                                    nbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                                    nbSettings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+                                    nbSettings.EncodeHtml = false;
+
+                                    if (!ViewContext.ViewData.ModelState.IsValid)
+                                    {
+                                        nbSettings.Groups.Add(group =>
+                                            {
+                                                group.Text = "Ошибки!";
+                                                group.HeaderStyle.Font.Bold = true;
+                                                group.HeaderImage.Url = Url.Content("~/Images/ERROR_X16.png");
+
+                                                group.SetContentTemplateContent(c => ViewContext.Writer.Write(@Html.ValidationSummary(false).ToHtmlString()));
+                                            });
+                                    }
+
+                                    nbSettings.Groups.Add(group =>
+                                        {
+                                            group.Text = string.Format("Банк - {0}", Model.Name);
+                                            group.HeaderStyle.Font.Bold = true;
+
+                                            group.Expanded = true;
+                                            group.HeaderStyle.HoverStyle.Font.Underline = true;
+                                            group.HeaderImage.Url = Url.Content("~/Images/bank.png");
+
+                                            group.SetContentTemplateContent(c =>
+                                                {
+                                                    Html.RenderPartial("PageMainPartial", Model);
+                                                }
+                                                );
+                                        });
+
+                                    nbSettings.Groups.Add(group =>
+                                    {
+                                        group.Text = string.Format("Реквизиты");
+                                        group.HeaderStyle.Font.Bold = true;
+
+                                        group.Expanded = false;
+                                        group.HeaderStyle.HoverStyle.Font.Underline = true;
+                                        group.HeaderImage.Url = Url.Content("~/Images/DOCUMENTDONE_X16.png");
+
+                                        group.SetContentTemplateContent(c => Html.RenderPartial("PageCompanyPartial", Model));
+                                    });
+                                    
+                                    nbSettings.Groups.Add(group =>
+                                    {
+                                        group.Text = string.Format("Банковская информация");
+                                        group.HeaderStyle.Font.Bold = true;
+
+                                        group.Expanded = false;
+                                        group.HeaderStyle.HoverStyle.Font.Underline = true;
+                                        group.HeaderImage.Url = Url.Content("~/Images/DOCUMENTDONE_X16.png");
+
+                                        group.SetContentTemplateContent(c => Html.RenderPartial("PageBankPartial", Model));
+                                    });
+                                    
+                                    nbSettings.Groups.Add(group =>
+                                    {
+                                        group.Text = "Атрибуты";
+                                        group.HeaderStyle.Font.Bold = true;
+
+                                        group.Expanded = false;
+                                        group.HeaderStyle.HoverStyle.Font.Underline = true;
+                                        group.HeaderImage.Url = Url.Content("~/Images/DOCUMENTDONE_X16.png");
+
+                                        group.SetContentTemplateContent(c => Html.RenderPartial("PageAtributePartial", Model));
+                                    });
+                                    
+
+                                    nbSettings.Groups.Add(group =>
+                                    {
+                                        group.Text = string.Format("Банковские счета");
+                                        group.HeaderStyle.Font.Bold = true;
+                                        group.Expanded = false;
+                                        group.HeaderStyle.HoverStyle.Font.Underline = true;
+                                        group.HeaderImage.Url = Url.Content("~/Images/MONEY_X16.png");
+
+                                        group.SetContentTemplateContent(c =>
+                                        {
+                                            Html.DevExpress().Menu(mnuSettings =>
+                                            {
+                                                mnuSettings.EnableHotTrack = true;
+                                                mnuSettings.Name = "mAccounts";
+                                                mnuSettings.ClientSideEvents.ItemClick = "OnAccountsMenuItemClick";
+                                                mnuSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+                                                mnuSettings.Items.Add(item =>
+                                                {
+                                                    item.Name = "mnuAdd";
+                                                    item.Text = "Добавить";
+                                                    item.Image.Url = @Url.Content("~/Images/WIZARD_X16.png");
+                                                    item.Enabled = !(Model.IsReadOnly | Model.IsSystem);
+                                                });
+                                                mnuSettings.Items.Add(item =>
+                                                {
+                                                    item.Name = "mnuEdit";
+                                                    item.Text = "Изменить";
+                                                    item.Image.Url = @Url.Content("~/Images/PROPERTIES_X16.png");
+                                                });
+                                                mnuSettings.Items.Add(item =>
+                                                {
+                                                    item.Name = "mnuDelete";
+                                                    item.Text = "Удалить";
+                                                    item.Image.Url = @Url.Content("~/Images/DELETEDELEMENT_X16.png");
+                                                    item.Enabled = !(Model.IsReadOnly | Model.IsSystem);
+                                                });
+                                            }).GetHtml();
+                                            Html.RenderPartial("AccountsGridPartial", Model);
+                                        });
+                                    });
+
+                                    nbSettings.Groups.Add(group =>
+                                    {
+                                        group.Text = string.Format("Адреса");
+                                        group.HeaderStyle.Font.Bold = true;
+
+                                        group.Expanded = false;
+                                        group.HeaderStyle.HoverStyle.Font.Underline = true;
+                                        group.HeaderImage.Url = Url.Content("~/Images/town_x16.png");
+
+                                        group.SetContentTemplateContent(c =>
+                                        {
+                                            Html.DevExpress().Menu(mnuSettings =>
+                                            {
+                                                mnuSettings.EnableHotTrack = true;
+                                                mnuSettings.Name = "mAddresses";
+                                                mnuSettings.ClientSideEvents.ItemClick = "OnAddressesMenuItemClick";
+                                                mnuSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+                                                mnuSettings.Items.Add(item =>
+                                                {
+                                                    item.Name = "mnuAdd";
+                                                    item.Text = "Добавить";
+                                                    item.Image.Url = @Url.Content("~/Images/WIZARD_X16.png");
+                                                    item.Enabled = !(Model.IsReadOnly | Model.IsSystem);
+                                                });
+                                                mnuSettings.Items.Add(item =>
+                                                {
+                                                    item.Name = "mnuEdit";
+                                                    item.Text = "Изменить";
+                                                    item.Image.Url = @Url.Content("~/Images/PROPERTIES_X16.png");
+                                                });
+                                                mnuSettings.Items.Add(item =>
+                                                {
+                                                    item.Name = "mnuDelete";
+                                                    item.Text = "Удалить";
+                                                    item.Image.Url = @Url.Content("~/Images/DELETEDELEMENT_X16.png");
+                                                    item.Enabled = !(Model.IsReadOnly | Model.IsSystem);
+                                                });
+                                                mnuSettings.Items.Add(item =>
+                                                {
+                                                    item.Name = "mnuShowOnMap";
+                                                    item.Text = "Перейти";
+                                                    item.Image.Url = @Url.Content("~/Images/RUNROUNDGREEN_X16.png");
+                                                });
+                                            }).GetHtml();
+                                            Html.RenderPartial("AddressGridPartial", Model);
+                                        });
+                                    });
+
+                                    nbSettings.Groups.Add(group =>
+                                    {
+                                        group.Text = string.Format("Коды");
+                                        group.HeaderStyle.Font.Bold = true;
+
+                                        group.Expanded = false;
+                                        group.HeaderStyle.HoverStyle.Font.Underline = true;
+                                        group.HeaderImage.Url = Url.Content("~/Images/codename_x16.png");
+
+                                        group.SetContentTemplateContent(c =>
+                                        {
+                                            Html.DevExpress().Menu(mnuSettings =>
+                                            {
+                                                mnuSettings.EnableHotTrack = true;
+                                                mnuSettings.Name = "mCodes";
+                                                mnuSettings.ClientSideEvents.ItemClick = "OnCodesMenuItemClick";
+                                                mnuSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+                                                mnuSettings.Items.Add(item =>
+                                                {
+                                                    item.Name = "mnuAdd";
+                                                    item.Text = "Добавить";
+                                                    item.Image.Url = @Url.Content("~/Images/WIZARD_X16.png");
+                                                    item.Enabled = !(Model.IsReadOnly | Model.IsSystem);
+                                                });
+                                                mnuSettings.Items.Add(item =>
+                                                {
+                                                    item.Name = "mnuEdit";
+                                                    item.Text = "Изменить";
+                                                    item.Image.Url = @Url.Content("~/Images/PROPERTIES_X16.png");
+                                                });
+                                            }).GetHtml();
+                                            Html.RenderPartial("CodesGridPartial", Model);
+                                        });
+                                    });
+
+                                    nbSettings.Groups.Add(group =>
+                                    {
+                                        group.Text = "Иерархия";
+                                        group.HeaderStyle.Font.Bold = true;
+
+                                        group.Expanded = false;
+                                        group.HeaderStyle.HoverStyle.Font.Underline = true;
+                                        group.HeaderImage.Url = Url.Content("~/Images/filter_nodes_x16.png");
+
+                                        group.SetContentTemplateContent(c =>
+                                        {
+                                            CoreController<Agent> controller = (CoreController<Agent>)ViewContext.Controller;
+                                            Html.RenderAction("GroupsControlPartial", new
+                                            {
+                                                Area = "General",
+                                                Controller = "Hierarchy",
+                                                RootList = HierarchyModel.GetLinkedHierarchies(controller.RootHierachy, HierarchyModel.EDIT_HIERARCHY_CHAIN).Select(s => s.Code).ToArray(),
+                                                Model = Model,
+                                                IsReadonly = Model.IsReadOnly
+                                            });
+                                        });
+                                    });
+
+                                    nbSettings.Groups.Add(group =>
+                                    {
+                                        group.Text = "Свойства";
+                                        group.HeaderStyle.Font.Bold = true;
+
+                                        group.Expanded = false;
+                                        group.HeaderStyle.HoverStyle.Font.Underline = true;
+                                        group.HeaderImage.Url = Url.Content("~/Images/property.png");
+
+                                        group.SetContentTemplateContent(c => Html.RenderPartial("PreviewSystemPartial", Model));
+                                    });
+
+                                }).Render();
+
+                    }
+                });
+        });
+        
+    });
+
+    settings.Panes.Add(footerPane =>{
+        footerPane.Size = 80;
+        footerPane.AllowResize = DefaultBoolean.False;
+        footerPane.ShowSeparatorImage = DefaultBoolean.False;
+        footerPane.SetContent(() => @Html.RenderPartial("FooterPartial"));
+    });
+}).GetHtml()
+
+
+
+
+

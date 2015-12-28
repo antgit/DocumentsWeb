@@ -1,0 +1,120 @@
+﻿@using System.Globalization
+@using BusinessObjects
+@Html.DevExpress().GridView(settings=>{
+    settings.Settings.ShowTitlePanel = true;
+    settings.Name = "gvFinanceOutDocuments";
+
+    settings.SetTitlePanelTemplateContent(c =>
+    {
+        ViewContext.Writer.Write("<div style=\"width: 100%; text-align: center; font-size: 10pt;\">");
+        Html.DevExpress().HyperLink(hl =>
+        {
+            hl.Properties.ImageUrl = Url.Content("~/Images/REFRESHGREEN_X16.png");
+            hl.ToolTip = "Обновить";
+            hl.Style.Add("float", "left");
+            hl.NavigateUrl = "javascript:gvFinanceOutDocuments.PerformCallback('refresh=true');";
+        }).Render();
+        Html.DevExpress().HyperLink(hl =>
+        {
+            hl.Properties.Text = "Просмотреть весь список исходящих оплат...";
+            hl.NavigateUrl = Url.Action("Index", "ViewListFinanceOutNds", new { Area = "FinancesNds", Controller = "ViewListFinanceOutNds" });
+        }).Render();
+        ViewContext.Writer.Write("</div>");
+    });
+
+    settings.CallbackRouteValues = new { Area = "FinancesNds", Controller = "Home", Action = "ViewBoardFinanceOutPartial" };
+    settings.Settings.ShowFilterBar = GridViewStatusBarMode.Hidden;
+    settings.SettingsBehavior.AllowFocusedRow = true;
+    settings.KeyFieldName = GlobalPropertyNames.Id;
+    settings.Settings.ShowGroupPanel = true;
+    settings.Settings.ShowFilterRow = false;
+    settings.Settings.ShowFilterRowMenu = false;
+    settings.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+    settings.SettingsPager.Visible = false;
+    settings.Settings.ShowVerticalScrollBar = true;
+    settings.Settings.ShowHorizontalScrollBar = true;
+    settings.Styles.Cell.Font.Size = System.Web.UI.WebControls.FontUnit.Point(11);
+    settings.Styles.Cell.Paddings.Padding = System.Web.UI.WebControls.Unit.Pixel(0);
+    settings.Styles.Cell.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control; 
+                                                
+                                                    
+    settings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100); 
+
+    settings.Columns.Add(cc =>
+    {
+        cc.Width = System.Web.UI.WebControls.Unit.Pixel(55);
+        cc.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+        cc.SetDataItemTemplateContent(c =>
+        {
+            string icon = (int)DataBinder.Eval(c.DataItem, "StateId") == State.STATEACTIVE
+                                ? Url.Content("~/Images/DOCUMENTDONE_X16.png")
+                                : Url.Content("~/Images/DOCUMENTNOTDONE_X16.png");
+            ViewContext.Writer.Write("<table><tr>");
+            ViewContext.Writer.Write("<td>");
+            Html.DevExpress().HyperLink(hl =>
+            {
+                hl.Properties.ImageUrl = icon;
+                hl.ToolTip = "Просмотреть/Изменить";
+                hl.NavigateUrl = "javascript:gvPriceKinds.StartEditRow(" + c.ItemIndex.ToString(CultureInfo.InvariantCulture) + ");";
+            }).Render();
+            ViewContext.Writer.Write("</td><td>");
+            Html.DevExpress().HyperLink(hl =>
+            {
+                hl.Properties.ImageUrl = Url.Content("~/Images/delete_x16.png");
+                hl.ToolTip = "Удалить";
+                hl.NavigateUrl = "javascript:if (confirm(\"Вы уверены, что хотите удалить этот прайс-лист?\")) {gvFinanceOutDocuments.DeleteRow(" + c.ItemIndex.ToString(CultureInfo.InvariantCulture) + ");}";
+            }).Render();
+            ViewContext.Writer.Write("</td></tr></table>");
+        });
+    });
+    
+    settings.Columns.Add(column =>
+    {
+        column.FieldName = GlobalPropertyNames.Date;
+        column.Caption = "Дата";
+        column.Width = 70;
+        column.PropertiesEdit.DisplayFormatString = "d";
+        column.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+        column.ColumnType = MVCxGridViewColumnType.DateEdit;
+    });
+    MVCxGridViewColumn colNumber = settings.Columns.Add("DocNumber", "Номер");
+    colNumber.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+    colNumber.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+    colNumber.Width = 70;
+    
+    settings.Columns.Add(column =>
+    {
+        column.FieldName = GlobalPropertyNames.DocSumma;
+        column.Caption = "Сумма";
+        column.Width = 100;
+        column.ColumnType = MVCxGridViewColumnType.SpinEdit;
+        column.PropertiesEdit.DisplayFormatString = "0.00";
+        column.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+    });
+
+    MVCxGridViewColumn colWho = settings.Columns.Add("AgentFromName", "Кто");
+    colWho.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+    colWho.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+    colWho.Width = 450;
+           
+    MVCxGridViewColumn colWhom = settings.Columns.Add("AgentToName", "Кому");
+    colWhom.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+    colWhom.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+    colWhom.Width = 450;
+
+    settings.CustomCallback = (sender, e) =>
+    {
+        MVCxGridView grid = (MVCxGridView)sender;
+        string refreshArg = e.Parameters.Split('&').FirstOrDefault(s => s.StartsWith("refresh"));
+        bool refresh = (refreshArg != null) && (refreshArg.EndsWith("true"));
+        if (refresh)
+        {
+            System.Data.DataTable tbl = FinanceHelper.GetDocumentsOut(true, 10, State.STATEACTIVE);
+            tbl.DefaultView.RowFilter = "StateId=1";
+            grid.DataSource = tbl.DefaultView.ToTable();
+        }
+        grid.DataBind();
+    };
+}).Bind(FinanceHelper.GetDocumentsOut()).GetHtml()

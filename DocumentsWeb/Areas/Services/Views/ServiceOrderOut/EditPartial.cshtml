@@ -1,0 +1,73 @@
+﻿@using BusinessObjects.Security
+@model DocumentsWeb.Areas.Services.Models.DocumentServiceModel
+
+@Html.DevExpress().NavBar(
+nbSettings =>
+{
+    nbSettings.Name = "nbDocFeatures";
+    nbSettings.AllowExpanding = true;
+    nbSettings.AllowSelectItem = true;
+    nbSettings.AutoCollapse = false;
+    nbSettings.EnableHotTrack = true;
+    nbSettings.EnableAnimation = true;
+    nbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    nbSettings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+    nbSettings.EncodeHtml = false;
+
+    if (!ViewContext.ViewData.ModelState.IsValid)
+    {
+        nbSettings.Groups.Add(group =>
+        {
+            group.Text = "Ошибки!";
+            group.HeaderStyle.Font.Bold = true;
+            group.HeaderImage.Url = Url.Content("~/Images/ERROR_X16.png");
+
+            group.SetContentTemplateContent(c => ViewContext.Writer.Write(@Html.ValidationSummary(false).ToHtmlString()));
+        });
+    }
+    
+    nbSettings.Groups.Add(group => {
+        group.Text = Model.Name;
+        group.HeaderStyle.Font.Bold = true;
+        
+        group.Expanded = true;
+        group.HeaderStyle.HoverStyle.Font.Underline = true;
+        group.HeaderImage.Url = Url.Content("~/Images/DOCUMENTDONE_X16.png");
+        
+        group.SetContentTemplateContent(c =>
+            {
+                @Html.DevExpress().PageControl(settings =>
+                    {
+                        settings.Name = "tsEditDocument";
+                        settings.EnableClientSideAPI = true;
+                        settings.ClientSideEvents.Init = "OnEditDocumentInit";
+                        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                        settings.TabPages.Add("Главная").SetContent(() => Html.RenderPartial("PageMainPartial", Model));
+
+                        settings.TabPages.Add("Примечания").SetContent(() => Html.RenderAction("NotesGrid", new {Area = "General", Controller = "Note", modelId = Model.ModelId}));
+
+                        if (User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                        {
+                            settings.TabPages.Add("Свойства").SetContent(() => Html.RenderPartial("PagePropertiesPartial", Model));
+                        }
+                    }).GetHtml();
+            });
+    });
+    
+    nbSettings.Groups.Add(group =>
+    {
+        group.Text = "Детализация - услуги...";
+        group.Expanded = true;
+        group.HeaderStyle.Font.Bold = true;
+        group.HeaderStyle.HoverStyle.Font.Underline = true;
+        group.HeaderImage.Url = Url.Content("~/Images/SERVICE_X16.png");
+        group.SetContentTemplateContent(c =>
+            {
+                ViewContext.Writer.Write("<table id=\"tableDetalsProduct\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%\";>");
+                ViewContext.Writer.Write("<tr><td>");
+                @Html.RenderPartial("DetailsGridPartial");
+                ViewContext.Writer.Write("</td></tr></table>");
+            });
+
+    });
+}).GetHtml()

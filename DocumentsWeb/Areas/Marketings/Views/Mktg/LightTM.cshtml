@@ -1,0 +1,47 @@
+﻿@using BusinessObjects
+@using DocumentsWeb.Models
+@using DocumentsWeb.Areas.Analitics.Models
+@using DevExpress.Web.Mvc
+@using DevExpress.Web.Mvc.UI
+@model AnaliticModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("LightTM", "Mktg", FormMethod.Post, new { @class = "edit_form", @id = "editForm" }))
+{
+    <br />
+    <br />
+    <b>Торговая марка:</b>
+    <input type="hidden" id="KindId" name="KindId" value="@Model.KindId" />
+    <table style="width: 100%; height: 100%;">
+        <tr>
+            <td class="table_label" style="width: 75px;">
+                 @Html.DevExpress().Label(s =>
+                 {
+                     s.ControlStyle.CssClass = "label";
+                     s.Style.Add("float", "left");
+                     s.Text = "Имя:";
+                     s.Width = 75;
+                     s.AssociatedControlName = GlobalPropertyNames.Name;
+                 }).GetHtml()
+            </td>
+            <td>
+                 @Html.DevExpress().TextBox(s =>
+                 {
+                     s.ControlStyle.CssClass = "editor";
+                     s.Name = GlobalPropertyNames.Name;
+                     s.Style.Add("float", "left");
+                     //s.Properties.NullText = "Введите фактическое имя ...";
+                     s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                     s.ShowModelErrors = true;
+                     s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                     s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+                     //s.Properties.ClientSideEvents.GotFocus = "OnEditorGotFocus";
+                     //s.Properties.ClientSideEvents.LostFocus = "OnEditorLostFocus";
+                 }).Bind(Model.Name).GetHtml()
+            </td>
+        </tr>
+    </table>
+}

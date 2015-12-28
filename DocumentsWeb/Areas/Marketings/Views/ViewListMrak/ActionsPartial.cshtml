@@ -1,0 +1,226 @@
+﻿@using System.Globalization
+@using BusinessObjects
+@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentWeb.Extentions
+@using DocumentsWeb.Models
+@{   
+    bool haveCreate = WADataProvider.FolderElementRightView.IsAllow(Right.DOCCREATE, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_MKTG_MRAK).Id);
+    bool haveEdit = WADataProvider.FolderElementRightView.IsAllow(Right.DOCEDIT, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_MKTG_MRAK).Id);
+    bool haveDelete = WADataProvider.FolderElementRightView.IsAllow(Right.DOCTRASH, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_MKTG_MRAK).Id);
+    bool haveView = WADataProvider.FolderElementRightView.IsAllow(Right.DOCVIEW, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_MKTG_MRAK).Id);
+}
+
+<script type="text/javascript">
+    var controllerName = 'Mktg';
+
+    function createCopy() {
+        var url = controllerName + "/CreateCopy?Id=" + gvDocuments.GetRowKey(gvDocuments.GetFocusedRowIndex());
+        $.post(url, function (data) {
+        }).success(function () {
+            gvDocuments.PerformCallback();
+        });
+    }
+
+    function changeState(state) {
+        var url = controllerName + "/ChangeState?Id=" + gvDocuments.GetRowKey(gvDocuments.GetFocusedRowIndex()) + "&state=" + state.toString();
+        $.post(url, function (data) {
+        }).success(function () {
+            gvDocuments.PerformCallback();
+        });
+    }
+
+    function OnMenuItemClick(s, e) {
+        switch (e.item.name) {
+//            case "mnuAdd":
+//                window.open('@DevExpressHelper.GetUrl(new { Controller = "Mktg", Action = "Create" })', "_blank");
+//                break;
+            case "mnuEdit":
+                var id = gvDocuments.GetRowKey(gvDocuments.GetFocusedRowIndex());
+                if (id == null)
+                    break;
+                window.open('@DevExpressHelper.GetUrl(new { Controller = "Mktg", Action = "Edit" })/' + id, "_blank");
+                break;
+            case "mnuDelete":
+                if (gvDocuments.GetFocusedRowIndex() != 0 && confirm("Удалить?")) {
+                    var url = "Mktg/Delete?Id=" + gvDocuments.GetRowKey(gvDocuments.GetFocusedRowIndex());
+                    $.post(url, function (data) {
+                    }).success(function () {
+                        gvDocuments.PerformCallback();
+                    });
+                }
+                break;
+
+
+            case "mnuStateActive":
+                changeState(@State.STATEACTIVE.ToString());
+                break;
+            case "mnuStateNeedCorrect":
+                changeState(@State.STATENOTDONE.ToString());
+                break;
+            case "mnuStateBan":
+                changeState(@State.STATEDENY.ToString());
+                break;
+
+//            case "mnuAddCopy":
+//                alert('В разработке, в ближайшее время функция будет доступна');
+//                break;        
+            default:
+                //alert(e.item.name);
+                break;
+        }
+    }
+</script>
+
+@Html.DevExpress().NavBar(
+settings =>
+{
+    settings.Name = "nbFeatures";
+    settings.AllowExpanding = true;
+    settings.AllowSelectItem = true;
+    settings.AutoCollapse = false;
+    settings.EnableHotTrack = true;
+    settings.EnableAnimation = true;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.ClientSideEvents.ItemClick = "OnMenuItemClick";
+    settings.EncodeHtml = false;
+    settings.SaveStateToCookies = true;
+    settings.SaveStateToCookiesID = Url.RequestContext.RouteData.Values["controller"] + "Nav";
+    
+    settings.Groups.Add(group => {
+        group.Text = "Действия";
+        
+        group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+        group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.CssClass = "navpanellink";
+        group.HeaderImage.Url = Url.Content("~/Images/documentokey_x16.png");
+
+        MVCxNavBarItem item = group.Items.Add("Создать", "mnuAdd", "~/Images/new_x16.png");
+        item.ToolTip = "Создание нового документа";
+        item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "Mktg", Action = "Create" });
+        item.Target = "_blank";
+        item.ClientEnabled = haveCreate;
+
+        item = group.Items.Add("Создать копию", "mnuAddCopy", "~/Images/copy_x16.png");
+        item.ToolTip = "Создание копии текущего выделенного в списке документа";
+        item.NavigateUrl = "javascript:createCopy();";
+        item.ClientEnabled = haveCreate;
+
+        item = group.Items.Add("Установить состояние \"Активен\"", "mnuStateActive", "~/Images/state_active_x16.png");
+        item.NavigateUrl = "javascript:changeState(" + State.STATEACTIVE.ToString(CultureInfo.InvariantCulture) + ");";
+        item.ClientEnabled = haveEdit;
+        
+        item = group.Items.Add("Требовать корректировки", "mnuStateNeedCorrect", "~/Images/state_needcorrect_x16.png");
+        item.ToolTip = "Установка данного состояния возможная только при текущем состоянии не соответствующего \"Требовующего корректировки\" - например данное действие имеет смысл для проведенных документов, чтобы в дальшейшем откорректировать документ";
+        item.NavigateUrl = "javascript:alert('В разработке, в ближайшее время функция будет доступна');";
+        item.ClientEnabled = haveEdit;
+
+        item = group.Items.Add("Обновить", "mnuRefresh", "~/Images/refresh_x16.png");
+        item.ToolTip = "Обновить данные в списке документов. Рекомендуемое действие вместо обновления страницы.";
+        item.NavigateUrl = "javascript:gvDocuments.PerformCallback('refresh=true');";
+    });
+
+    settings.Groups.Add(group => {
+        group.Text = "Фильтр";
+        
+        group.Expanded = false;
+        group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemLinkMode = GroupItemLinkMode.ContentBounds;
+        
+        group.ItemStyle.HoverStyle.Font.Bold = true;
+        group.ItemStyle.HoverStyle.Font.Underline = true;
+        group.ItemStyle.SelectedStyle.Font.Bold = true;
+        group.HeaderImage.Url = Url.Content("~/Images/documentfilter_x16.png");
+
+        MVCxNavBarItem item = group.Items.Add("Только активные", "mnuFilterActive", "~/Images/filter_state_active_x16.png");
+        item.ToolTip = "Отображать в списке только активные (проведенные) документы";
+        item.NavigateUrl = "javascript:gvDocuments.ApplyFilter('StateId = 1');";
+        
+            
+        item = group.Items.Add("Требующие корректировки", "mnuFilterCorrect", "~/Images/filter_state_needcorrect_x16.png");
+        item.ToolTip = "Отображать в списке только требующие корректировки (непроведенные) документы";
+        item.NavigateUrl = "javascript:gvDocuments.ApplyFilter('StateId = 2');";
+
+        item = group.Items.Add("Черновики", "mnuFilterBan", "~/Images/filter_state_ban_x16.png");
+        item.ToolTip = "Отображать в списке только документы-черновики";
+        item.NavigateUrl = "javascript:gvDocuments.ApplyFilter('StateId = 0');";
+            
+        item = group.Items.Add("Корзина", "mnuFilterDeleted", "~/Images/filter_state_deleted_x16.png");
+        item.ToolTip = "Отображать в списке только удаленные документы";
+        item.NavigateUrl = "javascript:gvDocuments.ApplyFilter('StateId = 5');";
+    });
+    settings.Groups.Add(group =>
+    {
+        group.Text = "Отчеты";
+        group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+        group.ItemStyle.CssClass = "navpanellink";
+        group.HeaderImage.Url = Url.Content("~/Images/stireportv3_x16.png");
+        group.Expanded = false;
+
+        MVCxNavBarItem item = group.Items.Add("Microsoft Excel", "mnuExportToXLSX", "~/Images/FILEEXCEL_X16.png");
+        item.ToolTip = "Экспорт списка документов в Microsoft Excel";
+        item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "ViewListMrak", Action = "ExportTo", type = "XLSX", subtype = Url.RequestContext.RouteData.Values["action"] });
+
+        item = group.Items.Add("Adobe PDF", "mnuExportToPDF", "~/Images/FILEPDF_X16.png");
+        item.ToolTip = "Экспорт списка документов в Adobe PDF";
+        item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "ViewListMrak", Action = "ExportTo", type = "PDF", subtype = Url.RequestContext.RouteData.Values["action"] });
+        
+        item = group.Items.Add("Перейти в отчеты...", "mnuReportNavToReportsMain", "~/Images/arrowgreen.png");
+        item.ToolTip = "Перейти в раздел отчетов...";
+        item.NavigateUrl = Url.Action("Index", new { area = "Reports", Controller = "Report" });
+        
+    });
+    settings.Groups.Add(group =>
+    {
+        group.Text = "Сервис";
+        group.Name = "grpSettings";
+        group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+        group.HeaderImage.Url = Url.Content("~/Images/settings_x16.png");
+        
+        group.SetContentTemplateContent(c =>
+        {
+            ViewContext.Writer.Write("<div style=\"padding: 5px;\">");
+
+            ViewContext.Writer.Write("<table style=\"width: 100%; border-collapse: collapse;\"><tr><td style=\"width: 1px;\">");
+            Html.DevExpress().HyperLink(hlSettings =>
+            {
+                hlSettings.NavigateUrl = "javascript:if (gvDocuments.IsCustomizationWindowVisible()) gvDocuments.HideCustomizationWindow(); else { gvDocuments.ShowCustomizationWindow(document.getElementById('mnuShowCustomizationLocation'));  };";
+                hlSettings.Properties.ImageUrl = "~/Images/settings_x16.png";
+                hlSettings.Properties.Style.Border.BorderColor = System.Drawing.Color.White;
+            }).Render();
+            ViewContext.Writer.Write("</td><td style=\"padding-left: 4px;\">");
+            Html.DevExpress().HyperLink(hlSettings =>
+            {
+                hlSettings.Properties.Text = "Настройка колонок";
+                hlSettings.Properties.Style.Font.Size = 10;
+                hlSettings.Properties.Style.Font.Underline = true;
+                hlSettings.NavigateUrl = "javascript:if (gvDocuments.IsCustomizationWindowVisible()) gvDocuments.HideCustomizationWindow(); else { gvDocuments.ShowCustomizationWindow(document.getElementById('mnuShowCustomizationLocation'));  };";
+            }).Render();
+            ViewContext.Writer.Write("<div id=\"mnuShowCustomizationLocation\"></div>");
+
+            ViewContext.Writer.Write("</td></tr><tr><td colspan=\"2\" style=\"padding-top: 5px;\"><hr />");
+            Html.DevExpress().Label(s => s.Text = "Выбрать внешний вид: ").Render();
+            ViewContext.Writer.Write("</td></tr><tr><td colspan=\"2\" style=\"padding-top: 2px;\">");
+            Html.DevExpress().ComboBox(cmbSettings =>
+            {
+                cmbSettings.Name = "cmbLayout";
+                cmbSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                cmbSettings.Properties.Items.Add("Первое представление", 1);
+                cmbSettings.Properties.Items.Add("Второе представление", 2);
+                cmbSettings.Properties.Items.Add("Третье представление", 3);
+                cmbSettings.SelectedIndex = DocumentsWeb.Code.LayoutHelper.GetCurrentSettingIndex(Url.RequestContext.RouteData.Values["controller"].ToString()) - 1; 
+                EditButton b = cmbSettings.Properties.Buttons.Add();
+                b.ToolTip = "Сохранить";
+                b.Image.Url = Url.Content("~/Images/save_x12.png");
+                cmbSettings.Properties.ClientSideEvents.SelectedIndexChanged = "cmbLayoutSelectedIndexChanged";
+                cmbSettings.Properties.ClientSideEvents.ButtonClick = "function(s, e) { onSaveButtonClick(); }";
+            }).Render();
+            ViewContext.Writer.Write("</td></tr></table>");
+        });
+    });
+}).GetHtml()

@@ -1,0 +1,46 @@
+﻿@using DocumentsWeb.Code;
+
+@{
+    string FolderCode = (string)ViewData["FolderCode"];
+    string CreateUrl = (string)ViewData["CreateUrl"];
+    //string popupAt = string.Empty;
+}
+
+@Html.DevExpress().PopupControl(pc =>
+{
+    pc.Name = "SelectDocumentTemplate";
+    //pc.PopupElementID = popupAt;
+    pc.Height = 250;
+    pc.Width = 520;
+
+    pc.ShowFooter = false;
+    pc.ShowHeader = false;
+    pc.PopupHorizontalAlign = PopupHorizontalAlign.LeftSides;
+    pc.PopupVerticalAlign = PopupVerticalAlign.Below;
+    pc.EnableAnimation = true;
+    pc.AllowDragging = false;
+    pc.CloseAction = CloseAction.OuterMouseClick;
+
+    
+    pc.SetContent(() =>
+    {
+        ViewContext.Writer.Write("<table style=\"width:100%; height:100%;\"><tr><td>");
+        Html.RenderPartial("SelectDocumentTemplateGridPartial", new ViewDataDictionary { 
+            { "FolderCode", FolderCode },
+            { "CreateUrl", CreateUrl }
+        });
+        ViewContext.Writer.Write("</td></tr><tr><td><table style=\"float:right;\"><tr><td>");
+        @*Html.DevExpress().Button(s=>{
+            s.Name = "gvDocumentTemplate_btnSelect";
+            s.Text = "Выбрать";
+            //s.ClientSideEvents.Click = "function (s, e) { var id = gvDocumentTemplateSelect.GetRowKey(gvDocumentTemplateSelect.GetFocusedRowIndex()); if (id != null) { " + ComboboxName + ".SetValue(id); } " + Name + ".Hide(); }";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().Button(s=>{
+            s.Name = "gvDocumentTemplateSelect_btnCancel";
+            s.Text = "Отмена";
+            s.ClientSideEvents.Click = "function (s, e) { SelectDocumentTemplate.Hide(); }";
+        }).Render();*@
+        ViewContext.Writer.Write("</td></tr></table></td></tr></table>");
+    });    
+}).GetHtml()

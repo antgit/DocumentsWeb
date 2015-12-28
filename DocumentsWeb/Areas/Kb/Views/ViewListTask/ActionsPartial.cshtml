@@ -1,0 +1,206 @@
+﻿@using System.Globalization
+@using BusinessObjects
+@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentsWeb.Models;
+@using DocumentsWeb.Controllers;
+@using DocumentsWeb.Areas.General.Models;
+
+@{
+    bool haveCreate = WADataProvider.LibrariesElementRightView.IsAllow(Right.UICREATE, WebModuleNames.WEB_TASKS);
+    bool haveEdit = WADataProvider.LibrariesElementRightView.IsAllow(Right.UIEDIT, WebModuleNames.WEB_TASKS);
+    bool haveDelete = WADataProvider.LibrariesElementRightView.IsAllow(Right.UITRASH, WebModuleNames.WEB_TASKS);
+    bool haveView = WADataProvider.LibrariesElementRightView.IsAllow(Right.UIVIEW, WebModuleNames.WEB_TASKS);
+    string helpDefaultLink = string.Empty;
+    if (ViewData.ContainsKey("HelpDefaultLink"))
+    {
+        helpDefaultLink = ViewData["HelpDefaultLink"].ToString();
+    }
+}
+<script src="@Url.Content("~/Scripts/jTaskActionsViewList.js")" type="text/javascript"></script>
+<script type="text/javascript">
+    var controllerName = 'Task';
+//    function exportTo(type) {
+//        document.location = '@DevExpressHelper.GetUrl(new { Controller = "ProductTypeName", Action = "ExportTo", subtype = Url.RequestContext.RouteData.Values["action"] })&type=' + type;
+//    }
+</script>
+
+<div id="divActions" style="width: 100%; height: 100%; overflow: auto;">
+    @Html.DevExpress().NavBar(settings =>
+    {
+        settings.Name = "nbFeatures";
+        settings.AllowExpanding = true;
+        settings.AllowSelectItem = true;
+        settings.AutoCollapse = false;
+        settings.EnableHotTrack = true;
+        settings.EnableAnimation = true;
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        settings.EncodeHtml = false;
+        settings.Groups.Add(group => {
+            group.Text = "Задачи";
+            group.Expanded = false;
+
+            group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+            group.HeaderImage.Url = Url.Content("~/Images/okey_x16.png");
+            group.HeaderStyle.Font.Bold = true;
+            group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+            group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+            group.ItemStyle.CssClass = "navpanellink";
+            group.ItemStyle.HoverStyle.Font.Bold = true;
+            group.ItemStyle.HoverStyle.Font.Underline = true;
+            
+            MVCxNavBarItem item = group.Items.Add("Помощь", "mnuActionHelp", "~/Images/INFO_X16.png");
+            item.ToolTip = "Показать справочную информацию";
+            item.Image.Url = "~/Images/INFO_X16.png";
+            if (string.IsNullOrEmpty(helpDefaultLink))
+                item.NavigateUrl = "javascript:alert('Справочная информация отсутствует!');";
+            else
+            {
+                item.Target = "_blank";
+                item.NavigateUrl = helpDefaultLink.StartsWith("~/") ? Url.Content(helpDefaultLink) : helpDefaultLink;
+            }
+
+            item = group.Items.Add("Создать", "mnuAdd", "~/Images/new_x16.png");
+            item.NavigateUrl = "javascript:create();";
+            item.ClientEnabled = haveCreate;
+            item.ToolTip = "Создать новую задачу";
+
+            item = group.Items.Add("Создать копию", "mnuAddCopy", "~/Images/copy_x16.png");
+            item.NavigateUrl = "javascript:createCopy();";
+            item.ClientEnabled = haveCreate;
+            item.ToolTip = "Создать копию задачи, текуще выделенной в списке";
+                    
+            item = group.Items.Add("Изменить", "mnuEdit", "~/Images/editdoc_x16.png");
+            item.NavigateUrl = "javascript:editRow();";
+            item.ClientEnabled = haveEdit;
+            item.ToolTip = "Изменить/откорректировать выделенную задачу в списке";
+
+            item = group.Items.Add("Просмотр", "mnuPreview", "~/Images/editdoc_x16.png");
+            item.NavigateUrl = "javascript:previewRow();";
+            item.ClientEnabled = haveView;
+            item.ToolTip = "Просмотр данных о задаче";
+
+            item = group.Items.Add("Удалить", "mnuDelete", "~/Images/delete_x16.png");
+            item.NavigateUrl = "javascript:deleteTask();";
+            item.ClientEnabled = haveDelete;
+            item.ToolTip = "Удулить выделенную задачу в корзину";
+            
+            item = group.Items.Add("Обновить", "mnuRefresh", "~/Images/refresh_x16.png");
+            item.NavigateUrl = "javascript:dxGridViewTasks.PerformCallback('refresh=true');";
+            item.ToolTip = "Обновить данные в списке задач. Рекомендуемое действие вместо обновления страницы.";
+            
+            item = group.Items.Add();
+            item.SetTemplateContent(s => ViewContext.Writer.Write("<hr>"));
+
+            item = group.Items.Add("Установить состояние \"Активен\"", "mnuStateActive", "~/Images/state_active_x16.png");
+            item.NavigateUrl = "javascript:changeState(" + State.STATEACTIVE.ToString(CultureInfo.InvariantCulture) + ");";
+            item.ClientEnabled = haveEdit;
+            item.ToolTip = "Установка данного состояния возможная только при текущем состоянии не соответствующего \"Активному\" - например данное действие имеет смысл для требующих корректировки, запрещенных или удаленных задач";
+            
+            item = group.Items.Add("Требовать корректировки", "mnuStateNeedCorrect", "~/Images/state_needcorrect_x16.png");
+            item.NavigateUrl = "javascript:changeState(" + State.STATENOTDONE.ToString(CultureInfo.InvariantCulture) + ");";
+            item.ToolTip = "Установка данного состояния возможная только при текущем состоянии не соответствующего \"Требовующего корректировки\" - например данное действие имеет смысл для активных задач, чтобы в дальшейшем откорректировать задачу";
+            item.ClientEnabled = haveEdit;
+            
+            item = group.Items.Add("\"Запрещен\"", "mnuStateBan", "~/Images/state_ban_x16.png");
+            item.NavigateUrl = "javascript:changeState(" + State.STATEDENY.ToString(CultureInfo.InvariantCulture) + ");";
+            item.ToolTip = "Установка данного состояния возможная только при текущем состоянии не соответствующего \"Запрещеному\" - например данное действие имеет смысл для для блокировки задачи по каким-либо причинам";
+            item.ClientEnabled = haveEdit;
+        });
+        
+
+        settings.Groups.Add(group =>
+        {
+            group.Text = "Иерархия";
+            group.Expanded = true;
+            group.HeaderImage.Url = Url.Content("~/Images/filter_nodes_x16.png");
+            group.SetContentTemplateContent(content =>
+            {
+                CoreController<Task> controller = (CoreController<Task>)ViewContext.Controller;
+                Html.RenderAction("HierarchyPartial", new
+                {
+                    Area = "General",
+                    Controller = "Hierarchy",
+                    RootList = HierarchyModel.GetLinkedHierarchies(controller.RootHierachy, HierarchyModel.FILTER_HIERARCHY_CHAIN).Select(s => s.Code).ToArray(),
+                    OnSelectNode = "Hierarchy_NodeSelect"
+                });
+            });
+        });
+        
+        settings.Groups.Add(group => {
+            group.Text = "Фильтр";
+            group.Expanded = true;
+            group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+            group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+            group.ItemStyle.HoverStyle.Font.Bold = true;
+            group.ItemStyle.HoverStyle.Font.Underline = true;
+            group.ItemStyle.SelectedStyle.Font.Bold = true;
+            group.HeaderImage.Url = Url.Content("~/Images/filter_x16.png");
+            
+            MVCxNavBarItem item = group.Items.Add("Только активные", "mnuFilterActive", "~/Images/filter_state_active_x16.png");
+            item.NavigateUrl = "javascript:ShowOnlyActive();";
+            item.Selected = true;
+            item.ToolTip = "Отображать в списке только активные данные";
+            
+            item = group.Items.Add("Требующие корректировки", "mnuFilterCorrect", "~/Images/filter_state_needcorrect_x16.png");
+            item.NavigateUrl = "javascript:ShowOnlyNotDone();";
+            item.ToolTip = "Отображать в списке только требующие корректировки данные";
+            
+            item = group.Items.Add("Только запрещенные", "mnuFilterBan", "~/Images/filter_state_ban_x16.png");
+            item.NavigateUrl = "javascript:ShowOnlyDenyed();";
+            item.ToolTip = "Отображать в списке только требующие запрещенные данные";
+            
+            item = group.Items.Add("Корзина", "mnuFilterDeleted", "~/Images/filter_state_deleted_x16.png");
+            item.NavigateUrl = "javascript:ShowOnlyDeleted();";
+            item.ToolTip = "Отображать в списке только удаленные данные";
+
+            item = group.Items.Add("Отложено", "mnuFilterDelay", "~/Images/filter_x16.png");
+            Analitic anState = WADataProvider.WA.Cashe.GetCasheData<Analitic>().ItemCode<Analitic>(Task.TASK_STATE_DELAY);
+            item.NavigateUrl = string.Format("javascript:ShowByStateFilter({0});", anState.Id);
+            //item.NavigateUrl = string.Format("javascript:dxGridViewTasks.ApplyFilter('StateId = 1 AND TaskStateId={0}');PostFilterAplly();", anState.Id);
+            item.ToolTip = "Отображать в списке задачи только активные и имеющие состоние \"Отложено\"";
+
+            item = group.Items.Add("Выполняется", "mnuFilterOnProgress", "~/Images/filter_x16.png");
+            anState = WADataProvider.WA.Cashe.GetCasheData<Analitic>().ItemCode<Analitic>(Task.TASK_STATE_INPROGRESS);
+            item.NavigateUrl = string.Format("javascript:ShowByStateFilter({0});", anState.Id);
+            item.ToolTip = "Отображать в списке задачи только активные и имеющие состоние \"Выполняется\"";
+            
+            item = group.Items.Add("Выполнено", "mnuFilterDone", "~/Images/filter_x16.png");
+            anState = WADataProvider.WA.Cashe.GetCasheData<Analitic>().ItemCode<Analitic>(Task.TASK_STATE_DONE);
+            item.NavigateUrl = string.Format("javascript:ShowByStateFilter({0});", anState.Id);
+            item.ToolTip = "Отображать в списке задачи только активные и имеющие состоние \"Выполненна\"";
+            
+            item = group.Items.Add("Не выполнено", "mnuFilterNotDone", "~/Images/filter_x16.png");
+            anState = WADataProvider.WA.Cashe.GetCasheData<Analitic>().ItemCode<Analitic>(Task.TASK_STATE_NOTDONE);
+            item.NavigateUrl = string.Format("javascript:ShowByStateFilter({0});", anState.Id);
+            item.ToolTip = "Отображать в списке задачи только активные и имеющие состоние \"Не выполнено\"";
+
+            item = group.Items.Add("Рассматривается", "mnuFilterOnView", "~/Images/filter_x16.png");
+            anState = WADataProvider.WA.Cashe.GetCasheData<Analitic>().ItemCode<Analitic>(Task.TASK_STATE_VIEW);
+            item.NavigateUrl = string.Format("javascript:ShowByStateFilter({0});", anState.Id);
+            item.ToolTip = "Отображать в списке задачи только активные и имеющие состоние \"Рассматривается\"";
+
+            item = group.Items.Add("Не начата", "mnuFilterNotStart", "~/Images/filter_x16.png");
+            anState = WADataProvider.WA.Cashe.GetCasheData<Analitic>().ItemCode<Analitic>(Task.TASK_STATE_NOTSTART);
+            item.NavigateUrl = string.Format("javascript:ShowByStateFilter({0});", anState.Id);
+            item.ToolTip = "Отображать в списке задачи только активные и имеющие состоние \"Не начата\"";
+
+            item = group.Items.Add("Передана", "mnuFilterReasign", "~/Images/filter_x16.png");
+            anState = WADataProvider.WA.Cashe.GetCasheData<Analitic>().ItemCode<Analitic>(Task.TASK_STATE_REASIGN);
+            item.NavigateUrl = string.Format("javascript:ShowByStateFilter({0});", anState.Id);
+            item.ToolTip = "Отображать в списке задачи только активные и имеющие состоние \"Передана\"";
+        });
+
+        settings.Groups.Add(group =>
+        {
+            group.Text = "Сервис";
+            group.Name = "grpSettings";
+            group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+            group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+            group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+            group.Expanded = false;
+            group.HeaderImage.Url = Url.Content("~/Images/settings_x16.png");
+            group.SetContentTemplateContent(c => Html.RenderPartial("SettingsPartial", new ViewDataDictionary { { "GridName", "dxGridViewTasks" }, { "ShowMemoCheckBox", true } }));
+        });
+    }).GetHtml()
+</div>

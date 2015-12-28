@@ -1,0 +1,155 @@
+﻿@using System.Web.UI.WebControls;
+
+<table style="width: 100%; height: 100%; margin-top: 100px;">
+    <tr>
+        <td style="width: 50%;">
+        </td>
+        <td>
+@Html.DevExpress().RoundPanel(s=>
+{
+    s.Width = Unit.Pixel(450);
+    s.HeaderText = "Регистрация компании";
+    s.SetContent(() =>
+    {
+        ViewContext.Writer.Write("<table style=\"width: 100%; height: 100%;\" border=0>");
+        
+        ViewContext.Writer.Write("<tr><td style=\"width: 150px;\">");
+        Html.DevExpress().Label(ls =>
+        {
+            ls.Text = "Компания<sp style=\"color: red;\">*</sp>:";
+            ls.EncodeHtml = false;
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TextBox(ts =>
+        {
+            ts.Name = "CompanyName";
+            ts.Width = Unit.Percentage(100);
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        @Html.DevExpress().Image(si =>
+        {
+            si.Name = "CompanyNameValidator";
+            si.ImageUrl = Url.Content("~/Images/ok_16.png");
+            si.ClientVisible = false;
+        }).Render();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td style=\"width: 150px;\">");
+        Html.DevExpress().Label(ls =>
+        {
+            ls.Text = "Ф.И.О. сотрудника<sp style=\"color: red;\">*</sp>:";
+            ls.EncodeHtml = false;
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TextBox(ts =>
+        {
+            ts.Name = "WorkerName";
+            ts.Width = Unit.Percentage(100);
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        @Html.DevExpress().Image(si =>
+        {
+            si.Name = "WorkerNameValidator";
+            si.ImageUrl = Url.Content("~/Images/ok_16.png");
+            si.ClientVisible = false;
+        }).Render();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td style=\"width: 150px;\">");
+        Html.DevExpress().Label(ls =>
+        {
+            ls.Text = "Номер телефона:";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TextBox(ts =>
+        {
+            ts.Name = "Pohone";
+            ts.Width = Unit.Percentage(100);
+        }).Render();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td style=\"width: 150px;\">");
+        Html.DevExpress().Label(ls =>
+        {
+            ls.Text = "E-mail<sp style=\"color: red;\">*</sp>:";
+            ls.EncodeHtml = false;
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TextBox(ts =>
+        {
+            ts.Name = "Email";
+            ts.Width = Unit.Percentage(100);
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        @Html.DevExpress().Image(si =>
+        {
+            si.Name = "EmailValidator";
+            si.ImageUrl = Url.Content("~/Images/ok_16.png");
+            si.ClientVisible = false;
+        }).Render();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td style=\"width: 150px;\">");
+        Html.DevExpress().Label(ls =>
+        {
+            ls.Text = "Логин<sp style=\"color: red;\">*</sp>:";
+            ls.EncodeHtml = false;
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().TextBox(ts =>
+        {
+            ts.Name = "Login";
+            ts.Width = Unit.Percentage(100);
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        @Html.DevExpress().Image(si =>
+        {
+            si.Name = "LoginValidator";
+            si.ImageUrl = Url.Content("~/Images/ok_16.png");
+            si.ClientVisible = false;
+        }).Render();
+        ViewContext.Writer.Write("</td></tr>");
+        ViewContext.Writer.Write("</table>");
+
+        ViewContext.Writer.Write("<table style=\"width: 100%; height: 100%; margin-top: 10px; margin-bottom: 15px;\" border=0>");
+        ViewContext.Writer.Write("<tr><td>");
+
+        ViewContext.Writer.Write("<table cellspacing=\"0\" cellpadding=\"0\" border=0>");
+        ViewContext.Writer.Write("<tr><td>");
+        Html.DevExpress().CheckBox(cs =>
+        {
+            cs.Name = "DataOk";
+        }).Render();
+        ViewContext.Writer.Write("</td><td>");
+        Html.DevExpress().Label(ls =>
+        {
+            ls.Text = "Правильность данных подтверждаю";
+            ls.EncodeHtml = false;
+        }).Render();
+        ViewContext.Writer.Write("</td></tr>");
+        ViewContext.Writer.Write("</table>");
+
+        ViewContext.Writer.Write("</td><td style=\"float: right;\">");
+        ViewContext.Writer.Write("<div>");
+        Html.DevExpress().Button(bs =>
+        {
+            bs.Name = "btnSubmit";
+            bs.Text = "Готово";
+            bs.ClientSideEvents.Click = "registryClick";
+        }).Render();
+        ViewContext.Writer.Write("</div>");
+        ViewContext.Writer.Write("</td></tr>");
+        ViewContext.Writer.Write("</table>");
+
+        Html.DevExpress().Label(ls =>
+        {
+            ls.Text = "<sp style=\"color: red;\">*</sp> - поля обязательные для заполения";
+            ls.EncodeHtml = false;
+        }).Render();
+    });
+}).GetHtml()
+        </td>
+        <td style="width: 50%;">
+        </td>
+    </tr>
+</table>

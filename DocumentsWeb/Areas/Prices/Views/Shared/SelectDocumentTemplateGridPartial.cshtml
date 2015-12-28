@@ -1,0 +1,63 @@
+﻿@using BusinessObjects
+@using DocumentsWeb.Controllers
+@using DocumentsWeb.Models
+
+@{
+    string code = (string)ViewData["FolderCode"];
+    string CreateUrl = (string)ViewData["CreateUrl"];
+}
+
+@Html.DevExpress().GridView(settings=>{
+    settings.Name = "gvDocumentTemplateSelect";
+    settings.KeyFieldName = GlobalPropertyNames.Id;
+    settings.Width = System.Web.UI.WebControls.Unit.Pixel(800);
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+
+    settings.Settings.ShowVerticalScrollBar = true;
+    settings.Settings.VerticalScrollableHeight = 200;
+    settings.CallbackRouteValues = new { Controller = ViewContext.RouteData.Values["Controller"], Action = "DocumentTemplateSelectPartial" };
+    settings.SettingsBehavior.AllowFocusedRow = true;
+
+    settings.Settings.ShowFilterRow = true;
+    settings.Settings.ShowFilterRowMenu = true;
+    settings.Settings.ShowHorizontalScrollBar = true;
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+    settings.Styles.AlternatingRow.Enabled = DefaultBoolean.True;
+
+    settings.Columns.Add(column =>
+    {
+        column.FieldName = "Name";
+        column.Caption = "Наименование";
+        column.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+        column.Width = System.Web.UI.WebControls.Unit.Pixel(350);
+        column.SetDataItemTemplateContent(itm => {
+            Html.DevExpress().HyperLink(hl =>
+            {
+                hl.Properties.Text = itm.Text;
+                hl.NavigateUrl = CreateUrl + "?tmlId=" + DataBinder.Eval(itm.DataItem, "Id").ToString();
+                hl.Properties.Target = "blank";
+            }).Render();
+        });
+    });
+
+    settings.Columns.Add(column =>
+    {
+        column.FieldName = GlobalPropertyNames.DisplayMemo;
+        column.Caption = "Примечание";
+        column.Width = System.Web.UI.WebControls.Unit.Pixel(350);
+        column.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+    });
+
+    if (WADataProvider.CurrentUserCompanyMultyCount())
+    {
+        /*settings.Columns.Add(column =>
+        {
+            column.FieldName = "MyCompanyName";
+            column.Caption = "Компания-владелец";
+            column.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+            column.Width = System.Web.UI.WebControls.Unit.Pixel(350);
+        });*/
+    }
+
+    //settings.ClientSideEvents.BeginCallback = "function (s, e) { e.customArgs['Name'] = '" + Name + "'; e.customArgs['showOnlyServices'] = '" + showOnlyServices + "'; e.customArgs['showOnlyProducts'] = '" + showOnlyProducts + "'; }";
+}).Bind(DocumentData.GetDocumentTemplates(code)).GetHtml()

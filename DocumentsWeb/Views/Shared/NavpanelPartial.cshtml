@@ -1,0 +1,459 @@
+﻿@using BusinessObjects.Security
+@using DocumentsWeb.Models
+@{
+    ViewBag.Title = "NavpanelPartial";
+    bool IsNdsAllow = WADataProvider.IsUserCompanyHasNds();
+    bool IsNoNdsAllow = WADataProvider.IsUserCompanyHasNoNds();
+    bool IsDefaultNds = WADataProvider.IsDefaultCompanyHasNds();
+}
+
+@*@if(Utils.IsIE9())
+    {
+        <script type="text/javascript">
+            maxwinIE();
+         
+        </script>            
+    }
+    else if(Utils.IsMozzila())
+    {
+        <script type="text/javascript">
+            requestFullScreen();
+         
+        </script>  
+    }*@
+            
+@Html.DevExpress().Menu(settings =>
+{
+    settings.Name = "mnuNavpanel";
+    settings.ShowPopOutImages = DefaultBoolean.True;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.ItemAutoWidth = true;
+    settings.ClientSideEvents.CloseUp = "function (s, e) { if (PeriodChanged) { window.location.reload(); } }";
+
+    settings.Items.Add(item =>
+    {
+        item.Text = "Период";
+        item.Image.Url = Url.Content("~/Images/PERIOD_X16.png");
+        item.Name = "mnu_period";
+        item.ToolTip = "Период за который отображается информация в большинстве списков документов. Старайтесь использовать период в минимальных диапазонах!";
+        item.Items.Add();
+        item.SetSubMenuTemplateContent(c =>
+        {
+            Html.RenderPartial("../Period/PeriodPartial", WADataProvider.Period);
+        });
+    });
+    
+    if (WADataProvider.HiearchyElementRightView.IsAllow(Right.VIEW, "WEB_MAIN"))
+    {
+        //secureEntityHierarchy.IsAllow(Right.VIEW, childItem.Id)
+        settings.Items.Add(item =>
+        {
+            item.Text = "Раздел";
+            item.Image.Url = Url.Content("~/Images/WINDOWSLIST_X16.png");
+            item.Name = "submenu";
+            item.Items.Add();
+            item.SetSubMenuTemplateContent(c =>
+            {
+                ViewContext.Writer.Write(
+                    "<table class=\"sitemap\">" +
+                        "<tr>");
+                            if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW ,BusinessObjects.Web.Core.WebModuleNames.WEB_NAVIGATOR) 
+                                || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_DOCFINANCE) 
+                                || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_DOCFINANCENDS) 
+                                || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_DOCSERVICE) 
+                                || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_DOCSERVICENDS) 
+                                || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                            {
+                                ViewContext.Writer.Write(
+                                "<td valign=\"top\">" +
+                                    "<ul>");
+                                        if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_NAVIGATOR) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                            ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/NODE_X16.png") + "\"/>" + Html.ActionLink("Навигатор", "Index", new { area = "", controller = "Home" }) + "</li>");
+                                        if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_DOCFINANCE) 
+                                            || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_DOCFINANCENDS) 
+                                            || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                            if (IsDefaultNds)
+                                                ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/MONEY_X16.png") + "\"/>" + Html.ActionLink("Управление финансами", "Index", new { area = "FinancesNds", controller = "Home" }) + "</li>");
+                                            else
+                                                ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/MONEY_X16.png") + "\"/>" + Html.ActionLink("Управление финансами", "Index", new { area = "Finances", controller = "Home" }) + "</li>");
+                                        if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_DOCSERVICE) 
+                                            || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_DOCSERVICENDS) 
+                                            || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                        {
+                                            if (IsDefaultNds)
+                                                ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/COMPONENTS_X16.png") + "\"/>" + Html.ActionLink("Услуги", "Index", new { area = "ServicesNds", controller = "Home" }) + "</li>");
+                                            else
+                                                ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/COMPONENTS_X16.png") + "\"/>" + Html.ActionLink("Услуги", "Index", new { area = "Services", controller = "Home" }) + "</li>");
+                                        }
+                                        ViewContext.Writer.Write(
+                                    "</ul>" +
+                                "</td>");
+                            }
+                            if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_DOCSALE) 
+                                || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_DOCSALENDS) 
+                                || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, "WEB_DOCTAX") 
+                                || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_DOCPRICE) 
+                                || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                            {
+                                ViewContext.Writer.Write(
+                                "<td valign=\"top\">" +
+                                    "<ul>");
+                                        if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_DOCSALE) 
+                                            || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_DOCSALENDS) 
+                                            || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                        {
+                                            if (IsDefaultNds)
+                                                ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/toolbox.png") + "\"/>" + Html.ActionLink("Управление продажами", "Index", new { area = "SalesNds", controller="Home"}) + "</li>");
+                                            else
+                                                ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/toolbox.png") + "\"/>" + Html.ActionLink("Управление продажами", "Index", new { area = "Sales", controller = "Home" }) + "</li>");
+                                        }
+                                        if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_DOCTAX) & IsNdsAllow || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                            ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/bank.png") + "\"/>" + Html.ActionLink("Налоговые документы", "Index", new { area = "Taxes", controller="Home"}) + "</li>");
+                                        if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_DOCPRICE) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                            ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/PRICE_POLICY_X16.png") + "\"/>" + Html.ActionLink("Ценовая политика", "Index", new { area = "Prices", controller = "Home" }) + "</li>");
+                                        ViewContext.Writer.Write(
+                                    "</ul>" +
+                                "</td>");
+                            }
+                            if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_DOCDOGOVOR) 
+                                || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_DOCMKTG)
+                                || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_DOCALL) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                            {
+                                ViewContext.Writer.Write(
+                                "<td valign=\"top\">" +
+                                    "<ul>");
+                                        if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_DOCDOGOVOR) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                            ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/CONTRACT_X16.png") + "\"/>" + Html.ActionLink("Договора", "Index", new { area = "Contracts", controller = "Home" }) + "</li>");
+                                        if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_DOCMKTG) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                            ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/CONTRACT_X16.png") + "\"/>" + Html.ActionLink("Маркетинг", "Index", new { area = "Marketings", controller = "Home" }) + "</li>");
+                                        if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_DOCALL) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                            ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/CONTRACT_X16.png") + "\"/>" + Html.ActionLink("Все документы", "Index", new { area = "", controller = "Document" }) + "</li>");
+                                        ViewContext.Writer.Write(
+                                    "</ul>" +
+                                "</td>");
+                            }
+                            ViewContext.Writer.Write(
+                        "</tr>" +
+                    "</table>"
+                    );
+            });
+        });
+    }
+    if (WADataProvider.HiearchyElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_AGENTS))
+    {
+        settings.Items.Add(item =>
+        {
+            item.Text = "Корреспонденты";
+            item.Name = "submenu";
+            item.Image.Url = Url.Content("~/Images/AGENTMYFIRM_X16.png");
+            item.Items.Add();
+            item.SetSubMenuTemplateContent(c =>
+            {
+                ViewContext.Writer.Write(
+                    "<table class=\"sitemap\">" +
+                        "<tr>");
+                            if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_MYCOMPANY) || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_SUPPLYER) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                            {
+                                ViewContext.Writer.Write(
+                                "<td valign=\"top\">" +
+                                    "<ul>");
+                                        if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_MYCOMPANY) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                            ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/building.png") + "\"/>" + Html.ActionLink("Наши фирмы", "Index", new { area = "Agents", controller = "MyDepatment" }) + "</li>");
+                                        if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_SUPPLYER) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                            ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/TRUCKYELLOW_X16.png") + "\"/>" + Html.ActionLink("Поставщики", "Index", new { area = "Agents", controller = "Supplyer" }) + "</li>");
+                                
+                                        if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_EMPLOERS) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                            ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/users.png") + "\"/>" + Html.ActionLink("Сотрудники", "Index", new { area = "Agents", controller = "Worker" }) + "</li>");
+                                        ViewContext.Writer.Write(
+                                    "</ul>" +
+                                "</td>");
+                            }
+                            if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_CLIENTS) || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_BANKS) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                            {
+                                ViewContext.Writer.Write(
+                                "<td valign=\"top\">" +
+                                    "<ul>");
+                                        if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_STORES) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                            ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/AGENTSTORE_X16.png") + "\"/>" + Html.ActionLink("Склады", "Index", new { area = "Agents", controller = "Store" }) + "</li>");
+                                        if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_CLIENTS) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                            ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/AGENTFIRM_X16.png") + "\"/>" + Html.ActionLink("Покупатели", "Index", new { area = "Agents", controller = "Byer" }) + "</li>");
+                                        ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/arrowgreen.png") + "\"/>" + Html.ActionLink("Все справочники корреспондентов...", "Index", new { area = "Agents", controller = "Home" }) + "</li>");
+                                        //if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_BANKS) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                        //    ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/bank.png") + "\"/>" + Html.ActionLink("Банки", "Index", new { area = "Agents", controller = "Bank" }) + "</li>");
+                                        ViewContext.Writer.Write(
+                                    "</ul>" +
+                                "</td>");
+                            }
+                            ViewContext.Writer.Write(
+                        "</tr>" +
+                    "</table>"
+                );
+            });
+        });
+    }
+    if (WADataProvider.HiearchyElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_PRODUCTS))
+    {
+        settings.Items.Add(item =>
+        {
+            item.Text = "Товары";
+            item.Name = "submenu";
+            item.Image.Url = Url.Content("~/Images/PRODUCT_X16.png");
+            item.Items.Add();
+            item.SetSubMenuTemplateContent(c =>
+            {
+                ViewContext.Writer.Write(
+                    "<table class=\"sitemap\">" +
+                        "<tr>");
+                if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_PRODUCTS) || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_SERVICES) || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_ASSETS) ||
+                                WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_RAWMATERIALS) || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_PRODUCTFINISHED) ||
+                                WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_PRODUCTPACK) || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_MONEY) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                            {
+                                ViewContext.Writer.Write(
+                                "<td valign=\"top\">" +
+                                    "<ul>");
+                                        if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_PRODUCTS) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                            ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/PRODUCT_X16.png") + "\"/>" + Html.ActionLink("Товары", "Index", new { area = "Products", controller = "Product" }) + "</li>");
+                                        if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_SERVICES) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                            ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/SERVICE_X16.png") + "\"/>" + Html.ActionLink("Услуги", "Index", new { area = "Products", controller = "Service" }) + "</li>");
+                                        if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_UNIT) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                            ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/UNIT_X16.png") + "\"/>" + Html.ActionLink("Единицы измерения", "Index", new { area = "General", controller = "Unit" }) + "</li>");
+                    
+                                        //if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_ASSETS) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                        //    ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/PRODUCT_X16.png") + "\"/>" + Html.ActionLink("Основные средства", "Index", new { area = "Products", controller = "Assets" }) + "</li>");
+                                        //if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_RAWMATERIALS) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                        //    ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/PRODUCT_X16.png") + "\"/>" + Html.ActionLink("Сырьё", "Index", new { area = "Products", controller = "RawMaterial" }) + "</li>");
+                                        //if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_PRODUCTFINISHED) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                        //    ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/PRODUCT_X16.png") + "\"/>" + Html.ActionLink("Готовая продукция", "Index", new { area = "Products", controller = "FinishProduction" }) + "</li>");
+                                        //if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_PRODUCTPACK) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                        //    ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/PRODUCT_X16.png") + "\"/>" + Html.ActionLink("Тара", "Index", new { area = "Products", controller = "Pack" }) + "</li>");
+                                        //if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_MONEY) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                        //    ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/STACKOFMONEY_X16.png") + "\"/>" + Html.ActionLink("Денежные объекты", "Index", new { area = "Products", controller = "Money" }) + "</li>");
+                                        ViewContext.Writer.Write(
+                                    "</ul>" +
+                                "</td>");
+                            }
+                if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_PACK) || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, "WEB_PRODUCTTYPE") ||
+                                WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_RETURN) || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, "WEB_PRODUCTGROUP") ||
+                                WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_BREND) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                            {
+                                ViewContext.Writer.Write(
+                                "<td valign=\"top\">" +
+                                    "<ul>");
+                                if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_BREND) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                    ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/MISCCUSTOM11_X16.png") + "\"/>" + Html.ActionLink("Бренды", "Index", new { area = "Analitics", controller = "Brand" }) + "</li>");
+
+                                if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_PRODUCTGROUP) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                    ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/MISCCUSTOM10_X16.png") + "\"/>" + Html.ActionLink("Товарная группа", "Index", new { area = "Analitics", controller = "TradeGroup" }) + "</li>");
+
+                                if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_PRODUCTTYPE) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                    ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/MISCGREEN_X16.png") + "\"/>" + Html.ActionLink("Вид продукции", "Index", new { area = "Analitics", controller = "ProductType" }) + "</li>");
+                    
+                                //if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_PACK) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                //    ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/MISCMAGENTA_X16.png") + "\"/>" + Html.ActionLink("Вид упаковки", "Index", new { area = "Analitics", controller = "ProductPackType" }) + "</li>");
+                                
+                                //if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_RETURN) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                //    ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/MISCBLUE_X16.png") + "\"/>" + Html.ActionLink("Причина возврата", "Index", new { area = "Analitics", controller = "ReturnReason" }) + "</li>");
+                                
+                                
+                                ViewContext.Writer.Write(
+                                    "</ul>" +
+                                "</td>");
+                            }
+
+                if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_PACK) || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, "WEB_PRODUCTTYPE") ||
+                                WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_RETURN) || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, "WEB_PRODUCTGROUP") ||
+                                WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_BREND) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                {
+                    ViewContext.Writer.Write(
+                    "<td valign=\"top\">" +
+                        "<ul>");
+                    if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_PACK) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                        ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/MISCMAGENTA_X16.png") + "\"/>" + Html.ActionLink("Вид упаковки", "Index", new { area = "Analitics", controller = "ProductPackType" }) + "</li>");
+                    if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_RETURN) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                        ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/MISCBLUE_X16.png") + "\"/>" + Html.ActionLink("Причина возврата", "Index", new { area = "Analitics", controller = "ReturnReason" }) + "</li>");
+
+                    ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/arrowgreen.png") + "\"/>" + Html.ActionLink("Все справочники объектов учета...", "Index", new { area = "Products", controller = "Home" }) + "</li>");
+                    ViewContext.Writer.Write(
+                        "</ul>" +
+                    "</td>");
+                }
+                            ViewContext.Writer.Write(
+                        "</tr>" +
+                    "</table>"
+                    );
+            });
+        });
+    }
+    
+    if (WADataProvider.HiearchyElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_DICTIONARIES))
+    {
+        settings.Items.Add(item =>
+        {
+            item.Text = "Справочники";
+            item.Name = "submenu";
+            item.Image.Url = Url.Content("~/Images/BOOKBLUE_X16.png");
+            item.Items.Add();
+            item.SetSubMenuTemplateContent(c =>
+            {
+                ViewContext.Writer.Write(
+                        "<table class=\"sitemap\">" +
+                            "<tr>");
+                                if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_AGENTCATEGORY) || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, "WEB_METRICAREA") ||
+                                    WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_OUTLETTYPE) || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, "WEB_OWNERSHIP") ||
+                                    WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_PAYMENTTYPE) || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, "WEB_OUTLETLOCATION") ||
+                                    WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_REASONTRADEPOINT) || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, "WEB_EQUIPMENTPLACEMENT") || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                {
+                                    ViewContext.Writer.Write(
+                                    "<td valign=\"top\">" +
+                                        "<ul>");
+                                    if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_AGENTCATEGORY) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                        ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/MISCCUSTOM12_X16.png") + "\"/>" + Html.ActionLink("Канал сбыта", "Index", new { area = "Analitics", controller = "AgentCategory", action = "Index" }) + "</li>");
+                                            
+                                            if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_OUTLETTYPE) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                                ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/MISCCUSTOM14_X16.png") + "\"/>" + Html.ActionLink("Тип торговой точки", "Index", new { area = "Analitics", controller = "AgentTypeOutlet", action = "Index" }) + "</li>");
+                                            if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_OWNERSHIP) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                                ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/MISCCUSTOM15_X16.png") + "\"/>" + Html.ActionLink("Форма собственности", "Index", new { area = "Analitics", controller = "OwnerShip", action = "Index" }) + "</li>");
+                                            ViewContext.Writer.Write(
+                                        "</ul>" +
+                                    "</td>");
+                                }
+
+                                if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_AGENTCATEGORY) || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, "WEB_METRICAREA") ||
+                                                    WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_OUTLETTYPE) || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, "WEB_OWNERSHIP") ||
+                                                    WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_PAYMENTTYPE) || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, "WEB_OUTLETLOCATION") ||
+                                                    WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_REASONTRADEPOINT) || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, "WEB_EQUIPMENTPLACEMENT") || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                {
+                                    ViewContext.Writer.Write(
+                                    "<td valign=\"top\">" +
+                                        "<ul>");
+                                    if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_METRICAREA) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                        ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/MISCCUSTOM13_X16.png") + "\"/>" + Html.ActionLink("Метраж торговой точки", "Index", new { area = "Analitics", controller = "MetricArea", action = "Index" }) + "</li>");
+                                    if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_OUTLETLOCATION) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                        ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/MISCCUSTOM17_X16.png") + "\"/>" + Html.ActionLink("Расположение торговой точки", "Index", new { area = "Analitics", controller = "OutletLocation", action = "Index" }) + "</li>");
+                                    if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_REASONTRADEPOINT) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                        ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/MISCCUSTOM18_X16.png") + "\"/>" + Html.ActionLink("Состояние отношений с торговой точкой", "Index", new { area = "Analitics", controller = "ReasonTradepoint", action = "Index" }) + "</li>");
+                                    ViewContext.Writer.Write(
+                                "</ul>" +
+                            "</td>");
+                                }
+                                if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_CURRENCY) || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, "WEB_UNIT") || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, "WEB_TIMEPERIODS") || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                {
+                                    ViewContext.Writer.Write(
+                                    "<td valign=\"top\">" +
+                                        "<ul>");
+                                    if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_CURRENCY) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                            ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/CURRENCYEURO_X16.png") + "\"/>" + Html.ActionLink("Валюты", "Index", new { area = "General", controller = "Currency" }) + "</li>");
+                                    if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_TIMEPERIODS) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                            ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/calendar.png") + "\"/>" + Html.ActionLink("Графики работ", "Index", new { area = "General", controller = "TimePeriod" }) + "</li>");
+                                    ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/arrowgreen.png") + "\"/>" + Html.ActionLink("Все аналитические справочники ...", "Index", new { area = "Analitics", controller = "Home" }) + "</li>");
+                                            ViewContext.Writer.Write(
+                                        "</ul>" +
+                                    "</td>");
+                                }
+                                ViewContext.Writer.Write(
+                            "</tr>" +
+                        "</table>"
+                        );
+            });
+        });
+    }
+    
+
+
+    if (WADataProvider.HiearchyElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_REPORTS))
+    {
+        settings.Items.Add(item =>
+        {
+            item.Text = "Отчеты";
+            item.Name = "submenu";
+            item.Image.Url = Url.Content("~/Images/REPORT_X16.png");
+            item.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = "Report", Action = "Index", Area = "Reports" });
+        });
+    }
+
+
+    if (WADataProvider.HiearchyElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_USERS))
+    {
+        settings.Items.Add(item =>
+        {
+            item.Text = User.Identity.Name;
+            item.Name = "submenu";
+            item.Image.Url = Url.Content("~/Images/user-gray.png");
+            item.Items.Add();
+            item.SetSubMenuTemplateContent(c =>
+            {
+                ViewContext.Writer.Write(
+                    "<table class=\"sitemap\">" +
+                        "<tr>");
+                if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_USERHOME) || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_USERSETUP) ||
+                                WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_ADMINUSERS) || WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, "WEB_EXIT") || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                            {
+                                ViewContext.Writer.Write(
+                                "<td valign=\"top\">" +
+                                    "<ul>");
+                                        if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_USERHOME))
+                                            ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/blog.png") + "\"/>" + Html.ActionLink("Личная страница", "Index", new { area = "UserPersonal", controller = "Home" }) + "</li>");
+                                        if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_USERSETUP))
+                                            ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/gear.png") + "\"/>" + Html.ActionLink("Настройка аккаунта", "Index", new { area = "UserPersonal", controller = "AccountSetup" }) + "</li>");
+                                        if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_ADMINUSERS) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                            ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/AGENTWORKER_X16.png") + "\"/>" + Html.ActionLink("Пользователи", "Index", new { area = "Admins", controller = "User" }) + "</li>");
+                                        if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_ADMINSETUP) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                            ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/sys_config.png") + "\"/>" + Html.ActionLink("Настройка системы", "Index", new { area = "Admins", controller = "SysConfig" }) + "</li>");
+                                        if (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, BusinessObjects.Web.Core.WebModuleNames.WEB_EXIT) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+                                            ViewContext.Writer.Write("<li><img src=\"" + Url.Content("~/Images/cross.png") + "\"/>" + Html.ActionLink("Выйти", "LogOff", new { area = "", controller = "Account" }) + "</li>");
+                                        ViewContext.Writer.Write(
+                                    "</ul>" +
+                                "</td>");
+                            }
+                            ViewContext.Writer.Write(
+                        "</tr>" +
+                    "</table>"
+                );
+            });
+        });
+    }
+
+    //if (WADataProvider.HiearchyElementRightView.IsAllow(Right.VIEW, "WEB_STYLES"))
+    //{
+    //    settings.Items.Add(item =>
+    //    {
+    //        item.Text = "Стиль...";
+    //        item.Name = "submenu";
+    //        item.Image.Url = Url.Content("~/Images/Palette.png");
+    //        item.Items.Add();
+    //        item.SetSubMenuTemplateContent(c =>
+    //        {
+    //            ViewContext.Writer.Write("<div id=\"ThemesContainer\">");
+    //            foreach (ThemeGroupModel themeGroup in ThemesModel.Current.Groups)
+    //            {
+    //                ViewContext.Writer.Write("<div class=\"ThemeGroup\">" + themeGroup.Title + "</div>");
+
+    //                int i = 0;
+    //                ViewContext.Writer.Write("<table class=\"sitemap\">");
+    //                ViewContext.Writer.Write("<tr>");
+    //                foreach (ThemeModel theme in themeGroup.Themes)
+    //                {
+    //                    if (theme.Name != "DevEx")
+    //                    {
+    //                        if (i == 3)
+    //                        {
+    //                            ViewContext.Writer.Write("</tr><tr>");
+    //                            i = 0;
+    //                        }
+
+    //                        ViewContext.Writer.Write("<td>");
+    //                        //ViewContext.Writer.Write("<div class=\"" + theme.SpriteCssClass + "\" onclick=\"ASPxClientUtils.SetCookie(DXDemo.CurrentThemeCookieKey, '" + theme.Name + "');window.location.reload();\">" + theme.Title + "</div>");
+    //                        //$.ajax({ type: 'GET', url: '" + Url.Content("~/Document/GetSKU") + "', async: false, data: { mId: '" + Model.ModelId + "', GpId: GroupId.GetValue(), AnId: AnaliticId.GetValue() }, success: function(data) { SummValue3.SetValue(data); } });
+    //                        ViewContext.Writer.Write("<div class=\"" + theme.SpriteCssClass + "\" style=\"cursor: pointer;\" onclick=\"$.ajax({ type: 'GET', url: '" + Url.Content("~/UserConfig/SetUserTheme") + "', async: false, data: { ThemeName : '" + theme.Name + "' } }); window.location.reload();\">" + theme.Title + "</div>");
+    //                        ViewContext.Writer.Write("</td>");
+    //                        i++;
+    //                    }
+    //                }
+    //                ViewContext.Writer.Write("</tr>");
+    //                ViewContext.Writer.Write("</table>");
+    //            }
+    //            ViewContext.Writer.Write("</div>");
+    //        });
+    //    });
+    //}
+}).GetHtml()

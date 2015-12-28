@@ -1,0 +1,68 @@
+﻿@using BusinessObjects
+@using BusinessObjects.Security
+@Html.DevExpress().GridView(settings =>
+{
+    settings.Name = "dxGridViewAgents";
+    settings.CallbackRouteValues = new { Controller = "AccountingPrinters", Action = "FillAgentsListPartial" };
+
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+    settings.KeyFieldName = GlobalPropertyNames.Id;
+
+    settings.Columns.Add(col =>
+    {
+        col.FieldName = GlobalPropertyNames.FirstName;
+        col.Caption = "Фамилия";
+        col.Settings.AutoFilterCondition = AutoFilterCondition.BeginsWith;
+        col.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+        col.Width = 100;
+    });
+    settings.Columns.Add(col =>
+    {
+        col.FieldName = GlobalPropertyNames.LastName;
+        col.Caption = "Имя";
+        col.Settings.AutoFilterCondition = AutoFilterCondition.BeginsWith;
+        col.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+        col.Width = 100;
+    });
+
+    settings.Columns.Add(col =>
+    {
+        col.FieldName = GlobalPropertyNames.MidleName;
+        col.Caption = "Отчество";
+        col.Settings.AutoFilterCondition = AutoFilterCondition.BeginsWith;
+        col.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+        col.Width = 100;
+    });
+
+    if (User.IsInRole(Uid.GROUP_GROUPWEBADMIN))
+    {
+        MVCxGridViewColumn col_id = settings.Columns.Add("Id", "Ид");
+        col_id.Visible = false;
+        col_id.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Top;
+        col_id.Width = 100;
+    }
+    settings.Settings.ShowGroupPanel = DocumentsWeb.Code.LayoutHelper.GetCurrentSetting(Url.RequestContext.RouteData.Values["controller"].ToString()).Current.ShowGroupPanel;
+    settings.Settings.ShowFilterRow = DocumentsWeb.Code.LayoutHelper.GetCurrentSetting(Url.RequestContext.RouteData.Values["controller"].ToString()).Current.ShowFilterPanel;
+    settings.Settings.ShowFilterRowMenu = true;
+    settings.SettingsPager.PageSize = Utils.GetPageSize(settings);
+    settings.SettingsPager.Position = System.Web.UI.WebControls.PagerPosition.Top;
+    settings.SettingsPager.AlwaysShowPager = true;
+    settings.SettingsBehavior.AllowFocusedRow = true;
+    settings.SettingsCustomizationWindow.Enabled = true;
+    settings.SettingsCustomizationWindow.PopupVerticalAlign = PopupVerticalAlign.Below;
+    settings.SettingsCustomizationWindow.PopupHorizontalAlign = PopupHorizontalAlign.OutsideRight;
+    settings.Styles.AlternatingRow.Enabled = DefaultBoolean.True;
+    settings.KeyboardSupport = true;
+    settings.Styles.Cell.Paddings.Padding = System.Web.UI.WebControls.Unit.Pixel(2);
+    settings.SetPagerBarTemplateContent(c =>
+    {
+        Html.RenderPartial("TablePager", new ViewDataDictionary
+        {
+            { "ContentObject", c }
+        });
+    });
+
+    settings.Settings.VerticalScrollableHeight = 250;
+    settings.Settings.ShowVerticalScrollBar = true;
+}).Bind(DocumentsWeb.Areas.Agents.Models.ClientModel.GetWorkers()).GetHtml()

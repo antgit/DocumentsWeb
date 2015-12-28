@@ -1,0 +1,24 @@
+﻿@using DocumentsWeb.Models
+@{
+    int? TownId = null;
+    //string Name = null;
+
+    try { TownId = int.Parse(ViewData["TownId"].ToString()); TownId = (TownId == 0 ? null : TownId); }  catch { }
+    //try { Name = (string)ViewData["Name"])); Name = (Name == "" ? null : Name); }  catch { }
+}
+@Html.DevExpress().ComboBox(edtSettings =>
+{
+    edtSettings.Name = "StreetName";
+    edtSettings.CallbackRouteValues = new { Area = "Marketings", Controller = "Mktg", Action = "cmbStreetPartial" };
+    edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    edtSettings.Properties.NullDisplayText = "Укажите улицу...";
+    edtSettings.ControlStyle.CssClass = "editor";
+    edtSettings.Properties.IncrementalFilteringDelay = 400;
+    edtSettings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    edtSettings.Properties.DropDownStyle = DropDownStyle.DropDown;
+    edtSettings.ShowModelErrors = true;
+    edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+    edtSettings.Properties.ClientSideEvents.BeginCallback = "function(s,e){ e.customArgs['TownId'] = TownId.GetValue() == null ? 0 : TownId.GetValue(); }";
+    edtSettings.EncodeHtml = false;
+}).BindList(WADataProvider.GetStreets(TownId)).Bind(ViewData["StreetName"]).GetHtml()

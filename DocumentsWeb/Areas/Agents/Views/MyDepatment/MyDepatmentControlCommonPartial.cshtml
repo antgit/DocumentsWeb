@@ -1,0 +1,666 @@
+﻿@using BusinessObjects
+@using DocumentsWeb.Models
+@using DocumentsWeb.Areas.Agents.Models
+@using DocumentsWeb.Areas.Analitics.Models
+@model ClientModel
+
+@Html.DevExpress().NavBar(settings =>
+{
+    settings.Name = "tsEditAgent";
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.AutoCollapse = true;
+    //settings.Styles.Content.CssClass = "tabcontent";
+
+    if (!ViewContext.ViewData.ModelState.IsValid)
+    {
+        settings.Groups.Add(group =>
+        {
+            group.Text = "Ошибки!";
+            group.HeaderStyle.Font.Bold = true;
+            group.HeaderImage.Url = Url.Content("~/Images/ERROR_X16.png");
+
+            group.SetContentTemplateContent(c => ViewContext.Writer.Write(@Html.ValidationSummary(false).ToHtmlString()));
+        });
+    }
+    
+    settings.Groups.Add(gp =>
+    {
+        gp.Text = "Мое предприятие";
+        gp.HeaderImage.Url = Url.Content("~/Images/building.png");
+        gp.SetContentTemplateContent(gc =>
+        {
+            ViewContext.Writer.Write("<input type=\"hidden\" id=\"KindId\" name=\"KindId\" value=\"" + Model.KindId + "\" />");
+            ViewContext.Writer.Write("<table style=\"width: 500px;\">");
+            ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Наименование:";
+                s.AssociatedControlName = GlobalPropertyNames.Name;
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td colspan=\"3\">");
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = GlobalPropertyNames.Name;
+                s.Properties.NullDisplayText = "Введите наименование...";
+                s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.Name).GetHtml();
+            ViewContext.Writer.Write("</td><tr>");
+
+            ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Полное имя:";
+                s.AssociatedControlName = GlobalPropertyNames.NameFull;
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td colspan=\"3\">");
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = GlobalPropertyNames.NameFull;
+                s.Properties.NullDisplayText = "Введите полное имя...";
+                s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.NameFull).GetHtml();
+            ViewContext.Writer.Write("</td><tr>");
+
+            ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Международное:";
+                s.AssociatedControlName = GlobalPropertyNames.InternationalName;
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td colspan=\"3\">");
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = GlobalPropertyNames.InternationalName;
+                s.Properties.NullText = "Введите международное имя...";
+                s.ControlStyle.CssClass = "editor";
+                s.ShowModelErrors = true;
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.InternationalName).GetHtml();
+            ViewContext.Writer.Write("</td><tr>");
+
+            ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Код:";
+                s.AssociatedControlName = GlobalPropertyNames.Code;
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td colspan=\"3\">");
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = GlobalPropertyNames.Code;
+                s.Properties.NullText = "Введите код корреспондента...";
+                s.ControlStyle.CssClass = "editor";
+                s.ShowModelErrors = true;
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.Code).GetHtml();
+            ViewContext.Writer.Write("</td><tr>");
+
+            ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Налоговый номер:";
+                s.AssociatedControlName = "TaxNumber";
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td>");
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = "TaxNumber";
+                s.Properties.NullText = "Введите ИНН предприятия...";
+                s.ControlStyle.CssClass = "editor";
+                s.ShowModelErrors = true;
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.TaxNumber).GetHtml();
+            ViewContext.Writer.Write("</td>");
+
+            ViewContext.Writer.Write("<td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "ОКПО:";
+                s.AssociatedControlName = GlobalPropertyNames.Okpo;
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td>");
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = GlobalPropertyNames.Okpo;
+                s.Properties.NullText = "Введите ОКПО предприятия...";
+                s.ControlStyle.CssClass = "editor";
+                s.ShowModelErrors = true;
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.Okpo).GetHtml();
+            ViewContext.Writer.Write("</td><tr>");
+
+            ViewContext.Writer.Write("<td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Телефон:";
+                s.AssociatedControlName = GlobalPropertyNames.Phone;
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td colspan=\"3\">");
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = GlobalPropertyNames.Phone;
+                s.Properties.NullText = "Введите телефон предприятия...";
+                s.ControlStyle.CssClass = "editor";
+                s.ShowModelErrors = true;
+                s.Properties.MaskSettings.Mask = "000-000-00-00";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.Properties.MaskSettings.IncludeLiterals = MaskIncludeLiteralsMode.None;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.Phone).GetHtml();
+            ViewContext.Writer.Write("</td><tr>");
+
+            ViewContext.Writer.Write("<td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Плательщик НДС:";
+                s.AssociatedControlName = GlobalPropertyNames.NdsPayer;
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td>");
+            @Html.DevExpress().CheckBox(s =>
+            {
+                s.Name = GlobalPropertyNames.NdsPayer;
+                s.ControlStyle.CssClass = "editor";
+                s.ShowModelErrors = true;
+                s.Width = 100;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.NdsPayer).GetHtml();
+            ViewContext.Writer.Write("</td>");
+
+            ViewContext.Writer.Write("<td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "№ свидетельства:";
+                s.AssociatedControlName = GlobalPropertyNames.RegNumber;
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td>");
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = GlobalPropertyNames.RegNumber;
+                s.Properties.NullText = "Введите номер свидетельства предприятия...";
+                s.ControlStyle.CssClass = "editor";
+                s.ShowModelErrors = true;
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.RegNumber).GetHtml();
+            ViewContext.Writer.Write("</td><tr>");
+
+            ViewContext.Writer.Write("<td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Тип собственности:";
+                s.AssociatedControlName = GlobalPropertyNames.OwnershipId;
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td colspan=\"3\">");
+            @Html.DevExpress().ComboBox(s =>
+            {
+                s.Name = GlobalPropertyNames.OwnershipId;
+                s.Properties.NullDisplayText = "Укажите тип собственности...";
+                s.Properties.TextField = GlobalPropertyNames.Name;
+                s.Properties.ValueField = GlobalPropertyNames.Id;
+                s.Properties.ValueType = typeof(int);
+                s.ControlStyle.CssClass = "editor";
+                s.ShowModelErrors = true;
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).BindList(AnaliticModel.GetCollection(Hierarchy.SYSTEM_ANALITIC_AGENTOWNERSHIP)).Bind(Model.OwnerShipId).GetHtml();
+            ViewContext.Writer.Write("</td><tr>");
+
+            ViewContext.Writer.Write("<td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Тип торг. точки:";
+                s.AssociatedControlName = "TypeOutletId";
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td colspan=\"3\">");
+            @Html.DevExpress().ComboBox(s =>
+            {
+                s.Name = "TypeOutletId";
+                s.Properties.NullDisplayText = "Укажите тип трговой точки...";
+                s.Properties.TextField = GlobalPropertyNames.Name;
+                s.Properties.ValueField = GlobalPropertyNames.Id;
+                s.Properties.ValueType = typeof(int);
+                s.ControlStyle.CssClass = "editor";
+                s.ShowModelErrors = true;
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).BindList(AnaliticModel.GetCollection(Hierarchy.SYSTEM_ANALITIC_AGENTTYPEOUTLET)).Bind(Model.TypeOutletId).GetHtml();
+            ViewContext.Writer.Write("</td><tr>");
+
+            ViewContext.Writer.Write("<td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Метраж:";
+                s.AssociatedControlName = GlobalPropertyNames.MetricAreaId;
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td colspan=\"3\">");
+            @Html.DevExpress().ComboBox(s =>
+            {
+                s.Name = GlobalPropertyNames.MetricAreaId;
+                s.Properties.NullDisplayText = "Укажите метраж...";
+                s.Properties.TextField = GlobalPropertyNames.Name;
+                s.Properties.ValueField = GlobalPropertyNames.Id;
+                s.Properties.ValueType = typeof(int);
+                s.ControlStyle.CssClass = "editor";
+                s.ShowModelErrors = true;
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).BindList(AnaliticModel.GetCollection(Hierarchy.SYSTEM_ANALITIC_AGENTMETRICAREA)).Bind(Model.MetricAreaId).GetHtml();
+            ViewContext.Writer.Write("</td><tr>");
+
+            ViewContext.Writer.Write("<td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Категория торг.точки:";
+                s.AssociatedControlName = GlobalPropertyNames.CategoryId;
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td colspan=\"3\">");
+            @Html.DevExpress().ComboBox(s =>
+            {
+                s.Name = GlobalPropertyNames.CategoryId;
+                s.Properties.NullDisplayText = "Укажите категорию торговой точки...";
+                s.Properties.TextField = GlobalPropertyNames.Name;
+                s.Properties.ValueField = GlobalPropertyNames.Id;
+                s.Properties.ValueType = typeof(int);
+                s.ControlStyle.CssClass = "editor";
+                s.ShowModelErrors = true;
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).BindList(AnaliticModel.GetCollection(Hierarchy.SYSTEM_ANALITIC_AGENTCATEGORY)).Bind(Model.CategoryId).GetHtml();
+            ViewContext.Writer.Write("</td><tr>");
+
+            ViewContext.Writer.Write("<td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Физ. адрес:";
+                s.AssociatedControlName = GlobalPropertyNames.AddressPhysical;
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td colspan=\"3\">");
+            @Html.DevExpress().Memo(s =>
+            {
+                s.Name = GlobalPropertyNames.AddressPhysical;
+                s.Properties.NullText = "Введите физический адрес...";
+                s.ControlStyle.CssClass = "editor";
+                s.Height = 40;
+                s.ShowModelErrors = true;
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.AddressPhysical).GetHtml();
+            ViewContext.Writer.Write("</td><tr>");
+
+            ViewContext.Writer.Write("<td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Юр. адрес:";
+                s.AssociatedControlName = GlobalPropertyNames.AddressLegal;
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td colspan=\"3\">");
+            @Html.DevExpress().Memo(s =>
+            {
+                s.Name = GlobalPropertyNames.AddressLegal;
+                s.Properties.NullText = "Введите юридический адрес...";
+                s.ControlStyle.CssClass = "editor";
+                s.Height = 40;
+                s.ShowModelErrors = true;
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.AddressLegal).GetHtml();
+            ViewContext.Writer.Write("</td><tr>");
+
+            ViewContext.Writer.Write("<td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Примечание:";
+                s.AssociatedControlName = GlobalPropertyNames.Memo;
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td colspan=\"3\">");
+            @Html.DevExpress().Memo(s =>
+            {
+                s.Name = GlobalPropertyNames.Memo;
+                s.Properties.NullText = "Введите примечание или описание предприятия...";
+                s.ControlStyle.CssClass = "editor";
+                s.Height = 40;
+                s.ShowModelErrors = true;
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.Memo).GetHtml();
+            ViewContext.Writer.Write("</td><tr></table>");
+        });
+    });
+
+    settings.Groups.Add(gp =>
+    {
+        gp.Text = "Сотрудники";
+        gp.HeaderImage.Url = Url.Content("~/Images/commercial_x16.gif");
+        gp.SetContentTemplateContent(gc =>
+        {
+            Html.RenderPartial("MyDepatmentControlWorkersPartial", Model);
+        });
+    });
+    
+    settings.Groups.Add(gp =>
+    {
+        gp.Text = "Адреса";
+        gp.HeaderImage.Url = Url.Content("~/Images/misccustom15_x16.png");
+        gp.SetContentTemplateContent(gc =>
+        {
+            Html.RenderPartial("AddressGridPartial", Model);
+        });
+    });
+
+    settings.Groups.Add(gp =>
+    {
+        gp.Text = "Банковские счета";
+        gp.HeaderImage.Url = Url.Content("~/Images/misccustom10_x16.png");
+        gp.SetContentTemplateContent(gc =>
+        {
+            Html.RenderPartial("AccountsGridPartial", Model);
+        });
+    });
+
+    settings.Groups.Add(gp =>
+    {
+        gp.Text = "Коды";
+        gp.HeaderImage.Url = Url.Content("~/Images/misccustom11_x16.png");
+        gp.SetContentTemplateContent(gc =>
+        {
+            Html.RenderPartial("CodesGridPartial", Model);
+        });
+    });
+
+    settings.Groups.Add(gp =>
+    {
+        gp.Text = "Реквизиты";
+        gp.HeaderImage.Url = Url.Content("~/Images/misccustom12_x16.png");
+        gp.SetContentTemplateContent(gc =>
+        {
+            ViewContext.Writer.Write("<table style=\"width: 500px;\">");
+
+            ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Пенсионный фонд:";
+                s.AssociatedControlName = "RegPensionFund";
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td colspan=\"3\">");
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = "RegPensionFund";
+                s.Properties.NullDisplayText = "Регистрация в пенсионном фонде ...";
+                s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.RegPensionFund).GetHtml();
+            ViewContext.Writer.Write("</td><tr>");
+
+            ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Служба занятости:";
+                s.AssociatedControlName = "RegEmploymentService";
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td colspan=\"3\">");
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = "RegEmploymentService";
+                s.Properties.NullDisplayText = "Регистрация в службе занятости ...";
+                s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.RegEmploymentService).GetHtml();
+            ViewContext.Writer.Write("</td><tr>");
+
+            ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Фонд соцстраха по временной потере трудоспособности:";
+                s.AssociatedControlName = "RegSocialInsuranceDisability";
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td colspan=\"3\">");
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = "RegSocialInsuranceDisability";
+                s.Properties.NullDisplayText = "Соцстрах по временной потере трудоспособности ...";
+                s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.RegSocialInsuranceDisability).GetHtml();
+            ViewContext.Writer.Write("</td><tr>");
+
+            ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Фонд соцстраха по безработице:";
+                s.AssociatedControlName = "RegSocialInsuranceNesch";
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td colspan=\"3\">");
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = "RegSocialInsuranceNesch";
+                s.Properties.NullDisplayText = "Соцстрах по безработице ...";
+                s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.RegSocialInsuranceNesch).GetHtml();
+            ViewContext.Writer.Write("</td><tr>");
+
+            ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "ПФУ:";
+                s.AssociatedControlName = "RegPfu";
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td colspan=\"3\">");
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = "RegPfu";
+                s.Properties.NullDisplayText = "ПФУ ...";
+                s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.RegPfu).GetHtml();
+            ViewContext.Writer.Write("</td><tr>");
+
+            ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "ОПФГ:";
+                s.AssociatedControlName = "RegOpfg";
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td colspan=\"3\">");
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = "RegOpfg";
+                s.Properties.NullDisplayText = "ОПФГ ...";
+                s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.RegOpfg).GetHtml();
+            ViewContext.Writer.Write("</td><tr>");
+
+            ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "КОАТУ:";
+                s.AssociatedControlName = "RegKoatu";
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td colspan=\"3\">");
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = "RegKoatu";
+                s.Properties.NullDisplayText = "КОАТУ ...";
+                s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.RegKoatu).GetHtml();
+            ViewContext.Writer.Write("</td><tr>");
+
+            ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "КФВ:";
+                s.AssociatedControlName = "RegKfv";
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td colspan=\"3\">");
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = "RegKfv";
+                s.Properties.NullDisplayText = "КФВ ...";
+                s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.RegKfv).GetHtml();
+            ViewContext.Writer.Write("</td><tr>");
+
+            ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "ЗКГНГ:";
+                s.AssociatedControlName = "RegZkgng";
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td colspan=\"3\">");
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = "RegZkgng";
+                s.Properties.NullDisplayText = "ЗКГНГ ...";
+                s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.RegZkgng).GetHtml();
+            ViewContext.Writer.Write("</td><tr>");
+
+            ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "КВЕД:";
+                s.AssociatedControlName = "RegKved";
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td colspan=\"3\">");
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = "RegKved";
+                s.Properties.NullDisplayText = "КВЕД ...";
+                s.ControlStyle.CssClass = "editor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.RegKved).GetHtml();
+            ViewContext.Writer.Write("</td><tr>");
+
+            ViewContext.Writer.Write("</table>");
+        });
+    });
+    
+    settings.Groups.Add(gp =>
+    {
+        gp.Text = "Свойства";
+        gp.HeaderImage.Url = Url.Content("~/Images/property.png");
+        gp.SetContentTemplateContent(gc =>
+        {
+            ViewContext.Writer.Write("<table style=\"width: 500px;\">");
+
+            ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Идентификатор:";
+                s.AssociatedControlName = "txtId";
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td>");
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = "txtId";
+                s.ControlStyle.CssClass = "editor2";
+                s.Enabled = false;
+            }).Bind(Model.Id).GetHtml();
+            ViewContext.Writer.Write("</td></tr>");
+
+            ViewContext.Writer.Write("<tr><td class=\"table_label\">");
+            @Html.DevExpress().Label(s =>
+            {
+                s.ControlStyle.CssClass = "label";
+                s.Text = "Имя пользователя:";
+                s.AssociatedControlName = GlobalPropertyNames.UserName;
+            }).GetHtml();
+            ViewContext.Writer.Write("</td><td>");
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = GlobalPropertyNames.UserName;
+                s.ControlStyle.CssClass = "editor2";
+                s.Enabled = false;
+            }).Bind(Model.UserName).GetHtml();
+            ViewContext.Writer.Write("</td></tr></table>");
+        });
+    });
+}).GetHtml()

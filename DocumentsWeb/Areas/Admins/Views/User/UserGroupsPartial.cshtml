@@ -1,0 +1,26 @@
+﻿@using BusinessObjects
+@using DocumentsWeb.Models
+@model UserModel
+
+@Html.DevExpress().GridView(settings =>
+{
+    settings.Name = "gvUserGroups";
+    settings.KeyFieldName = GlobalPropertyNames.Id;
+    settings.CallbackRouteValues = new { Area="Admins", Controller = "User", Action = "UserGroupsPartial", id=Model.Id };
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Columns.Add("Name");
+    
+    settings.CommandColumn.Visible = true;
+    settings.CommandColumn.ShowSelectCheckbox = true;
+    settings.CommandColumn.Width = 20;
+
+    settings.ClientSideEvents.SelectionChanged = "gvUserGroups_SelectionChanged";
+    settings.PreRender = (s, e) =>
+    {
+        ASPxGridView gridView = (ASPxGridView)s;
+        foreach (var item in Model.Groups)
+	    {
+            gridView.Selection.SelectRowByKey(item.Id);
+	    }
+    };
+}).Bind(UserModel.GetAllGroups()).GetHtml()

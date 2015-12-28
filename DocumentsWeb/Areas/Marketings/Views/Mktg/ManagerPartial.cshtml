@@ -1,0 +1,31 @@
+﻿@using DocumentsWeb.Models
+@using DocumentsWeb.Areas.Agents.Models
+@using BusinessObjects;
+@using BusinessObjects.Security;
+@using BusinessObjects.Web.Core;
+@model DocumentsWeb.Areas.Marketings.Models.DocumentMktgModel
+
+@{   
+    bool haveEdit = WADataProvider.FolderElementRightView.IsAllow(BusinessObjects.Security.Right.DOCEDIT, WADataProvider.WA.GetFolderByCodeFind(BusinessObjects.Folder.CODE_FIND_MKTG_MRAK).Id);
+}
+           
+@Html.DevExpress().ComboBox(settings =>{
+    settings.Name = "ManagerId";
+    settings.CallbackRouteValues = new { Area="Marketings", Controller = "Mktg", Action = "ManagerPartial", mId = Model.ModelId };
+    settings.Properties.EnableCallbackMode = true;
+    settings.Properties.ValueField = "Id";
+    settings.Properties.TextField = "Name";
+    settings.Properties.ValueType = typeof(int);
+    settings.Properties.NullDisplayText = "Выберите менеджера...";
+    //settings.ControlStyle.CssClass = "editor";
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.ReadOnly = !(haveEdit && !Model.IsReadOnly);
+    settings.ShowModelErrors = true;
+    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+    settings.Properties.ClientSideEvents.BeginCallback = "function(s, e) { e.customArgs['MainClientDepatmentId'] = MainClientDepatmentId.GetValue(); e.customArgs['Id'] = " + @Model.Id + "}";
+    settings.Properties.ClientSideEvents.EndCallback = "function(s, e) { s.SetSelectedIndex(-1);}";
+    settings.Properties.ClientSideEvents.GotFocus = "OnEditorGotFocus";
+    settings.Properties.ClientSideEvents.LostFocus = "OnEditorLostFocus";
+}).BindList(ClientModel.GetChainSourceList(Model.MainClientDepatmentId)).Bind(Model.ManagerId == 0 ? null : (int?)Model.ManagerId).GetHtml()

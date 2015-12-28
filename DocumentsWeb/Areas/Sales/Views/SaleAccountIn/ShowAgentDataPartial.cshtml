@@ -1,0 +1,14 @@
+﻿@Html.DevExpress().PopupControl(settings =>{
+    settings.Name = "pcEdit";
+    settings.Width = 650;
+    settings.Height = 460;
+    settings.AllowDragging = true;
+    settings.AllowResize = false;
+    settings.ResizingMode = ResizingMode.Postponed;
+    settings.CloseAction = CloseAction.CloseButton;
+    settings.EnableAnimation = false;
+    settings.HeaderText = "Редактирование корреспондента...";
+    settings.Modal = true;
+    settings.PopupHorizontalAlign = PopupHorizontalAlign.WindowCenter;
+    settings.PopupVerticalAlign = PopupVerticalAlign.WindowCenter;
+}).GetHtml()

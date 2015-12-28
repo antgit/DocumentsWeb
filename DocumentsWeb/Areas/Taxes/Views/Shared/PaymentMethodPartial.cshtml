@@ -1,0 +1,20 @@
+﻿@model DocumentsWeb.Areas.Taxes.Models.DocumentTaxModel
+@using BusinessObjects
+
+@Html.DevExpress().ComboBox(settings=>
+{
+    settings.Name = GlobalPropertyNames.PaymentMethod;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.ClientEnabled = !Model.IsReadOnly;
+    settings.ShowModelErrors = !Model.IsReadOnly && Model.MainCompanyDepatmentId.HasValue && Model.MainCompanyDepatmentId.Value != 0;
+    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    settings.Properties.DropDownStyle = DropDownStyle.DropDown;
+      
+    settings.Properties.ValueType = typeof(string);
+    settings.Properties.Items.Add("Оплата с поточного рахунку");
+    settings.Properties.Items.Add("Бартер");
+    settings.Properties.Items.Add("Готівка");
+}).Bind(Model.PaymentMethod).GetHtml()

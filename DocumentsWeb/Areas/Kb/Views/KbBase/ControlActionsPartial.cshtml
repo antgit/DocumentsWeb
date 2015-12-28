@@ -1,0 +1,103 @@
+﻿@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentsWeb.Models
+@model DocumentsWeb.Areas.Kb.Models.KnowledgeModel
+@{   
+    bool haveEdit = (!Model.IsReadOnly && WADataProvider.LibrariesElementRightView.IsAllow(Right.UIEDIT, WebModuleNames.WEB_KNOWLEDGES) && !WADataProvider.CommonRightView.ReadOnly) || WADataProvider.CommonRightView.AdminEnterprize;
+    string helpDefaultLink = string.Empty;
+    if (ViewData.ContainsKey("HelpDefaultLink"))
+    {
+        helpDefaultLink = ViewData["HelpDefaultLink"].ToString();
+    }
+    string gridStyle = "dxgvControl_" + Utils.CurrentTheme;
+}
+
+<div id="divActions"  class="@gridStyle">
+@Html.DevExpress().NavBar(
+nbsettings =>
+{
+    nbsettings.Name = "nbFeatures";
+    nbsettings.AllowExpanding = true;
+    nbsettings.AllowSelectItem = true;
+    nbsettings.AutoCollapse = true;
+    nbsettings.EnableHotTrack = true;
+    nbsettings.EnableAnimation = true;
+    nbsettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    nbsettings.EncodeHtml = false;
+    nbsettings.SaveStateToCookies = true;
+    nbsettings.SaveStateToCookiesID = Url.RequestContext.RouteData.Values["controller"] + "NavControlAction";
+
+    nbsettings.Groups.Add(group => {
+        group.Text = "Действия";
+        group.HeaderStyle.Font.Bold = true;
+        group.HeaderImage.Url = Url.Content("~/Images/okey_x16.png");
+        group.ItemLinkMode = GroupItemLinkMode.TextAndImage;
+        group.ItemStyle.Paddings.PaddingTop = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.Paddings.PaddingBottom = System.Web.UI.WebControls.Unit.Pixel(2);
+        group.ItemStyle.CssClass = "navpanellink";
+
+        group.Items.Add(item =>
+        {
+            item.Text = "Помощь";
+            item.ToolTip = "Показать справочную информацию";
+            item.Image.Url = "~/Images/INFO_X16.png";
+            if (string.IsNullOrEmpty(helpDefaultLink))
+                item.NavigateUrl = "javascript:alert('Справочная информация отсутствует!');";
+            else
+            {
+                item.Target = "_blank";
+                item.NavigateUrl = helpDefaultLink.StartsWith("~/") ? Url.Content(helpDefaultLink) : helpDefaultLink;
+            }
+        });
+        
+        
+        group.Items.Add(item =>
+        {
+            item.Text = "Закрыть";
+            item.ToolTip = "Закрыть текущее окно или страницу";
+            item.Image.Url = "~/Images/cross.png";
+            item.NavigateUrl = "javascript:window.open('', '_self', ''); window.close();";
+        });
+
+        if (haveEdit)
+        {
+            group.Items.Add(item =>
+                {
+                    item.Text = "Сохранить";
+                    item.ToolTip = "Сохранить текущий документ возможно если заполнены все необходимые данные, требуемые для корректного оформления документа. Для больших документов рекомендуется сохраняться как можно чаще";
+                    item.Image.Url = "~/Images/SAVE_X16.png";
+                    item.NavigateUrl = "javascript:document.getElementById('editForm').submit()";
+                });
+        }
+
+        if (Model.IsReadOnly)
+        {
+            if (WADataProvider.CurrentUser.Groups.FirstOrDefault(s => s.Name == Uid.GROUP_GROUPSYSTEMADMIN || s.Name == Uid.GROUP_GROUPWEBADMIN) != null)
+            {
+                group.Items.Add(item =>
+                {
+                    item.Text = "Разрешить изменения";
+                    item.ToolTip = "Снять блокировку изменений в задаче!";
+                    item.Image.Url = "~/Images/UNLOCK16.png";
+                    item.NavigateUrl = "javascript:makeNotReadOnly()";
+                });
+            }
+        }
+        else
+        {
+            if (WADataProvider.CurrentUser.Groups.FirstOrDefault(s => s.Name == Uid.GROUP_GROUPSYSTEMADMIN || s.Name == Uid.GROUP_GROUPWEBADMIN) != null)
+            {
+                group.Items.Add(item =>
+                {
+                    item.Text = "Запретить изменения";
+                    item.ToolTip = "Установить блокировку изменений в задаче (перевести в состояние только чтение)!";
+                    item.Image.Url = "~/Images/SECURITY_X16.png";
+                    item.NavigateUrl = "javascript:makeReadOnly()";
+                });
+            }
+        }
+    });
+
+   
+}).GetHtml()
+</div>

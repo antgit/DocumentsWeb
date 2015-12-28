@@ -1,0 +1,409 @@
+﻿@*Html.DevExpress().Chart(ccs =>
+{
+    ccs.Name = "cLine";
+    ccs.Width = System.Web.UI.WebControls.Unit.Pixel(10000);
+    ccs.Height = System.Web.UI.WebControls.Unit.Pixel(300);
+    
+    //ccs.SeriesTemplate.DataFilters.Add(new DataFilter("DevId", "System.Int32", DataFilterCondition.Equal, "8"));
+
+    ccs.Titles.Add(new ChartTitle()
+    {
+        Font = new System.Drawing.Font("Tahoma", 10),
+        Alignment = System.Drawing.StringAlignment.Near,
+        Text = "Порт 4"
+    });
+
+    ccs.SeriesTemplate.ChangeView(DevExpress.XtraCharts.ViewType.Line);
+    ccs.SeriesTemplate.ArgumentDataMember = "Tm";
+    ccs.SeriesTemplate.ValueDataMembers[0] = "Value";
+
+    ccs.SeriesTemplate.Label.ResolveOverlappingMode = ResolveOverlappingMode.Default;
+    //ccs.SeriesTemplate.Label.Visible = false;
+    ccs.SeriesDataMember = "DevId";
+    ccs.Legend.Visible = false;
+    
+    LineSeriesView view = (LineSeriesView)ccs.SeriesTemplate.View;
+    //view.ColorEach = true;
+    view.LineMarkerOptions.Kind = MarkerKind.Circle;
+    //view.LineMarkerOptions.Visible = false;
+    view.LineMarkerOptions.Size = 8;
+
+    XYDiagram diagram = (XYDiagram)ccs.Diagram;
+    
+    diagram.AxisY.Interlaced = true;
+    diagram.AxisY.Title.Text = "Градусы цельсия";
+    diagram.AxisY.Title.Font = new System.Drawing.Font("Tahoma", 10);
+    diagram.AxisY.Title.Visible = true;
+    //diagram.AxisY.Range.SetMinMaxValues(120, 390);
+
+    /*diagram.AxisX.Visible = true;
+    diagram.AxisX.Title.Text = "Дата";
+    diagram.AxisX.Title.Font = new System.Drawing.Font("Tahoma", 10);
+    diagram.AxisX.Title.Visible = true;*/
+    diagram.AxisX.Label.ResolveOverlappingMode = AxisLabelResolveOverlappingMode.HideOverlapped;
+    diagram.AxisX.Label.ResolveOverlappingMinIndent = 5;
+}).Bind(DocumentsWeb.Areas.Routes.Models.ChartDataModel.GetDeviceValues(8, 4)).GetHtml()*@
+
+<div style="width: 100%; height: 100%; overflow: auto;">
+<table style="width: 100%;">
+    <tr>
+        <td style="width: 1px; vertical-align: top;">
+            @Html.DevExpress().HyperLink(hl =>
+            {
+                hl.Name = "port1_history";
+                hl.Properties.ImageUrl = Url.Content("~/Images/Sensors/history_x16.png");
+                hl.ToolTip = "История";
+                hl.Properties.Style.Cursor = "pointer";
+                //hl.NavigateUrl = Url.Action("HistoryView", new { controller = "Sensors", devId = 8, portNo = 4 });
+                hl.Properties.ClientSideEvents.Click = "function(s, e) { ShowHistory(1); }";
+                hl.Properties.Target = "blanc";
+            }).GetHtml()
+        </td>
+        <td style="width: 1px; -webkit-transform: rotate(-90deg);  -moz-transform: rotate(-90deg); -ms-transform: rotate(-90deg); -o-transform: rotate(-90deg); transform: rotate(-90deg);">
+            Порт&nbsp;1
+        </td>
+        <td style="padding-right: 15px;">
+            <div id="chart1" style="width: 100%; height: 250px;"></div>
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 1px; vertical-align: top;">
+            @Html.DevExpress().HyperLink(hl =>
+            {
+                hl.Name = "port2_history";
+                hl.Properties.ImageUrl = Url.Content("~/Images/Sensors/history_x16.png");
+                hl.ToolTip = "История";
+                hl.Properties.Style.Cursor = "pointer";
+                //hl.NavigateUrl = Url.Action("HistoryView", new { controller = "Sensors", devId = 8, portNo = 4 });
+                hl.Properties.ClientSideEvents.Click = "function(s, e) { ShowHistory(2); }";
+                hl.Properties.Target = "blanc";
+            }).GetHtml()
+        </td>
+        <td style="width: 1px; -webkit-transform: rotate(-90deg);  -moz-transform: rotate(-90deg); -ms-transform: rotate(-90deg); -o-transform: rotate(-90deg); transform: rotate(-90deg);">
+            Порт&nbsp;2
+        </td>
+        <td style="padding-right: 15px;">
+            <div id="chart2" style="width: 100%; height: 250px;"></div>
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 1px; vertical-align: top;">
+            @Html.DevExpress().HyperLink(hl =>
+            {
+                hl.Name = "port3_history";
+                hl.Properties.ImageUrl = Url.Content("~/Images/Sensors/history_x16.png");
+                hl.ToolTip = "История";
+                hl.Properties.Style.Cursor = "pointer";
+                //hl.NavigateUrl = Url.Action("HistoryView", new { controller = "Sensors", devId = 8, portNo = 4 });
+                hl.Properties.ClientSideEvents.Click = "function(s, e) { ShowHistory(3); }";
+                hl.Properties.Target = "blanc";
+            }).GetHtml()
+        </td>
+        <td style="width: 1px; -webkit-transform: rotate(-90deg);  -moz-transform: rotate(-90deg); -ms-transform: rotate(-90deg); -o-transform: rotate(-90deg); transform: rotate(-90deg);">
+            Порт&nbsp;3
+        </td>
+        <td style="padding-right: 15px;">
+            <div id="chart3" style="width: 100%; height: 250px;"></div>
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 1px; vertical-align: top;">
+            @Html.DevExpress().HyperLink(hl =>
+            {
+                hl.Name = "port4_history";
+                hl.Properties.ImageUrl = Url.Content("~/Images/Sensors/history_x16.png");
+                hl.ToolTip = "История";
+                hl.Properties.Style.Cursor = "pointer";
+                //hl.NavigateUrl = Url.Action("HistoryView", new { controller = "Sensors", devId = 8, portNo = 4 });
+                hl.Properties.ClientSideEvents.Click = "function(s, e) { ShowHistory(4); }";
+                hl.Properties.Target = "blanc";
+            }).GetHtml()
+        </td>
+        <td style="width: 1px; -webkit-transform: rotate(-90deg);  -moz-transform: rotate(-90deg); -ms-transform: rotate(-90deg); -o-transform: rotate(-90deg); transform: rotate(-90deg);">
+            Порт&nbsp;4
+        </td>
+        <td style="padding-right: 15px;">
+            <div id="chart4" style="width: 100%; height: 250px;"></div>
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 1px; vertical-align: top;">
+            @Html.DevExpress().HyperLink(hl =>
+            {
+                hl.Name = "port5_history";
+                hl.Properties.ImageUrl = Url.Content("~/Images/Sensors/history_x16.png");
+                hl.ToolTip = "История";
+                hl.Properties.Style.Cursor = "pointer";
+                //hl.NavigateUrl = Url.Action("HistoryView", new { controller = "Sensors", devId = 8, portNo = 4 });
+                hl.Properties.ClientSideEvents.Click = "function(s, e) { ShowHistory(5); }";
+                hl.Properties.Target = "blanc";
+            }).GetHtml()
+        </td>
+        <td style="width: 1px; -webkit-transform: rotate(-90deg);  -moz-transform: rotate(-90deg); -ms-transform: rotate(-90deg); -o-transform: rotate(-90deg); transform: rotate(-90deg);">
+            Порт&nbsp;5
+        </td>
+        <td style="padding-right: 15px;">
+            <div id="chart5" style="width: 100%; height: 250px;"></div>
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 1px; vertical-align: top;">
+            @Html.DevExpress().HyperLink(hl =>
+            {
+                hl.Name = "port6_history";
+                hl.Properties.ImageUrl = Url.Content("~/Images/Sensors/history_x16.png");
+                hl.ToolTip = "История";
+                hl.Properties.Style.Cursor = "pointer";
+                //hl.NavigateUrl = Url.Action("HistoryView", new { controller = "Sensors", devId = 8, portNo = 4 });
+                hl.Properties.ClientSideEvents.Click = "function(s, e) { ShowHistory(6); }";
+                hl.Properties.Target = "blanc";
+            }).GetHtml()
+        </td>
+        <td style="width: 1px; -webkit-transform: rotate(-90deg);  -moz-transform: rotate(-90deg); -ms-transform: rotate(-90deg); -o-transform: rotate(-90deg); transform: rotate(-90deg);">
+            Порт&nbsp;6
+        </td>
+        <td style="padding-right: 15px;">
+            <div id="chart6" style="width: 100%; height: 250px;"></div>
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 1px; vertical-align: top;">
+            @Html.DevExpress().HyperLink(hl =>
+            {
+                hl.Name = "port7_history";
+                hl.Properties.ImageUrl = Url.Content("~/Images/Sensors/history_x16.png");
+                hl.ToolTip = "История";
+                hl.Properties.Style.Cursor = "pointer";
+                //hl.NavigateUrl = Url.Action("HistoryView", new { controller = "Sensors", devId = 8, portNo = 4 });
+                hl.Properties.ClientSideEvents.Click = "function(s, e) { ShowHistory(7); }";
+                hl.Properties.Target = "blanc";
+            }).GetHtml()
+        </td>
+        <td style="width: 1px; -webkit-transform: rotate(-90deg);  -moz-transform: rotate(-90deg); -ms-transform: rotate(-90deg); -o-transform: rotate(-90deg); transform: rotate(-90deg);">
+            Порт&nbsp;7
+        </td>
+        <td style="padding-right: 15px;">
+            <div id="chart7" style="width: 100%; height: 250px;"></div>
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 1px; vertical-align: top;">
+            @Html.DevExpress().HyperLink(hl =>
+            {
+                hl.Name = "port8_history";
+                hl.Properties.ImageUrl = Url.Content("~/Images/Sensors/history_x16.png");
+                hl.ToolTip = "История";
+                hl.Properties.Style.Cursor = "pointer";
+                //hl.NavigateUrl = Url.Action("HistoryView", new { controller = "Sensors", devId = 8, portNo = 4 });
+                hl.Properties.ClientSideEvents.Click = "function(s, e) { ShowHistory(8); }";
+                hl.Properties.Target = "blanc";
+            }).GetHtml()
+        </td>
+        <td style="width: 1px; -webkit-transform: rotate(-90deg);  -moz-transform: rotate(-90deg); -ms-transform: rotate(-90deg); -o-transform: rotate(-90deg); transform: rotate(-90deg);">
+            Порт&nbsp;8
+        </td>
+        <td style="padding-right: 15px;">
+            <div id="chart8" style="width: 100%; height: 250px;"></div>
+        </td>
+    </tr>
+</table>
+</div>
+
+<script type="text/javascript">
+    //$(function () {
+        var updateInterval = 10000;
+        var in_query = false;
+        var previousPoints = [];
+        var gdata = null;
+
+        for (var i = 0; i < 8; i++) {
+            previousPoints.push(null);
+        }
+
+        function showTooltip(x, y, contents) {
+            $('<div id="tooltip">' + contents + '</div>').css({
+                position: 'absolute',
+                display: 'none',
+                top: y + 5,
+                left: x + 5,
+                border: '1px solid #fdd',
+                padding: '2px',
+                'background-color': '#fee',
+                opacity: 0.80
+            }).appendTo("body").fadeIn(200);
+        }
+
+        function getDataByPort(data, portNo) {
+            var port = [];
+
+            for (var i = 0; i < data.length; i++) {
+                if (data[i]['MessageId' + portNo.toString()] == 0) {
+                    port.push([data[i].JavaScriptTimeStamp, data[i]['Value' + portNo.toString()]]);
+                }
+            }
+            return port;
+        }
+
+        function getMessagesByPort(data, portNo) {
+            var port = [];
+            var points = getDataByPort(data, portNo);
+            var i = 0;
+            var summ = 0;
+
+            if (points.length > 0) {
+                for (i = 0; i < points.length; i++) {
+                    summ += points[i][1];
+                }
+                summ = Math.round(summ / points.length, 2);
+            } else {
+                summ = 0;
+            }
+
+            for (i = 0; i < data.length; i++) {
+                if (data[i]['MessageId' + portNo.toString()] != 0) {
+                    /*if (i == 0 && data.length > 1) {
+                        data[i]['Value' + portNo.toString()] = data[i + 1]['Value' + portNo.toString()];
+                    } else if (i > 0) {
+                        data[i]['Value' + portNo.toString()] = data[i - 1]['Value' + portNo.toString()];
+                    }*/
+                    port.push([data[i].JavaScriptTimeStamp, /*data[i]['Value' + portNo.toString()]*/summ]);
+                }
+            }
+            return port;
+        }
+
+        function getFormattedDate(date) {
+            date.setHours(date.getHours() + (date.getTimezoneOffset() / 60));
+            var then = date.getDate() + '.' + (date.getMonth() + 1) + '.' + date.getFullYear();
+            then += ' ' + date.getHours() + ':' + date.getMinutes();
+            return then;
+        }
+
+        function getFormattedMessage(msgId) {
+            var msgText = '';
+            switch (msgId) {
+                case 240: msgText = 'Вычисленное значение заведомо неверно.'; break;
+                case 241: msgText = 'Ошибка в пакете OWEN, пришел фарш.'; break;
+                case 242: msgText = 'Ошибка CRC пакета OWEN.'; break;
+                case 243: msgText = 'Нет ответа от модуля ввода'; break;
+                case 247: msgText = 'Датчик отключен.';
+                case 248: msgText = 'Велика температура холодного спая.'; break;
+                case 249: msgText = 'Мала температура холодного спая.'; break;
+                case 250: msgText = 'Вычисленное значение слишком велико.'; break;
+                case 251: msgText = 'Вычисленное значение слишком мало.'; break;
+                case 252: msgText = 'Короткое замыкание.'; break;
+                case 253: msgText = 'Обрыв датчика.'; break;
+                case 254: msgText = 'Отсутствие связи с АЦП.'; break;
+                case 255: msgText = 'Некорректный калибровочный коэффициент.'; break;
+            }
+            return msgText;
+        }
+
+        function messageId(datetime, idx) {
+            for (var i = 0; i < gdata.length; i++) {
+                if (gdata[i].JavaScriptTimeStamp == datetime) {
+                    return gdata[i]['MessageId' + (idx + 1).toString()];
+                }
+            }
+            return 0;
+        }
+
+        function setHoverListener(idx) {
+            $("#chart" + (idx + 1).toString()).bind("plothover", function (event, pos, item) {
+                if (item) {
+                    if (previousPoints[idx] != item.dataIndex) {
+                        previousPoints[idx] = item.dataIndex;
+
+                        $("#tooltip").remove();
+                        var x = item.datapoint[0],
+                        y = item.datapoint[1].toFixed(2);
+
+                        var msgId = messageId(x, idx);//gdata[item.dataIndex]['MessageId' + (idx + 1).toString()];
+                        if (msgId == 0) {
+                            showTooltip(item.pageX, item.pageY, getFormattedDate(new Date(x)) + ' <b>' + y + '</b>');
+                        } else {
+                            showTooltip(item.pageX, item.pageY, getFormattedDate(new Date(x)) + ' ' + getFormattedMessage(msgId));
+                        }
+                    }
+                }
+                else {
+                    $("#tooltip").remove();
+                    previousPoints[idx] = null;
+                }
+            });
+        }
+
+        function update() {
+            if (!in_query) {
+                in_query = true;
+                $.getJSON('Logger/GetLastValues', { deviceId: dId, count: 50, tmps: new Date().getTime() }, function (data) {
+                    gdata = data;
+                    if (plot.length == 0) {
+                        for (var i = 0; i < 8; i++) {
+                            var item = $.plot($("#chart" + (i + 1).toString()),
+                            [{
+                                data: getDataByPort(data, i + 1),
+                            },
+                            {
+                                data: getMessagesByPort(data, i + 1),
+                                lines: { show: false },
+                                points: { show: true, symbol: function cross(ctx, x, y, radius, shadow) {
+                                    var size = radius * Math.sqrt(Math.PI) / 2;
+                                    ctx.moveTo(x - size, y - size);
+                                    ctx.lineTo(x + size, y + size);
+                                    ctx.moveTo(x - size, y + size);
+                                    ctx.lineTo(x + size, y - size);
+                                }},
+                                color: "rgb(255, 0, 0)"
+                            }],
+                            {
+                                grid: { clickable: false, hoverable: true },
+                                series: {
+                                    lines: { show: true },
+                                    points: { show: true }
+                                },
+                                xaxis: {
+                                    mode: "time",
+                                    timeformat: "%d.%m.%y<br/>%H:%M"
+                                }
+                            });
+                            plot.push(item);
+                            setHoverListener(i);
+                        }
+                        isPlot = false;
+                    } else {
+                        if (!isPlot) {
+                            for (var i = 0; i < plot.length; i++) {
+                                plot[i].setData([{
+                                    data: getDataByPort(data, i + 1),
+                                },
+                                {
+                                    data: getMessagesByPort(data, i + 1),
+                                    lines: { show: false },
+                                    points: { show: true, symbol: function cross(ctx, x, y, radius, shadow) {
+                                        var size = radius * Math.sqrt(Math.PI) / 2;
+                                        ctx.moveTo(x - size, y - size);
+                                        ctx.lineTo(x + size, y + size);
+                                        ctx.moveTo(x - size, y + size);
+                                        ctx.lineTo(x + size, y - size);
+                                    }},
+                                    color: "rgb(255, 0, 0)"
+                                }]);
+                                plot[i].setupGrid();
+                                plot[i].draw();
+                            }
+                        }
+                    }
+                    in_query = false;
+                });
+            }
+            setTimeout(update, updateInterval);
+        }
+
+        /*dId = gvDeviceList.GetRowKey(1);
+        alert(dId);
+        if (dId != null) {
+            update();
+        }*/
+    //});
+</script>

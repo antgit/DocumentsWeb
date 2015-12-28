@@ -1,0 +1,24 @@
+﻿@using DocumentsWeb.Areas.Agents.Models
+@using DocumentsWeb.Areas.Sales.Models
+@model DocumentSaleModel
+@Html.DevExpress().ComboBox(settings =>{
+    settings.Name = "ManagerId";
+    settings.CallbackRouteValues = new { Controller = Url.RequestContext.RouteData.Values["controller"], Action = "ManagerPartial", modelId = Model.ModelId };
+    settings.Properties.EnableCallbackMode = true;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    settings.Properties.ValueField = "Id";
+    settings.Properties.TextField = "Name";
+    settings.Properties.ValueType = typeof(int);
+    settings.Properties.NullDisplayText = "Выберите менеджера...";
+    EditButton b = settings.Properties.Buttons.Add();
+    b.Image.Url = "~/Images/search_x10.png";
+    b.ToolTip = "Поиск";
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.ClientEnabled = !Model.IsReadOnly;
+    settings.ShowModelErrors = true;
+    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+    settings.Properties.ClientSideEvents.BeginCallback = "function(s, e) { e.customArgs['MainCompanyDepatmentId'] = MainCompanyDepatmentId.GetValue(); e.customArgs['Id'] = " + @Model.Id + "}";
+    settings.Properties.ClientSideEvents.EndCallback = "function(s, e) { s.SetSelectedIndex(-1);}";
+    settings.Properties.ClientSideEvents.ButtonClick = "function(s, e) { switch(e.buttonIndex) { case 0: ShowManagerFinder(); break; } }";
+}).BindList(ClientModel.GetChainSourceList(Model.MainCompanyDepatmentId, Model.ManagerId)).Bind(Model.ManagerId == 0 ? null : (int?)Model.ManagerId).GetHtml()

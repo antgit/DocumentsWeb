@@ -1,0 +1,99 @@
+﻿@using DevExpress.Web.Mvc.UI
+@using System.Web.UI.WebControls
+@using DevExpress.Utils;
+@{    
+    ViewBag.Title = "Мониторинг датчиков";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script type="text/javascript" src="@Url.Content("~/Scripts/jquery.flot.min.js")"></script>
+
+<script type="text/javascript">
+    var plot = [];
+    var isPlot = true;
+    var dId = 0;
+
+    function CollapseActionsPane() {
+        splFullScreenMode.GetPaneByName('actionPane').Collapse(splFullScreenMode.GetPaneByName('DataPane'));
+    }
+
+    function SelectDevice(s, e) {
+        dId = s.GetRowKey(e.visibleIndex);
+        if (dId != null) {
+            update();
+        }
+    }
+
+    function ShowHistory(port) {
+        window.open('Sensors/HistoryView?deviceId=' + dId.toString() + '&portNo=' + port.toString());
+        //window.location = 'Sensors/HistoryView?deviceId=' + dId.toString() + '&portNo=' + port.toString();
+    }
+
+    function ChangePaneSize(s, e) {
+        if (!isPlot) {
+            for (var i = 0; i < plot.length; i++) {
+                plot[i].resize();
+                plot[i].setupGrid();
+                plot[i].draw();
+            }
+        }
+        /*if (plot != undefined) {
+            plot.resize();
+            plot.setupGrid();
+            plot.draw();
+        }*/
+    }
+</script>
+
+@Html.Partial("NavpanelPartial")
+@Html.DevExpress().Splitter(settings =>
+{
+    settings.Name = "splFullScreenMode";
+    settings.Orientation = Orientation.Vertical;
+    settings.Styles.Pane.Paddings.Padding = 0;
+    settings.FullscreenMode = true;
+
+    settings.Panes.Add(contentPane =>
+    {
+        contentPane.ScrollBars = ScrollBars.None;
+        contentPane.Panes.Add(actionsPane =>
+        {
+            actionsPane.Name = "actionPane";
+            actionsPane.AllowResize = DefaultBoolean.True;
+            actionsPane.Size = 270;
+            actionsPane.MinSize = 270;
+            actionsPane.ShowCollapseBackwardButton = DefaultBoolean.True;
+            actionsPane.ScrollBars = ScrollBars.None;
+            actionsPane.SetContent(() =>
+            {
+                Html.RenderPartial("ActionsPartial");
+            });
+        });
+        contentPane.Panes.Add(mapPane =>
+        {
+            mapPane.Name = "DataPane";
+            mapPane.ScrollBars = ScrollBars.None;
+            mapPane.SetContent(() =>
+            {
+                Html.RenderPartial("IndexPartial");
+            });
+        });
+    });
+
+    settings.Panes.Add(footerPane =>
+    {
+        footerPane.Size = 80;
+        footerPane.AllowResize = DefaultBoolean.False;
+        footerPane.ShowSeparatorImage = DefaultBoolean.False;
+        footerPane.SetContent(() =>
+        {
+            @Html.RenderPartial("FooterPartial");
+        });
+    });
+
+    settings.ClientSideEvents.PaneResized = "ChangePaneSize";
+}).GetHtml()
+@*@Html.Partial("PopupWindowPartial", new ViewDataDictionary { 
+    { "Title", "" },
+    { "AutoUpdateGrids", new string[] { "gvZonesList", "gvRoutesList", "gvRouteMemberList" } }
+})*@

@@ -1,0 +1,17 @@
+﻿<table style="width: 100%; padding: 3px;">
+    <tr>
+        <td style="width: 16px;">
+            @Html.DevExpress().Image(img => {
+                img.ImageUrl = Url.Content("~/Images/Routes/report_x16.png");
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().HyperLink(hl =>
+            {
+                hl.Properties.Text = "Пропуски заданий";
+                hl.Properties.Target = "blank";
+                hl.NavigateUrl = Url.Action("RouteSkippingTasks", new { Controller = "Reports" });
+            }).GetHtml()
+        </td>
+    </tr>
+</table>

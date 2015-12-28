@@ -1,0 +1,126 @@
+﻿@using BusinessObjects
+@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DevExpress.Web.ASPxDocking
+@using DocumentsWeb.Models
+@using Unit = System.Web.UI.WebControls.Unit
+@{
+    string gridStyle = "dxgvControl_" + Utils.CurrentTheme;
+    bool IsNdsAllow = WADataProvider.IsUserCompanyHasNds();
+    string HelpDefaultLink = string.Empty;
+    if (ViewData.ContainsKey("HelpDefaultLink"))
+    {
+        HelpDefaultLink = ViewData["HelpDefaultLink"].ToString();
+    }
+}
+@Html.DevExpress().DockManager(
+                                settings => {
+                                                settings.Name = "dockManager";
+                                                //settings.ClientSideEvents.PanelShown = "function(s, e) { SetWidgetButtonVisible(e.panel.panelUID, false) }";
+                                                //settings.ClientSideEvents.PanelCloseUp = "function(s, e) { SetWidgetButtonVisible(e.panel.panelUID, true) }";
+                                                //settings.SaveStateToCookies = true;
+                                                //settings.SaveStateToCookiesID = "ServiceArea_Home";
+                                }
+                                 ).GetHtml()
+<table style="height: 100%;width:100%; border:0; border-spacing:0;">
+    <tr>
+        @*<td align ="left" valign ="top" style="border-right: 3px solid #FFF; width:250px;">*@
+            <td align ="left" valign ="top" style="border-right: 3px solid @gridStyle; width:250px;" class="@gridStyle">
+            @Html.Partial("ActionsPartial", DocumentsWeb.Code.HomePageSection.GetCollectionFinances(false), new ViewDataDictionary { { "SettingsName", "FinancesHome" }, { "GroupNumber", 2 } })
+        </td>
+
+        <td align ="left" valign ="top" >
+            <table style="width: 100%;">
+                <tr>
+                    <td valign="middle" align="center" style="font-size: 14pt;">
+                        <b>Управление финансами</b>
+                        @Html.DevExpress().HyperLink(s =>
+                                       {
+                                           s.ToolTip = "Показать справочную информацию";
+                                           s.Properties.ImageUrl = "~/Images/INFO_X16.png";
+                                           if (string.IsNullOrEmpty(HelpDefaultLink))
+                                               s.NavigateUrl = "javascript:alert('Справочная информация отсутствует!');";
+                                           else
+                                           {
+                                               s.Properties.Target = "_blank";
+                                               s.NavigateUrl = HelpDefaultLink.StartsWith("~/") ? Url.Content(HelpDefaultLink) : HelpDefaultLink;
+                                           }
+                                       }).GetHtml()
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <p>Cоздание документов предприятия связянные финансовой деятельностью. Оплата за товары, оплата входящих счетов, поступление денежных средств.
+                           Если Ваше предприятие является плательшиком НДС используйте раздел 
+                            @Html.DevExpress().HyperLink(s =>
+                            {
+                                s.Name = "lnkFinancesNotNds";
+                                s.NavigateUrl = "~/FinancesNds/Home/";
+                                s.Properties.Text = "\"Управление финансами для плательщиков НДС\"";
+                                s.ToolTip = "Перейти в раздел \"Управление финансами для плательщиков НДС\"";
+                                s.Enabled = (WADataProvider.LibrariesElementRightView.IsAllow(Right.VIEW, WebModuleNames.WEB_DOCFINANCENDS) || User.IsInRole(Uid.GROUP_GROUPWEBADMIN)) & IsNdsAllow;
+                                s.ClientEnabled = s.Enabled;
+                            }).GetHtml()
+                            
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width:100%">
+                        @Html.DevExpress().DockZone(
+        settings => {
+                        settings.Name = "dockZone1";
+                        settings.ZoneUID = "leftZone";
+                        settings.ControlStyle.CssClass = "leftZone";
+                        settings.Width = Unit.Percentage(100);
+                        settings.PanelSpacing = 3;
+        }
+         ).GetHtml()
+                    </td>
+                </tr>
+            </table>
+        </td>
+
+        <td valign="top" style="border-left: 3px solid @gridStyle; width:250px;" class="@gridStyle" >
+            @Html.Partial("ReportsPartial")
+        </td>
+    </tr>
+</table>    
+
+@Html.DevExpress().DockPanel(
+    settings => {
+                    settings.Name = "rpFinanceIn";
+                    settings.PanelUID = "UIDFinanceIn";
+                    settings.CallbackRouteValues = new { Controller = "Home", Action = "ViewBoardFinanceInPartial" };
+                    settings.OwnerZoneUID = "leftZone";
+                    settings.HeaderText = "Входящие оплаты";
+                    settings.VisibleIndex = 0;
+                    settings.ShowCloseButton = false;
+                    settings.SaveStateToCookies = true;
+                    settings.SaveStateToCookiesID = "HomePageFinanceCoocies" + settings.PanelUID;
+                    settings.LoadContentViaCallback = LoadPanelContentViaCallback.None;
+                    settings.ShowOnPageLoad = WADataProvider.FolderElementRightView.IsAllow(Right.DOCVIEW, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_FINANCE_IN).Id);
+                    settings.Enabled = WADataProvider.FolderElementRightView.IsAllow(Right.DOCVIEW, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_FINANCE_IN).Id);
+                    settings.SetContent(() =>ViewContext.Writer.Write(Html.Partial("ViewBoardFinanceInPartial")));
+                    settings.Styles.Content.Paddings.Padding = 0;
+    }
+        ).GetHtml()
+
+@Html.DevExpress().DockPanel(
+    settings => {
+                    settings.Name = "rpFinanceOut";
+                    settings.PanelUID = "UIDFinanceOut";
+                    settings.CallbackRouteValues = new { Controller = "Home", Action = "ViewBoardFinanceOutPartial" };
+                    settings.OwnerZoneUID = "leftZone";
+                    settings.HeaderText = "Исходящие оплаты";
+                    settings.VisibleIndex = 1;
+                    settings.ShowCloseButton = false;
+                    settings.SaveStateToCookies = true;
+                    settings.SaveStateToCookiesID = "HomePageFinanceCoocies" + settings.PanelUID;
+                    settings.LoadContentViaCallback = LoadPanelContentViaCallback.None;
+                    settings.ShowOnPageLoad = WADataProvider.FolderElementRightView.IsAllow(Right.DOCVIEW, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_FINANCE_OUT).Id);
+                    settings.Enabled = WADataProvider.FolderElementRightView.IsAllow(Right.DOCVIEW, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_FINANCE_OUT).Id);
+                    settings.SetContent(() =>ViewContext.Writer.Write(Html.Partial("ViewBoardFinanceOutPartial")));
+                    settings.Styles.Content.Paddings.Padding = 0;
+    }
+        ).GetHtml()

@@ -1,0 +1,280 @@
+﻿@model DocumentsWeb.Areas.Kb.Models.TaskModel
+@using DocumentsWeb.Areas.Analitics.Models
+
+
+<table class="edit_form_table">
+    <tr>
+        <td colspan="4">                       
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "Name";
+                settings.Properties.Style.Font.Bold = true;
+            }).Bind(Model.Name).GetHtml() 
+            <hr />
+        </td>
+        
+    </tr>
+
+
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Text = "Автор:";
+                settings.AssociatedControlName = "UserOwnerId";
+            }).GetHtml()
+        </td>
+        <td colspan="3">                       
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "UserOwnerId";
+                settings.Properties.Style.Font.Bold = true;
+            }).Bind(Model.AgentOwnerName).GetHtml() 
+        </td>
+    </tr>
+
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Text = "Исполнитель:";
+                settings.AssociatedControlName = "UserToId";
+            }).GetHtml()
+        </td>
+        <td colspan="3">                       
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "UserToId";
+                settings.Properties.Style.Font.Bold = true;
+            }).Bind(Model.AgentToName).GetHtml() 
+        </td>
+    </tr>
+    <tr>
+        <td colspan="4"><hr /></td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Text = "Состояние:";
+                settings.AssociatedControlName = "TaskStateId";
+            }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "TaskStateId";
+                settings.Properties.Style.Font.Bold = true;
+            }).Bind(AnaliticModel.GetObject(Model.TaskStateId).Name).GetHtml() 
+        </td>
+
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Text = "Приоритет:";
+                settings.AssociatedControlName = "PriorityId";
+            }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "PriorityId";
+                settings.Properties.Style.Font.Bold = true;
+            }).Bind(AnaliticModel.GetObject(Model.PriorityId).Name).GetHtml() 
+        </td>
+    </tr>
+
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Text = "Дата план начала";
+                settings.AssociatedControlName = "DateStartPlan";
+            }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "DateStartPlan";
+                settings.Properties.Style.Font.Bold = true;
+            }).Bind(Model.DateStartPlan.HasValue ? Model.DateStartPlan.Value.ToString("d") : "").GetHtml()
+        </td>
+
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Text = "Время план начала:";
+                settings.AssociatedControlName = "DateStartPlanTimeAsDate";
+            }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "DateStartPlanTimeAsDate";
+                settings.Properties.Style.Font.Bold = true;
+            }).Bind(Model.DateStartPlanTimeAsDate.HasValue ? Model.DateStartPlanTimeAsDate.Value.ToString("t") : "").GetHtml() 
+        </td>
+    </tr>
+
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Text = "Дата план завершения:";
+                settings.AssociatedControlName = "DateEndPlan";
+            }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "DateEndPlan";
+                settings.Properties.Style.Font.Bold = true;
+            }).Bind(Model.DateEndPlan.HasValue ? Model.DateEndPlan.Value.ToString("d") : "").GetHtml() 
+        </td>
+
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Text = "Время план завершения:";
+                settings.AssociatedControlName = "DateEndPlanTimeAsDate";
+            }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "DateEndPlanTimeAsDate";
+                settings.Properties.Style.Font.Bold = true;
+            }).Bind(Model.DateEndPlanTimeAsDate.HasValue ? Model.DateEndPlanTimeAsDate.Value.ToString("t") : "").GetHtml() 
+        </td>
+    </tr>
+
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Text = "Дата начала:";
+                settings.AssociatedControlName = "DateStart";
+            }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "DateStart";
+                settings.Properties.Style.Font.Bold = true;
+            }).Bind(Model.DateStart.HasValue ? Model.DateStart.Value.ToString("d") : "").GetHtml() 
+        </td>
+
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Text = "Время начала:";
+                settings.AssociatedControlName = "DateStartTimeAsDate";
+            }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "DateStartTimeAsDate";
+                settings.Properties.Style.Font.Bold = true;
+            }).Bind(Model.DateStartTimeAsDate.HasValue ? Model.DateStartTimeAsDate.Value.ToString("t") : "").GetHtml() 
+        </td>
+    </tr>
+        
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Text = "Дата завершения:";
+                settings.AssociatedControlName = "DateEnd";
+            }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "DateEnd";
+                settings.Properties.Style.Font.Bold = true;
+            }).Bind(Model.DateEnd.HasValue ? Model.DateEnd.Value.ToString("d") : "").GetHtml() 
+            
+        </td>
+
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Text = "Время завершения:";
+                settings.AssociatedControlName = "DateEndTimeAsDate";
+            }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "DateEndTimeAsDate";
+                settings.Properties.Style.Font.Bold = true;
+            }).Bind(Model.DateEndTimeAsDate.HasValue ? Model.DateEndTimeAsDate.Value.ToString("t") : "").GetHtml() 
+        </td>
+    </tr>
+    
+    <tr>
+        <td colspan="4"><hr /></td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Text = "Номер:";
+                settings.AssociatedControlName = "TaskNumber";
+            }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "TaskNumber";
+                settings.Properties.Style.Font.Bold = true;
+            }).Bind(Model.TaskNumber).GetHtml() 
+        </td>
+
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Text = "% выполения:";
+                settings.AssociatedControlName = "DonePersent";
+            }).GetHtml()
+        </td>
+        <td>                       
+            @Html.DevExpress().Label(settings =>
+            {
+                settings.Name = "DonePersent";
+                settings.Properties.Style.Font.Bold = true;
+            }).Bind(Model.DonePersent).GetHtml()
+        </td>
+    </tr>
+
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(settings=>
+            {
+                settings.Text = "Видна только автору";
+                settings.AssociatedControlName = "InPrivate";
+            }).GetHtml()
+        </td>
+        <td colspan="3">                       
+            @Html.DevExpress().CheckBox(settings =>
+            {
+                settings.Name = "InPrivate";
+                settings.ReadOnly = true;
+            }).Bind(Model.InPrivate).GetHtml() 
+        </td>
+    </tr>
+
+    <tr>
+        
+        <td colspan="4">
+            <hr />                       
+            @Html.DevExpress().Label(settings =>
+                                   {
+                                       settings.Name = "Memo";
+                                       settings.EncodeHtml = false;
+                                   }).Bind(Model.Memo).GetHtml() 
+            <hr />
+        </td>
+    </tr>
+</table>

@@ -1,0 +1,51 @@
+using System;
+using System.Data;
+using System.Configuration;
+using System.Collections;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Web.UI.HtmlControls;
+using Stimulsoft.Report.Web;
+
+public partial class CustomizeWebDesignerFx : System.Web.UI.Page
+{
+    protected override void OnPreInit(EventArgs e)
+    {
+        StiWebDesignerOptions.Toolbar.ShowCodeTab = true;
+        StiWebDesignerOptions.MainMenu.ShowExitButton = false;
+        StiWebDesignerOptions.MainMenu.ShowPreview = false;
+        StiWebDesignerOptions.MainMenu.ShowDeletePage = false;
+        StiWebDesignerOptions.Toolbar.Zoom = StiWebDesignerOptions.StiZoomMode.PageWidth;
+
+        base.OnPreInit(e);
+    }
+
+
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        StiWebDesigner1.Design();
+    }
+
+
+    // Save Report
+    protected void StiWebDesigner1_SaveReport(object sender, StiWebDesigner.StiSaveReportEventArgs e)
+    {
+        // Web Designer return StiReport class in e.Report
+
+        // You can set an error code which will be displayed by the designer after saving
+        // e.ErrorCode = 1;
+        
+        // -1: default value, the message is not displayed
+        // 0: display 'Report is successfully saved' message
+    }
+
+
+    // User DataSet for preview report in Web Designer
+    protected void StiWebDesigner1_GetPreviewDataSet(object sender, StiWebDesigner.StiPreviewDataSetEventArgs e)
+    {
+        //e.PreviewDataSet = myDataSet;
+    }
+}

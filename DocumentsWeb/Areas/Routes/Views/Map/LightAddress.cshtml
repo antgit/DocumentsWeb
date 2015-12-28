@@ -1,0 +1,215 @@
+﻿@using BusinessObjects
+@using DocumentsWeb.Models
+@using DocumentsWeb.Areas.Agents.Models
+@model AgentAddressModel
+
+@{ 
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("LightAddress", "Map", FormMethod.Post, new { @class = "edit_form", @id = "editForm" }))
+{
+    <b>Адрес:</b>
+    <input type="hidden" id="Id" name="Id" value="@Model.Id" />
+    <input type="hidden" id="OwnId" name="OwnId" value="@Model.OwnId" />
+    <table style="width: 100%; height: 100%;">
+        <tr>
+            <td class="table_label">
+                @Html.DevExpress().Label(edtSettings =>
+           {
+               edtSettings.ControlStyle.CssClass = "label";
+               edtSettings.Text = "Страна:";
+               edtSettings.AssociatedControlName = "CountryId";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().ComboBox(edtSettings =>
+           {
+               edtSettings.Name = "CountryId";
+               edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+               edtSettings.Properties.ValueField = "Id";
+               edtSettings.Properties.TextField = "Name";
+               edtSettings.Properties.ValueType = typeof(int);
+               edtSettings.Properties.NullDisplayText = "Выберите страну...";
+               edtSettings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+               //edtSettings.Properties.FilterMinLength = 2;
+               edtSettings.ControlStyle.CssClass = "editor";
+               edtSettings.ShowModelErrors = true;
+               edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+               edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+               //edtSettings.Properties.ClientSideEvents.SelectedIndexChanged = "function(s,e){ TerritoryId.PerformCallback(); TownId.SetSelectedIndex(-1); }";
+               edtSettings.Properties.ClientSideEvents.ValueChanged = "function(s,e){ TerritoryId.PerformCallback(); }";
+           }).BindList(DocumentsWeb.Models.WADataProvider.GetCountries()).Bind(Model.CountryId == 0 ? null : (int?)Model.CountryId).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td class="table_label">
+                @Html.DevExpress().Label(edtSettings =>
+           {
+               edtSettings.ControlStyle.CssClass = "label";
+               edtSettings.Text = "Регион:";
+               edtSettings.AssociatedControlName = "TerritoryId";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.Partial("cmbTerritoryPartial", new ViewDataDictionary { { "CountryId", Model.CountryId }, { "TerritoryId", Model.TerritoryId } })
+            </td>
+        </tr>
+        <tr>
+            <td class="table_label">
+                @Html.DevExpress().Label(edtSettings =>
+           {
+               edtSettings.ControlStyle.CssClass = "label";
+               edtSettings.Text = "Район:";
+               edtSettings.AssociatedControlName = "RegionId";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.Partial("cmbRegionPartial", new ViewDataDictionary { { "TerritoryId", Model.TerritoryId }, { "RegionId", Model.RegionId } })
+            </td>
+        </tr>
+        <tr>
+            <td class="table_label">
+                @Html.DevExpress().Label(edtSettings =>
+           {
+               edtSettings.ControlStyle.CssClass = "label";
+               edtSettings.Text = "Город:";
+               edtSettings.AssociatedControlName = "TownId";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.Partial("cmbTownPartial", new ViewDataDictionary { { "TerritoryId", Model.TerritoryId }, { "RegionId", Model.RegionId }, { "TownId", Model.TownId } })
+            </td>
+        </tr>
+
+         <tr>
+            <td class="table_label">
+                @Html.DevExpress().Label(edtSettings =>
+           {
+               edtSettings.ControlStyle.CssClass = "label";
+               edtSettings.Text = "Индекс:";
+               edtSettings.AssociatedControlName = "PostIndex";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().TextBox(edtSettings =>
+           {
+               edtSettings.Name = "PostIndex";
+               edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+               edtSettings.Properties.NullDisplayText = "Введите индекс...";
+               edtSettings.ControlStyle.CssClass = "editor";
+               edtSettings.ShowModelErrors = true;
+               edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+               edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+           }).Bind(Model.PostIndex).GetHtml()
+            </td>
+        </tr>
+
+        <tr>
+            <td class="table_label">
+                @Html.DevExpress().Label(edtSettings =>
+           {
+               edtSettings.ControlStyle.CssClass = "label";
+               edtSettings.Text = "Улица:";
+               edtSettings.AssociatedControlName = "StreetName";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.Partial("cmbStreetPartial", new ViewDataDictionary { { "StreetName", Model.StreetName }, { "TownId", Model.TownId } })
+            </td>
+        </tr>
+
+        <tr>
+            <td class="table_label">
+                @Html.DevExpress().Label(edtSettings =>
+           {
+               edtSettings.ControlStyle.CssClass = "label";
+               edtSettings.Text = "Дом:";
+               edtSettings.AssociatedControlName = "HouseNumber";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().TextBox(edtSettings =>
+           {
+               edtSettings.Name = "HouseNumber";
+               edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+               edtSettings.Properties.NullDisplayText = "Введите номер дома...";
+               edtSettings.ControlStyle.CssClass = "editor";
+               edtSettings.ShowModelErrors = true;
+               edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+               edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+           }).Bind(Model.HouseNumber).GetHtml()
+            </td>
+        </tr>
+
+        <tr>
+            <td class="table_label">
+                @Html.DevExpress().Label(edtSettings =>
+           {
+               edtSettings.ControlStyle.CssClass = "label";
+               edtSettings.Text = "Широта:";
+               edtSettings.AssociatedControlName = "X";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().SpinEdit(edtSettings =>
+           {
+               edtSettings.Name = "X";
+               edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+               edtSettings.Properties.NullDisplayText = "Выберите координату X...";
+               edtSettings.ControlStyle.CssClass = "editor";
+               edtSettings.ShowModelErrors = true;
+               edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+               edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+               edtSettings.ReadOnly = true;
+           }).Bind(Model.X).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td class="table_label">
+                @Html.DevExpress().Label(edtSettings =>
+           {
+               edtSettings.ControlStyle.CssClass = "label";
+               edtSettings.Text = "Долгота:";
+               edtSettings.AssociatedControlName = "Y";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().SpinEdit(edtSettings =>
+           {
+               edtSettings.Name = "Y";
+               edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+               edtSettings.Properties.NullDisplayText = "Выберите координату Y...";
+               edtSettings.ControlStyle.CssClass = "editor";
+               edtSettings.ShowModelErrors = true;
+               edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+               edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+               edtSettings.ReadOnly = true;
+           }).Bind(Model.Y).GetHtml()
+            </td>
+        </tr>
+        <tr>
+            <td class="table_label">
+                @Html.DevExpress().Label(edtSettings =>
+           {
+               edtSettings.ControlStyle.CssClass = "label";
+               edtSettings.Text = "Радиус зоны:";
+               edtSettings.AssociatedControlName = "ZoneRadius";
+           }).GetHtml()
+            </td>
+            <td>
+                @Html.DevExpress().SpinEdit(edtSettings =>
+           {
+               edtSettings.Name = "ZoneRadius";
+               edtSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+               edtSettings.Properties.NullDisplayText = "Укажите радиус зоны в метрах ...";
+               edtSettings.ControlStyle.CssClass = "editor";
+               edtSettings.ShowModelErrors = true;
+               edtSettings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+               edtSettings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+               edtSettings.ReadOnly = true;
+           }).Bind(Model.ZoneRadius).GetHtml()
+            </td>
+        </tr>
+    </table>
+}

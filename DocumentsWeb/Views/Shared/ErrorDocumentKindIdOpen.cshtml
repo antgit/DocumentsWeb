@@ -1,0 +1,38 @@
+﻿@{ Layout = "~/Views/Shared/_Layout.cshtml"; } 
+
+@model System.Web.Mvc.HandleErrorInfo
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Нарушение системы разрешений</title>
+    <style type="text/css">
+        body 
+        {
+            text-align: center;
+            vertical-align: middle;
+        }
+        .style1
+        {
+            color: #CC3300;
+        }
+        .style2
+        {
+            width: 250px;
+            height: 282px;
+        }
+        </style>
+</head>
+<body>
+    <h1 class="style1">
+        Извините, но Вы пытаетесь открыть документ в форме редактироваеия или просмотра не предназначенной для данного вида документов.
+    </h1>
+    <p class="style1"><strong>Контроллер:</strong> @Model.ControllerName</p>
+    <p class="style1"><strong>Действие:</strong> @Model.ActionName</p>
+    <p class="style1"> <strong>Сообщение:</strong> @Model.Exception.Message</p>
+     <p class="style1">
+        <img alt="Нарушение системы безопасности" class="style2" 
+             src=@Url.Content("~/Images/SECURESHILDS.png") /></p>
+</body>
+</html>
+

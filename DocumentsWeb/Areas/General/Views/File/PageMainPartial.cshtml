@@ -1,0 +1,118 @@
+﻿@model DocumentsWeb.Areas.General.Models.FileDataModel
+<table class="edit_form_table2">
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>
+            {
+                //s.ControlStyle.CssClass = "label";
+                s.Text = "Тема:";
+                s.AssociatedControlName = "Theme";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = "Theme";
+                s.Properties.NullDisplayText = "Введите тему";
+                //s.ControlStyle.CssClass = "editor2";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.Theme).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>
+            {
+                //s.ControlStyle.CssClass = "label";
+                s.Text = "Категория:";
+                s.AssociatedControlName = "Category";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = "Category";
+                s.Properties.NullDisplayText = "Введите категорию";
+                //s.ControlStyle.CssClass = "editor2";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.Category).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>
+            {
+                //s.ControlStyle.CssClass = "label";
+                s.Text = "Содержимое:";
+                s.AssociatedControlName = "ContentType";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBox(s =>
+            {
+                s.Name = "ContentType";
+                s.Properties.NullDisplayText = "Введите тип содержимого";
+                //s.ControlStyle.CssClass = "editor2";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.ContentType).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            @Html.DevExpress().UploadControl(s =>
+            {
+                s.Name = "ucMultiSelection";
+                s.CallbackRouteValues = new { Controller = "File", Action = "FileUpload", rowId = Model.RowId };
+                //s.ControlStyle.CssClass = "editorArea";
+                s.Width = System.Web.UI.WebControls.Unit.Pixel(380);
+                //s.AdvancedModeSettings.EnableMultiSelect = true;
+                s.ValidationSettings.Assign(DocumentsWeb.Areas.Contracts.Controllers.ContractController.ValidationSettings);
+                s.Style.Add("float", "left");
+                s.Style.Add("margin", "5px");
+                s.Height = 20;
+                s.ClientSideEvents.TextChanged = "function(s, e) { btnUpload.SetEnabled(ucMultiSelection.GetText(0) != \"\"); }";
+                s.ClientSideEvents.FilesUploadComplete = "function(s,e) { gvFileVersions.PerformCallback(); }";
+            }).GetHtml()
+            @Html.DevExpress().Button(s =>
+            {
+                s.Name = "btnUpload";
+                s.Text = "Загрузить";
+                s.Style.Add("padding", "5px");
+                s.Height = 15;
+                s.ClientEnabled = false;
+                s.ClientSideEvents.Click = "function(s,e) { ucMultiSelection.Upload(); }";
+            }).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>
+            {
+                //s.ControlStyle.CssClass = "label";
+                s.Text = "Разрешить версии:";
+                s.AssociatedControlName = "AllowVersion";
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().CheckBox(s =>
+            {
+                s.Name = "AllowVersion";
+                s.ControlStyle.CssClass = "checkEditor";
+                s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                s.ShowModelErrors = true;
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+                s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.AllowVersion).GetHtml()
+        </td>
+    </tr>
+</table>
+@Html.Partial("FileVersionsPartial", Model)

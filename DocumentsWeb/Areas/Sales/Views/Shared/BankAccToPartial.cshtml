@@ -1,0 +1,22 @@
+﻿ @model DocumentsWeb.Areas.Sales.Models.DocumentSaleModel
+ @using DocumentsWeb.Areas.Agents.Models
+ @Html.DevExpress().ComboBox(settings =>{
+    settings.Name = "MainCompanyAccountId";
+    settings.ToolTip = "Выберите расчетный счет из списка доступных р./с. Данные зависят от выбранного предприятия от лица которого регестрируется документ в системе";
+    settings.CallbackRouteValues = new { Controller = Url.RequestContext.RouteData.Values["controller"], Action = "BankAccToPartial", modelId = Model.ModelId };
+    settings.Properties.EnableCallbackMode = true;
+    //settings.Properties.CallbackPageSize = 20;
+    settings.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+    settings.Properties.ValueField = "Id";
+    settings.Properties.TextField = "Name";
+    settings.Properties.ValueType = typeof(int);
+    settings.Properties.NullDisplayText = "Выберите р/с...";
+    //settings.ControlStyle.CssClass = "editor";
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.ClientEnabled = !Model.IsReadOnly;
+    settings.ShowModelErrors = true;
+    settings.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithText;
+    settings.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+    settings.Properties.ClientSideEvents.BeginCallback = "function(s, e) { e.customArgs['MainCompanyDepatmentId'] = MainCompanyDepatmentId.GetValue();}";
+    settings.Properties.ClientSideEvents.EndCallback = "function(s, e) { s.SetSelectedIndex(-1);}";
+}).BindList(ClientModel.GetAccounts(Model.MainCompanyDepatmentId)).BindList(ClientModel.GetAccountsByValue(Model.MainCompanyAccountId)).Bind(Model.MainCompanyAccountId).GetHtml()

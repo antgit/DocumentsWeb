@@ -1,0 +1,23 @@
+﻿@using BusinessObjects
+@using DocumentsWeb.Models
+@using DevExpress.Web.Mvc
+@using DevExpress.Web.Mvc.UI
+@*model ClientModel*@
+
+<h2>Редактирование завершено</h2>
+Закройте окно
+<input type="hidden" name="Id" id="Id" value="@Model.Id" />
+<input type="hidden" name="Name" id="Name" value="@Model.Name" />
+<input type="hidden" name="SaveFlag" id="SaveFlag" value="1" />
+
+<script type="text/javascript" language="javascript">
+    if (typeof parent.pcEdit != 'undefined') {
+        parent.pcEdit.Hide();
+    }
+    if (typeof parent.pcEditTimePeriodId != 'undefined') {
+        parent.pcEditTimePeriodId.Hide();
+    }
+    if (typeof parent.pcEditBreakPeriodId != 'undefined') {
+        parent.pcEditBreakPeriodId.Hide();
+    }
+</script>

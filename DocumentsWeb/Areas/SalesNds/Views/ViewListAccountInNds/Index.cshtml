@@ -1,0 +1,155 @@
+﻿@using System.Web.UI.WebControls
+@using BusinessObjects
+@using DocumentsWeb.Models
+@using Unit = System.Web.UI.WebControls.Unit
+@{
+    ViewBag.Title = "Управление продажами - входящие счета";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    bool haveCreate = WADataProvider.FolderElementRightView.IsAllow(BusinessObjects.Security.Right.DOCCREATE, WADataProvider.WA.GetFolderByCodeFind(Folder.CODE_FIND_SALES_ACCOUNT_IN).Id);
+}
+@Html.Partial("NavpanelPartial")
+@Html.DevExpress().Splitter(settings =>
+{
+    settings.Name = "splFullScreenMode";
+    settings.Orientation = Orientation.Vertical;
+    settings.Styles.Pane.Paddings.Padding = 0;
+    settings.FullscreenMode = true;
+    settings.Panes.Add(contentPane =>
+    {
+        contentPane.SetContent(() =>
+        {
+            @Html.DevExpress().Splitter(dpane =>
+            {
+                dpane.Name = "splDocsActions";
+                dpane.Orientation = Orientation.Vertical;
+                dpane.Styles.Pane.Paddings.Padding = 0;
+                dpane.Width = Unit.Percentage(100);
+                dpane.Height = Unit.Percentage(100);
+                dpane.Orientation = Orientation.Horizontal;
+                dpane.AllowResize = false;
+                dpane.Panes.Add(actionsPane =>
+                {
+
+                    actionsPane.Name = "ActionPane";
+                    actionsPane.Size = 270;
+                    actionsPane.ShowCollapseBackwardButton = DefaultBoolean.True;
+                    actionsPane.SetContent(() => Html.RenderPartial("ActionsPartial"));
+                });
+                dpane.Panes.Add(cPane =>
+                {
+                    cPane.Name = "GridPane";
+
+                    cPane.SetContent(() => @Html.RenderPartial("IndexPartial"));
+                });
+                dpane.ClientSideEvents.PaneResized = "function (s, e) { window.setTimeout(adjustSize, 12); }";
+            }).Render();
+        });
+    });
+
+    settings.Panes.Add(footerPane =>
+    {
+        footerPane.Size = 80;
+        footerPane.AllowResize = DefaultBoolean.False;
+        footerPane.ShowSeparatorImage = DefaultBoolean.False;
+        footerPane.SetContent(() => @Html.RenderPartial("FooterPartial"));
+    });
+}).GetHtml()
+
+<script type="text/javascript">
+    var mouse_x = 0;
+    var mouse_y = 0;
+
+    var item_id = 0;
+    var item_kind = '';
+
+    _aspxAttachEventToElement(window, "load", function () {
+        timeoutId = setTimeout(RefreshAllGridView, 20);
+    });
+
+    $(document).mousemove(function (e) {
+        mouse_x = e.pageX;
+        mouse_y = e.pageY;
+    });
+
+    function RefreshAllGridView() {
+        gvSalesDocuments.ApplyFilter('StateId = 1');
+        var a = nbFeatures.GetItemByName('mnuFilterActive');
+        if (a != null) nbFeatures.SetSelectedItem(a);
+        gvSalesDocuments.SetVisible(true);
+        //gvSalesDocuments.PerformCallback();
+
+    }
+    function adjustSize() {
+        var height = splDocsActions.GetPaneByName('GridPane').GetClientHeight();
+        var w = splDocsActions.GetPaneByName('GridPane').GetClientWidth();
+        gvSalesDocuments.SetHeight(height);
+        gvSalesDocuments.SetWidth(w);
+    }
+    //function showMyCompanyProperty() {
+    //        $.ajax({ type: "POST", url: '/dgmz/Agents/MyDepatment', data: null, success:
+    //                function (result)
+    //                {
+    //                    //ShowPopupEdit(-1);
+    //                }, 
+    //            error: function (req, status, error) { } 
+    //        });
+    //}
+
+    function moveToAgent(id, kind) {
+        mywindow = window.open('@Url.Content("~/Agents/Home/EditAgent?Id=")' + id + '&kind=' + kind);
+        //var grid = mywindow.window.document.getElementsByName('dxGridViewAgents');
+        //grid.SelectRowsByKey(id);
+
+    }
+
+    function editAgent(id, kind) {
+        pcEdit.SetCaption('');
+        pcEdit.Load('@DevExpressHelper.GetUrl(new { Area = "Agents", Controller = "Home", Action = "PopupEditAgent" })/' + id + '?kind=' + kind, 700, 520);
+    }
+
+    function popupVariants(id, kind) {
+        item_id = id;
+        item_kind = kind;
+        PopupMenu.ShowAtPos(mouse_x, mouse_y);
+    }
+</script>
+
+@Html.Partial("PopupWindowPartial", new ViewDataDictionary { 
+    { "Title", "" },
+    { "AutoUpdateGrids", new string[] { "gvSalesDocuments" } }
+})
+
+@Html.DevExpress().PopupControl(pMenu => {
+    pMenu.Name = "PopupMenu";
+    pMenu.PopupHorizontalAlign = PopupHorizontalAlign.OutsideRight;
+    pMenu.PopupVerticalAlign = PopupVerticalAlign.Below;
+    pMenu.ShowHeader = false;
+    pMenu.ShowFooter = false;
+    pMenu.ShowShadow = true;
+    pMenu.Modal = false;
+    pMenu.CloseAction = CloseAction.OuterMouseClick;
+    pMenu.SetContent(() =>
+    {
+        ViewContext.Writer.Write("<table>");
+        ViewContext.Writer.Write("<tr><td>");
+        Html.DevExpress().HyperLink(hl => {
+            hl.Name = "MoveToAgentLink";
+            hl.Properties.Text = "Перейти к корреспонденту";
+            hl.NavigateUrl = "javascript:void(0);";
+            hl.Properties.ClientSideEvents.Click = "function (s, e) { moveToAgent(item_id, item_kind); PopupMenu.SetVisible(false); }";
+        }).Render();
+        ViewContext.Writer.Write("</td></tr>");
+        
+        ViewContext.Writer.Write("<tr><td>");
+        Html.DevExpress().HyperLink(hl =>
+        {
+            hl.Name = "EditAgentLink";
+            hl.Properties.Text = "Редактировать здесь";
+            hl.NavigateUrl = "javascript:void(0);";
+            hl.Properties.ClientSideEvents.Click = "function (s, e) { editAgent(item_id, item_kind);  PopupMenu.SetVisible(false);}";
+        }).Render();
+        ViewContext.Writer.Write("</td></tr>");
+        ViewContext.Writer.Write("</table>");
+    });
+}).GetHtml()
+       

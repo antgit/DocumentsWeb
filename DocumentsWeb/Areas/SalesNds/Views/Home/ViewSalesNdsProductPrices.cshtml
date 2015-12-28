@@ -1,0 +1,64 @@
+﻿@using DevExpress.Web.Mvc.UI
+@using System.Web.UI.WebControls
+@{
+    ViewBag.Title = "Цены...";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script type="text/javascript">
+    _aspxAttachEventToElement(window, "resize", function() {
+        adjustSize();
+    });
+    function adjustSize() {
+        var height = Math.max(0, document.documentElement.clientHeight);
+        gvSaleNdsProductPrices.SetHeight(height);
+    }
+    function ShowProductProperty(id) {
+            ShowPopupEdit(id);
+        };
+
+        function ShowPopupEdit(id) {
+
+            pcEdit.Load('@DevExpressHelper.GetUrl(new { Controller = "Product", Action = "Edit", Area = "Products" })?Id=' + id, 700, 570);
+    }
+    function OnPopupClosing() {
+        ASPxClientEdit.ClearEditorsInContainer(null, '', true); 
+    }
+</script>
+
+@Html.Partial("NavpanelPartial")
+@Html.DevExpress().Splitter(settings =>
+{
+    settings.Name = "splFullScreenMode";
+    settings.Orientation = Orientation.Vertical;
+    settings.Styles.Pane.Paddings.Padding = 0;
+    settings.FullscreenMode = true;
+
+    settings.Panes.Add(contentPane =>
+    {
+        contentPane.SetContent(() =>
+        {
+            @Html.RenderPartial("ViewSalesNdsProductPricesPartial");
+        });
+    });
+
+    settings.Panes.Add(footerPane =>
+    {
+        footerPane.Size = 80;
+        footerPane.AllowResize = DefaultBoolean.False;
+        footerPane.ShowSeparatorImage = DefaultBoolean.False;
+        footerPane.SetContent(() =>
+        {
+            @Html.RenderPartial("FooterPartial");
+        });
+    });
+}).GetHtml()
+
+@Html.Partial("PopupWindowPartial", new ViewDataDictionary { 
+    { "Title", "Товар" },
+    { "AutoUpdateGrids", new string[] { "gvSaleNdsProductPrices" } },
+    { "OnClosing", "OnPopupClosing"}
+})
+
+
+

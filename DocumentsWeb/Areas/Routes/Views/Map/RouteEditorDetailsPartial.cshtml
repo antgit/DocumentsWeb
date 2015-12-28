@@ -1,0 +1,203 @@
+﻿@using DocumentsWeb.Areas.Routes.Models
+@model RouteTemplateModel
+
+@{
+    List<RouteTemplateDetailModel> list = Model.Details.Where(w => w.StateId != BusinessObjects.State.STATEDELETED).ToList();
+}
+
+@Html.DevExpress().GridView(s =>
+{
+    s.Name = "gvRouteEditorDetails";
+    s.CallbackRouteValues = new { Controller = "Map", Action = "RouteEditorDetailsPartial", mId = Model.ModelId };
+
+    s.SettingsEditing.AddNewRowRouteValues = new { Area = "Routes", Controller = "Map", Action = "AddZonePartial", mId = Model.ModelId };
+    s.SettingsEditing.UpdateRowRouteValues = new { Area = "Routes", Controller = "Map", Action = "UpdateZonePartial", mId = Model.ModelId };
+    s.SettingsEditing.DeleteRowRouteValues = new { Area = "Routes", Controller = "Map", Action = "DeleteZonePartial", mId = Model.ModelId };
+
+    s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+
+    s.Settings.ShowVerticalScrollBar = true;
+    s.Settings.VerticalScrollableHeight = 250;
+
+    s.SettingsPager.Mode = GridViewPagerMode.ShowAllRecords;
+    s.SettingsBehavior.AllowGroup = false;
+    s.SettingsBehavior.AllowSort = false;
+
+
+    s.Settings.ShowTitlePanel = true;
+    s.SetTitlePanelTemplateContent(c =>
+    {
+        ViewContext.Writer.Write("<div style=\"width: 100%; text-align: center; font-size: 10pt;\"><a href=\"javascript:gvRouteEditorDetails.AddNewRow();\">Создать</a></div>");
+    });
+
+    s.KeyFieldName = "RowId";
+
+    s.Columns.Add(col =>
+    {
+        col.Name = "colEdit";
+        col.Caption = "";
+        col.Width = 40;
+        col.CellStyle.Paddings.Padding = 2;
+        col.CellStyle.Paddings.PaddingTop = 4;
+        col.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Middle;
+        col.SetDataItemTemplateContent(c =>
+        {
+            Html.DevExpress().Image(img =>
+            {
+                img.Name = "EditPoint" + c.VisibleIndex.ToString();
+                img.ImageUrl = Url.Content("~/Images/Routes/edit_x16.png");
+                img.ControlStyle.Cursor = "Pointer";
+                img.ToolTip = "Изменить";
+                img.Properties.ClientSideEvents.Click = "function(s, e) { gvRouteEditorDetails.StartEditRow(" + c.VisibleIndex.ToString() + "); }";
+            }).Render();
+            Html.DevExpress().Image(img =>
+            {
+                img.Name = "DeletePoint" + c.VisibleIndex.ToString();
+                img.ImageUrl = Url.Content("~/Images/Routes/delete_x16.png");
+                img.ControlStyle.Cursor = "Pointer";
+                img.ToolTip = "Удалить";
+                img.Properties.ClientSideEvents.Click = "function(s, e) { if (confirm(\"Удалить?\")) { gvRouteEditorDetails.DeleteRow(" + c.VisibleIndex.ToString() + "); } }";
+            }).Render();
+        });
+    });
+
+    s.Columns.Add(col =>
+    {
+        col.Name = "colAgent";
+        col.Caption = "Корреспондент";
+        col.CellStyle.Paddings.Padding = 2;
+        col.FieldName = "AgentName";
+    });
+
+    s.Columns.Add(col =>
+    {
+        col.Name = "colPlanTime";
+        col.Caption = "Плановое время посещения";
+        col.CellStyle.Paddings.Padding = 2;
+        col.ColumnType = MVCxGridViewColumnType.TimeEdit;
+        col.FieldName = "PlanTime";
+    });
+    
+    s.Columns.Add(col =>
+    {
+        col.Name = "colAddress";
+        col.Caption = "Адрес";
+        col.CellStyle.Paddings.Padding = 2;
+        col.FieldName = "AddressName";
+    });
+
+    s.Columns.Add(col =>
+    {
+        col.Name = "colMove";
+        col.Caption = "";
+        col.Width = 40;
+        col.CellStyle.Paddings.Padding = 2;
+        col.CellStyle.Paddings.PaddingTop = 4;
+        col.CellStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Middle;
+        col.SetDataItemTemplateContent(c =>
+        {          
+            Html.DevExpress().Image(img =>
+            {
+                img.Name = "MovePointDown" + c.VisibleIndex.ToString();
+                if (c.ItemIndex < list.Count - 1)
+                {
+                    img.ImageUrl = Url.Content("~/Images/Routes/MoveArrows/move-down_x16.png");
+                    img.ControlStyle.Cursor = "Pointer";
+                    img.ToolTip = "Вниз";
+                    img.Properties.ClientSideEvents.Click = "function(s, e) { movePointDown(" + DataBinder.GetPropertyValue(c.DataItem, "Id").ToString() + ", '" + Model.ModelId + "'); }";
+                }
+                else
+                {
+                    img.ImageUrl = Url.Content("~/Images/Routes/MoveArrows/move-down-d_x16.png");
+                }
+            }).Render();
+            Html.DevExpress().Image(img =>
+            {
+                img.Name = "MovePointUp" + c.VisibleIndex.ToString();
+                if (c.ItemIndex > 0)
+                {
+                    img.ImageUrl = Url.Content("~/Images/Routes/MoveArrows/move-up_x16.png");
+                    img.ControlStyle.Cursor = "Pointer";
+                    img.ToolTip = "Вверх";
+                    img.Properties.ClientSideEvents.Click = "function(s, e) { movePointUp(" + DataBinder.GetPropertyValue(c.DataItem, "Id").ToString() + ", '" + Model.ModelId + "'); }";
+                }
+                else
+                {
+                    img.ImageUrl = Url.Content("~/Images/Routes/MoveArrows/move-up-d_x16.png");
+                }
+            }).Render();
+        });
+    });
+
+    s.Columns.Add(col =>
+    {
+        col.Name = "colOrder";
+        col.Visible = false;
+        col.FieldName = "OrderNo";
+        col.SortOrder = DevExpress.Data.ColumnSortOrder.Ascending;
+    });
+
+    s.SetEditFormTemplateContent(c =>
+    {
+        ViewContext.Writer.Write(Html.Hidden("Id", (c.ItemIndex >= 0 ? DataBinder.GetPropertyValue(c.DataItem, "Id") : 0)));
+        ViewContext.Writer.Write(Html.Hidden("RowId", (c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "RowId") : Guid.NewGuid().ToString())));
+        ViewContext.Writer.Write(Html.Hidden("OrderNo", (c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "OrderNo") : list.Count)));
+        ViewContext.Writer.Write(Html.Hidden("Guid", (c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "Guid") : new Guid())));
+        ViewContext.Writer.Write("<div>");
+        ViewContext.Writer.Write("<table style=\"width: 400px;\"><tr><td colspan=\"2\">");
+        Html.DevExpress().Button(btnSettings =>
+        {
+            btnSettings.Name = "btnUpdate";
+            btnSettings.ControlStyle.CssClass = "button";
+            btnSettings.Text = "Сохранить";
+            btnSettings.ClientSideEvents.Click = "function(s, e) { gvRouteEditorDetails.UpdateEdit(); }";
+        }).Render();
+        Html.DevExpress().Button(btnSettings =>
+        {
+            btnSettings.Name = "btnCancel";
+            btnSettings.ControlStyle.CssClass = "button";
+            btnSettings.Text = "Отмена";
+            btnSettings.ClientSideEvents.Click = "function(s, e) { gvRouteEditorDetails.CancelEdit(); }";
+        }).Render();
+        ViewContext.Writer.Write("</div>");
+
+        //ViewContext.Writer.Write("<table style=\"width: 200px\">");
+
+        ViewContext.Writer.Write("</td></tr><tr><td style=\"width: 100px;\">");
+
+        Html.DevExpress().Label(lb =>
+        {
+            lb.Name = "lbCustomer";
+            lb.Text = "Корреспондент:";
+            lb.ControlStyle.CssClass = "label";
+        }).Render();
+
+        ViewContext.Writer.Write("</td><td>");
+
+        Html.RenderPartial("ZonePartial", Model, new ViewDataDictionary
+        {
+            { "Name", "AgentId" },
+            { "Id", (c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "AgentId") : 0) }
+        });
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("<tr><td style=\"width: 100px;\">");
+
+        Html.DevExpress().Label(lb =>
+        {
+            lb.Name = "lbPlanTime";
+            lb.Text = "Плановое время посещения:";
+            lb.ControlStyle.CssClass = "label";
+        }).Render();
+
+        ViewContext.Writer.Write("</td><td>");
+
+        Html.DevExpress().TimeEdit(te =>
+        {
+            te.Name = "PlanTime";
+        }).Bind((c.ItemIndex >= 0 ? DataBinder.Eval(c.DataItem, "PlanTime") : 0)).Render();
+        ViewContext.Writer.Write("</td></tr>");
+
+        ViewContext.Writer.Write("</table>");
+    });
+}).Bind(list).GetHtml()

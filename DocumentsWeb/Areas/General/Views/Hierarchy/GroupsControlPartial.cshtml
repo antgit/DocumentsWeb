@@ -1,0 +1,46 @@
+﻿@using DevExpress.Web.Mvc.UI
+@using DocumentsWeb.Areas.General.Models;
+@using DocumentsWeb.Areas.Analitics.Models;
+@using DocumentsWeb;
+
+@{
+    IModelData M = (IModelData)ViewContext.RequestContext.RouteData.Values["Model"];
+    bool IsReadonly = ViewContext.RequestContext.RouteData.Values["IsReadonly"] == null ? false : bool.Parse(ViewContext.RequestContext.RouteData.Values["IsReadonly"].ToString());
+    string[] RootList = (string[])ViewContext.RequestContext.RouteData.Values["RootList"];
+    List<HierarchyModel> _RootList = new List<HierarchyModel>();
+    foreach (string r in RootList) 
+    {
+        _RootList.Add(HierarchyModel.GetObject(r));
+    }
+}
+
+<script type="text/javascript">
+    function removeItems(array, item) {
+        var i = 0;
+        while (i < array.length) {
+            if (array[i] == item) {
+                array.splice(i, 1);
+            } else {
+                i++;
+            }
+        }
+        return array;
+    }
+
+    function tvHierarchiesFilter_CheckedChanged(s, e) {
+        var arr = $('#InHierarchies').val().toString().split(',');
+        if (e.node.GetChecked()) {
+            arr.push(e.node.name);
+        } else {
+            removeItems(arr, e.node.name);
+        }
+        $('#InHierarchies').val(arr.join(','));
+    }
+</script>
+
+<input id="InHierarchies" name="InHierarchies" type="hidden" value="@M.InHierarchies" />
+@Html.Partial("GroupControlTreeViewPartial", new ViewDataDictionary
+{
+    { "InHies", M.InHierarchies },
+    { "IsReadonly", IsReadonly }
+})

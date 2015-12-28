@@ -1,0 +1,23 @@
+﻿@using BusinessObjects.Security
+@using BusinessObjects.Web.Core
+@using DocumentsWeb.Areas.General.Models
+@using DocumentsWeb.Models
+@model TimePeriodModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    bool haveEdit = WADataProvider.LibrariesElementRightView.IsAllow(Right.UIEDIT, WebModuleNames.WEB_TIMEPERIODS) && !WADataProvider.CommonRightView.ReadOnly;
+}
+           
+<script type="text/javascript">
+    @if(Model.IsSystem | Model.IsReadOnly | !haveEdit ) { ViewContext.Writer.Write("if (typeof parent.pcEdit != 'undefined') { parent.pcEdit.SetVisibleSaveButton(false); }"); }
+
+    function OntsEditTimeInit(s, e) {
+        s.SetHeight($(window).height());
+    }
+</script>
+
+@using (Html.BeginForm("Edit", "TimePeriod", FormMethod.Post, new { @class = "edit_form", @id = "editForm" }))
+{   
+    @Html.Partial("EditPartial", Model);
+}

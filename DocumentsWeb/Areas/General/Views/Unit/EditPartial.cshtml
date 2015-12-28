@@ -1,0 +1,75 @@
+﻿@using BusinessObjects
+@using DevExpress.Web.Mvc.UI
+@using DevExpress.Web.Mvc
+@using DevExpress.Web.ASPxEditors
+@using DevExpress.Web.ASPxClasses
+@using DevExpress.Utils
+@model DocumentsWeb.Areas.General.Models.WebUnitModel
+
+<input type="hidden" id="StateId" name="StateId" value="@Model.StateId" />
+
+<table style="width: 500px;">
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>{
+                                             s.ControlStyle.CssClass = "label";
+                                             s.Text = "Наименование:";
+                                             s.AssociatedControlName = GlobalPropertyNames.Name;
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBox(s =>{
+                                               s.Name = GlobalPropertyNames.Name;
+                                               s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+                                               s.Properties.NullText = "Введите наименование единицы измерения...";
+                                               s.ControlStyle.CssClass = "editor";
+                                               s.ShowModelErrors = true;
+                                               s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                                               s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.Text;
+                                               s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.Name).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>{
+                                             s.ControlStyle.CssClass = "label";
+                                             s.Text = "Сокращение:";
+                                             s.AssociatedControlName = GlobalPropertyNames.Code;
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBox(s =>{
+                                               s.Name = GlobalPropertyNames.Code;
+                                               s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+                                               s.Properties.NullText = "Введите сокращение ед измерения...";
+                                               s.ControlStyle.CssClass = "editor";
+                                               s.ShowModelErrors = true;
+                                               s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                                               s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.Text;
+                                               s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.Code).GetHtml()
+        </td>
+    </tr>
+    <tr>
+        <td class="table_label">
+            @Html.DevExpress().Label(s =>{
+                                             s.ControlStyle.CssClass = "label";
+                                             s.Text = "Международное:";
+                                             s.AssociatedControlName = GlobalPropertyNames.CodeInternational;
+            }).GetHtml()
+        </td>
+        <td>
+            @Html.DevExpress().TextBox(s =>{
+                                               s.Name = GlobalPropertyNames.CodeInternational;
+                                               s.ReadOnly = Model.IsReadOnly | Model.IsSystem;
+                                               s.Properties.NullText = "Введите международное наименование...";
+                                               s.ControlStyle.CssClass = "editor";
+                                               s.ShowModelErrors = true;
+                                               s.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                                               s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.Text;
+                                               s.Properties.ValidationSettings.ErrorTextPosition = ErrorTextPosition.Bottom;
+            }).Bind(Model.CodeInternational).GetHtml()
+        </td>
+    </tr>
+</table>
